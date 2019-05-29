@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN" "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+<generatorConfiguration>
+  <context id="context1">
+    <jdbcConnection connectionURL="jdbc:oracle:thin:@(DESCRIPTION =(ADDRESS = (PROTOCOL = TCP)(HOST = 47.106.125.208)(PORT = 1521))(CONNECT_DATA =(SERVER = DEDICATED)(SERVICE_NAME = SCS)))" 
+    				driverClass="oracle.jdbc.OracleDriver" 
+    				password="edw312295lotus223" 
+    				userId="edw" />
+    <javaModelGenerator targetPackage="com.CommonUtils" targetProject="CommonUtils" />
+    <sqlMapGenerator targetPackage="com.CommonUtils" targetProject="CommonUtils" />
+    <javaClientGenerator targetPackage="com.CommonUtils" targetProject="CommonUtils" type="XMLMAPPER" />
+    <table schema="SCS" tableName="T_DAY_SETTLEMENT_PARAMETER">
+      <!--  
+      <columnOverride column="???" property="???" domainObjectName="User" />
+      -->
+    </table>
+  </context>
+</generatorConfiguration>

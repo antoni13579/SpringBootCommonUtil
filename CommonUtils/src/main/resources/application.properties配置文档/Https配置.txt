@@ -1,0 +1,24 @@
+使用这个配置类的时候，需要进行create bean操作
+ * 
+ * 同时，如果需要配置HTTPS连接，需要在properties配置如下信息
+ * 
+ * 
+ * #https config
+server.port=10000
+server.ssl.key-store=classpath:keystore.p12
+server.ssl.key-store-password=123456
+server.ssl.key-password=123456
+http_port=10086
+
+server.http2.enabled=true
+server.compression.enabled=true
+
+#default true, not to be set
+#server.ssl.enabled=true
+
+#default TLS, not to be set
+#server.ssl.protocol=TLS
+   
+   keytool 生成证书
+   Windows下生成：keytool -genkey -alias tomcat -storetype PKCS12 -keyalg RSA -keysize 2048 -keystore keystore.p12 -validity 3650
+   Linux下生成：keytool -genkey -alias tomcat -keyalg RSA -validity 20000 -keystore keystore.p12

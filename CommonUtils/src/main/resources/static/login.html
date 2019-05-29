@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta http-equiv="Pragma" content="no-cache">
+		<meta http-equiv="Cache-Control" content="no-cache">
+		<meta http-equiv="Expires" content="0">
+		<title>系统登录</title>
+	</head>
+	
+	<body class="login">
+		<div class="container">
+			<div class="logo">
+        		<h3 style="color: #FFFFFF">脚手架代码测试系统</h3>
+    		</div>
+    		
+    		<!-- 登录窗口 -->
+    		<div class="content">
+				<form class="form-signin" role="form" name="loginForm" novalidate method="post" id="editForm">
+					<h3 class="form-signin-heading">登录</h3>
+					
+					<!-- 用于输入用户名 -->
+					<div class="input-group" style="padding-bottom: 20px;padding-top: 20px">
+						<div class="input-group-addon">
+                    		<i class="icon-user icon-2x"></i>
+                    		<span class="glyphicon glyphicon-user"></span>
+                		</div>
+                		<input type="text" class="form-control" placeholder="用户名" name="username" required="required" autofocus id="username" />
+            		</div>
+            
+            		<!-- 用于输入密码 -->
+            		<div class="input-group">
+                		<div class="input-group-addon">
+                    		<i class="icon-lock icon-2x"></i>
+                    		<span class="glyphicon glyphicon-certificate"></span>
+                		</div>
+                		<input type="password" name="password" class="form-control" placeholder="密码" required="required" id="password" />
+            		</div>
+            		
+            		<div style="text-align: center">
+            			<!-- 登录按钮 -->
+               	 		<button class="btn btn-success" type="button" style=" margin-top: 20px" id="submitBtn">
+            				<span><i class="icon-chevron-sign-up icon-large" style="color: white"></i> 登 录</span>
+                		</button>
+                		
+                		<!-- 清空按钮 -->
+                		<button class="btn btn-success" type="button" style=" margin-top: 20px" id="clearBtn">
+            				<span><i class="icon-chevron-sign-up icon-large" style="color: white"></i> 清空</span>
+                		</button>
+                		
+                		<p></p> 
+                		<!-- 用于返回服务器反馈的信息 -->
+                		<div id="responseInfo" name="responseInfo"></div>
+            		</div>
+            		
+            		<div id="registerLink"><a href="javascript:void(0);">还没有账号？点我注册</a></div>
+				</form>
+			</div>
+			
+			<!-- 注册窗口 -->
+			<!-- 
+					说明：
+					1. 上来一个ul先把登录和注册两个链接扔进去，ul的类nav,navbar-nav是导航条，navbar-right让他固定在右侧。每个li的里面，data-toggle="modal"是点击出现一个modal模组，data-target="#register"是点击之后出现的弹框的id，再里面的span是那个小人图标。
+					2. 接下来就是一个大div装着这个注册的弹框，id="register"，用来上面的data-target找到目标，class="modal fade"是说这是个modal模态框，fade是渐入效果，如果不加就是点击注册，直接出现，没有从上面慢慢滑下的效果， tabindex="-1"，让esc键起作用，按esc后弹框消失，这个tabindex设置任何值或空的都起作用，不明白原理是啥。
+					3. 再里面，先是一个class="modal-dialog"，算是个对话框，没有的话四周紧贴边框不好看，里面就是class="modal-content"内容了。
+					4. 内容分为三个部分，分别是class="modal-header"，class="modal-body"，class="modal-footer"，有点像HTML的标签。
+					5. header和footer都会带一条横线，不太好看，虽然footer会让两个按钮右侧对齐，不过还是不用比较好。
+					6. 其实还有一个class="modal-title"，可以作为题目，字体大，用class="text-center"可以居中。
+					7. 右上角那个叉号，放在了一个class="modal-body"的按钮里面，这个body可以到处用，还不错。class="close"是一个样式，让这个叉号按钮好看一点，并且位于右上角。 data-dismiss="modal"是指点击后关闭这个模态框。<span>&times;</span>是叉号的转义字符。
+					8. 然后中间的class="modal-body"就是一个普通的form表单，每个项目用class="form-group"，input用class="form-control"改变一下样式就好了。
+					9. 最后的两个提交和取消的按钮，外面加一个div，class="text-right"就可以右对齐了。
+					10. 下面加了个a链接，让两个弹框互相切换，data-toggle="modal"点击出现模态框， data-dismiss="modal"点击关闭当前模态框， data-target="#login"点击后出现的目标模态框id。
+					11. 后面那个登录弹框一毛一样，不说了。
+			 -->
+			<div id="registerDiv" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				<div class="modal-dialog modal-lg">
+					<div class="modal-content">
+						<!-- 标题 -->
+						<div class="modal-header">
+							<h4 class="text-center">注册信息</h4>
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                		</div>
+                		
+                		<!-- 注册信息窗口 -->
+                		<div class="modal-body">
+                			<form id="registerForm" class="form-horizontal">
+                				<div class="form-group">
+                                	<label for="">用户名</label>
+                                	<input class="form-control" type="text" id="usr" placeholder="用户名">
+                            	</div>
+                            
+                            	<div class="form-group">
+                                	<label for="">密码</label>
+                                	<input class="form-control" type="password" id="pwd" placeholder="密码">
+                            	</div>
+                            
+                            	<div class="form-group">
+                                	<label for="">再次输入密码</label>
+                                	<input class="form-control" type="password" id="reTypePwd" placeholder="密码">
+                            	</div>
+                            
+                            	<div class="form-group">
+                                	<label for="">邮箱</label>
+                                	<input class="form-control" type="email" id="eMail" name="eMail" placeholder="例如:123@123.com">
+                            	</div>
+                            
+                            	<div class="text-right">
+                                	<button class="btn btn-primary" type="button" id="registerBtn">提交</button>
+                                	<button class="btn btn-danger" data-dismiss="modal">取消</button>
+                            	</div>
+                            	
+                            	<p></p> 
+                				<!-- 用于返回服务器反馈的信息 -->
+                				<div id="responseRegisterInfo" name="responseRegisterInfo"></div>
+                            
+                            	<a href="" data-toggle="modal" data-dismiss="modal" data-target="">已有账号？点我登录</a>
+                			</form>
+                		</div>
+					</div>
+				</div>
+			</div>
+			
+			<div class="copyright">
+        		2019 © 全能服务有限公司 © 脚手架代码测试系统 版本：V1.0
+    		</div>
+		</div>
+		
+		<!-- 第三方Css框架 -->
+		<link href="../webjars/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+		
+		<!-- 第三方JavaScript框架  -->
+		<script src="../webjars/jquery/jquery.min.js"></script>
+		<script src="../webjars/bootstrap/js/bootstrap.min.js"></script>
+
+    	<!-- 自定义JavaScript框架 -->
+    	<script src="../Js/Utils/CommonUtils/CommonUtil.js"></script>
+    	<script src="../Js/login.js"></script>
+	</body>
+</html>

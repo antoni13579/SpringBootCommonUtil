@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta http-equiv="Pragma" content="no-cache">
+		<meta http-equiv="Cache-Control" content="no-cache">
+		<meta http-equiv="Expires" content="0">
+		<title>系统主页</title>
+	</head>
+	
+	<body ng-cloak ng-controller="mainController">
+		<header class="navbar navbar-default">
+    		<div ng-include="'../template/header/header.tpl.html'"></div>
+		</header>
+		
+		<div id="main">
+			<div id="sidebar-left"  class="col-xs-2 col-sm-2 none-padding">
+				<div ng-include="'../template/navigate/navigate.tpl.html'"></div>
+			</div>
+		</div>
+		
+		<!-- 修改用户密码界面 -->
+		<div id="modifyPasswordDiv" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-lg">
+				<div class="modal-content">
+					<!-- 标题 -->
+					<div class="modal-header">
+						<h4 class="text-center">修改密码</h4>
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                	</div>
+                		
+                	<!-- 修改密码窗口 -->
+                	<div class="modal-body">
+                		<form id="modifyPasswordForm" class="form-horizontal">
+                			<div class="form-group">
+                            	<label for="">旧密码</label>
+                                <input class="form-control" type="password" id="oldPassword" placeholder="密码">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="">新密码</label>
+                                <input class="form-control" type="password" id="newPassword" placeholder="密码">
+                            </div>
+                            
+                            <div class="text-right">
+                                <button class="btn btn-primary" type="button" id="modifyPasswordSummit">提交</button>
+                                <button class="btn btn-danger" data-dismiss="modal">取消</button>
+                                <button class="btn btn-primary" type="button" ng-click="openWebSocketTest()">打开WebSocket测试界面</button>
+                            </div>
+                            	
+                            <p></p> 
+                			<!-- 用于返回服务器反馈的信息 -->
+                			<div id="responseModifyPasswordInfo" name="responseModifyPasswordInfo"></div>	
+                		</form>
+                	</div>		
+				</div>		
+			</div>		
+		</div>
+		
+		<!-- 第三方Css框架 -->
+		<link href="../webjars/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+		<link href="../webjars/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
+		
+		<!-- 自定义Css框架 -->
+		<link href="../Css/index.css" rel="stylesheet" />
+		
+		<!-- 第三方JavaScript框架  -->
+		<script src="../webjars/jquery/jquery.min.js"></script>
+		<script src="../webjars/popper.js/umd/popper.min.js"></script>
+		<script src="../webjars/bootstrap/js/bootstrap.min.js"></script>
+		<script src="../webjars/angularjs/angular.js"></script>
+		<script src="../webjars/angularjs/angular-route.js"></script>
+		<script src="../webjars/ocLazyLoad/dist/ocLazyLoad.min.js"></script>
+
+    	<!-- 自定义JavaScript框架 -->
+    	<script src="../Js/Utils/AjaxUtils/Jquery/JqueryAjaxUtil.js"></script>
+    	<script src="../Js/index.js"></script>
+	</body>
+</html>

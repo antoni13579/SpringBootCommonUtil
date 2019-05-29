@@ -1,0 +1,16 @@
+<ul class="nav sidebar-left-list">
+    <li ng-repeat="firstLevel in configManagerSideBarMenu.childPermissionList">
+        <a href="javascript:void(0);" class="first-level" ng-click="toggleExpandNextLevel($event)">
+            <i class="icon-th-list" style="color: gray"></i>
+            {{firstLevel.permissionName}}<i class="icon-angle-left icon-large pull-right"></i>
+        </a>
+        <ul class="second">
+            <li ng-repeat="subMenu in firstLevel.childPermissionList">
+                <a href="javascript:void(0);" ng-click="createWorkTab(subMenu.permissionId,subMenu.permissionName,subMenu.permissionMark)">
+                    <i class="icon-arrow-right"></i>
+                    {{subMenu.permissionName}}
+                </a>
+            </li>
+        </ul>
+    </li>
+</ul>
