@@ -343,7 +343,7 @@ public final class FileUtil
 	{
 		String fileHeader = getFileHeader(file, true);
 		Collection<String> result = new HashSet<String>();
-		JavaCollectionsUtil.MapProcessor
+		JavaCollectionsUtil.mapProcessor
 		(
 				IOContants.fileType, 
 				(String key, String value, int indx) -> 

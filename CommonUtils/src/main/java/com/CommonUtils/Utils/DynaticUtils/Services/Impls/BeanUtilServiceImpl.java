@@ -2,13 +2,17 @@ package com.CommonUtils.Utils.DynaticUtils.Services.Impls;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.context.properties.bind.Bindable;
+import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Service;
@@ -22,10 +26,14 @@ import lombok.extern.slf4j.Slf4j;
 public final class BeanUtilServiceImpl implements ApplicationContextAware
 {
 	private static ApplicationContext APPLICATION_CONTEXT = null;
+	private static Binder BINDER = null;
 	
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException 
-	{ APPLICATION_CONTEXT = applicationContext; }
+	{
+		APPLICATION_CONTEXT = applicationContext;
+		BINDER = Binder.get(APPLICATION_CONTEXT.getEnvironment());
+	}
 	
 	public static <T> Optional<T> getBean(final Class<T> clazz)
 	{
@@ -105,4 +113,33 @@ public final class BeanUtilServiceImpl implements ApplicationContextAware
 	
 	public static int shutdownApplication()
 	{ return SpringApplication.exit(APPLICATION_CONTEXT); }
+	
+	/**用于在application.properties获取属性，
+	 * 
+	 * 
+	 * 假设在propertes配置中有这样一个配置：com.didispace.foo=bar
+	 * 
+	 * @Data
+		@ConfigurationProperties(prefix = "com.didispace")
+		public class FooProperties {
+
+    	private String foo;
+
+}
+
+
+		FooProperties foo = binder.bind("com.didispace", Bindable.of(FooProperties.class)).get();
+	 * 
+	 * */
+	public static <T> T getProperties(final String propertiesKey, final Class<T> clazz)
+	{ return BINDER.bind(propertiesKey, Bindable.of(clazz)).get(); }
+	
+	public static <K, V> Map<K, V> getProperties(final String propertiesKey, final Class<K> keyType, final Class<V> valueType)
+	{ return BINDER.bind(propertiesKey, Bindable.mapOf(keyType, valueType)).get(); }
+	
+	public static <T> List<T> getPropertiesList(final String propertiesKey, final Class<T> clazz)
+	{ return BINDER.bind(propertiesKey, Bindable.listOf(clazz)).get(); }
+	
+	public static <T> Set<T> getPropertiesSet(final String propertiesKey, final Class<T> clazz)
+	{ return BINDER.bind(propertiesKey, Bindable.setOf(clazz)).get(); }
 }

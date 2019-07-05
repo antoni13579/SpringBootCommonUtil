@@ -145,4 +145,22 @@ public final class HttpUtil
 	 * */
 	public static void setBean(final HttpSession httpSession, final String beanName, final Object beanInstance)
 	{ httpSession.setAttribute(beanName, beanInstance); }
+	
+	/**
+	 * <p>一般这个方法用于html与jsp并存的情况，主力军html，辅助军jsp</p>
+	 * 
+	 * <p>jsp存放路径：src/main目录下，建立webapp/WEB-INF目录，接下来就可以存放jsp页面文件了</p>
+	 * <p>访问路径：假设jsp文件存放的路径如下：src/main/webapp/WEB-INF/jsp/testJsp.jsp</p>
+	 * <p>那么path就需要输入为：/jsp/testJsp.jsp</p>
+	 * 
+	 * 
+	 * */
+	public static void jumpPage(final String path, final HttpServletRequest request, final HttpServletResponse response)
+	{
+		StringBuilder sb = new StringBuilder().append("/WEB-INF").append(path);
+		try 
+		{ request.getRequestDispatcher(sb.toString()).forward(request, response); }
+		catch (Exception ex)
+		{ log.error("跳转网页出现异常，网页路径为：{}，异常原因为：", sb.toString(), ex); }
+	}
 }

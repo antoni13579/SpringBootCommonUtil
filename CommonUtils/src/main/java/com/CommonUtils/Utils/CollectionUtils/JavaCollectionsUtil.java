@@ -123,7 +123,7 @@ public final class JavaCollectionsUtil
 	public static <T> T getItem(final Collection<T> items, final int dstIndx)
 	{
 		List<T> result = new ArrayList<T>();
-		CollectionProcessor(items, (T item, int indx) -> { if (dstIndx == indx) { result.add(item);} });
+		collectionProcessor(items, (T item, int indx) -> { if (dstIndx == indx) { result.add(item);} });
 		return result.get(0);
 	}
 	
@@ -214,7 +214,7 @@ public final class JavaCollectionsUtil
 		if (!isCollectionEmpty(maps))
 		{
 			Collection<Collection<V>> records = new ArrayList<Collection<V>>();			
-			CollectionProcessor
+			collectionProcessor
 			(
 					maps,
 					(Map<K, V> map, int indx) ->
@@ -232,7 +232,7 @@ public final class JavaCollectionsUtil
 	public static <K, V> Collection<V> getMapValues(final Map<K, V> map)
 	{
 		Collection<V> records = new ArrayList<V>();
-		MapProcessor(map, (K key, V value, int indx) -> { records.add(value); });
+		mapProcessor(map, (K key, V value, int indx) -> { records.add(value); });
 		return records;
 	}
 	
@@ -240,7 +240,7 @@ public final class JavaCollectionsUtil
 	 * 针对Map做的通用型迭代处理
 	 * */
 	@SafeVarargs
-	public static <K, V> boolean MapProcessor(final Map<K, V> map, final ItemProcessorForMap<K, V> ... itemProcessorForMaps)
+	public static <K, V> boolean mapProcessor(final Map<K, V> map, final ItemProcessorForMap<K, V> ... itemProcessorForMaps)
 	{		
 		if (!isMapEmpty(map))
 		{
@@ -263,7 +263,7 @@ public final class JavaCollectionsUtil
 	 * 针对Collection做的通用型迭代处理
 	 * */
 	@SafeVarargs
-	public static <T> boolean CollectionProcessor(final Collection<T> values, final ItemProcessorForCollection<T> ... itemProcessorForCollections)
+	public static <T> boolean collectionProcessor(final Collection<T> values, final ItemProcessorForCollection<T> ... itemProcessorForCollections)
 	{
 		if (!isCollectionEmpty(values))
 		{
@@ -281,13 +281,13 @@ public final class JavaCollectionsUtil
 	}
 	
 	@SafeVarargs
-	public static <K, V> boolean CollectionProcessor(final Collection<Map<K, V>> records, final ItemProcessorForMap<K, V> ... itemProcessorForMaps)
+	public static <K, V> boolean collectionProcessor(final Collection<Map<K, V>> records, final ItemProcessorForMap<K, V> ... itemProcessorForMaps)
 	{
-		return CollectionProcessor
+		return collectionProcessor
 		(
 				records, 
 				(final Map<K, V> record, final int indx) -> 
-				{ MapProcessor(record, itemProcessorForMaps); }
+				{ mapProcessor(record, itemProcessorForMaps); }
 		);
 	}
 	

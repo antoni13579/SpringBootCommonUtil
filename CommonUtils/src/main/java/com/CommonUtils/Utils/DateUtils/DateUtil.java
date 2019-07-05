@@ -324,7 +324,7 @@ public final class DateUtil
 	public static Map<Date, Collection<RetailTimeIndicatorEntry>> getRetailTimeIndicatorEntrys(final Date startDate, final Date endDate)
 	{
 		Map<Date, Collection<RetailTimeIndicatorEntry>> result = new TreeMap<>();
-		JavaCollectionsUtil.CollectionProcessor
+		JavaCollectionsUtil.collectionProcessor
 		(
 				getRange(startDate, endDate), 
 				(final Date dateRecord, final int indx) -> 

@@ -14,7 +14,7 @@ public final class ThymeleafUtil
 	public static String process(final String template, final Map<String, Object> attributes, final TemplateEngine templateEngine)
 	{
 		Context context = new Context();
-		JavaCollectionsUtil.MapProcessor
+		JavaCollectionsUtil.mapProcessor
 		(
 				attributes, 
 				(String key, Object value, int indx) -> 
