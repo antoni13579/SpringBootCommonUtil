@@ -64,6 +64,7 @@
 		<google.zxing.core.version>3.3.3</google.zxing.core.version>
 		<ikanalyzer.version>2012_u6</ikanalyzer.version>
 		<swagger.version>2.9.2</swagger.version>
+		<guava.version>28.0-jre</guava.version>
 	</properties>
 
 	<dependencies>
@@ -490,6 +491,13 @@
     		<groupId>io.springfox</groupId>
     		<artifactId>springfox-swagger-ui</artifactId>
     		<version>${swagger.version}</version>
+		</dependency>
+		
+		<!-- 由于项目引用的guava版本过旧，导致启动报错，所以需要直接用最新版本的guava来代替 -->
+		<dependency>
+    		<groupId>com.google.guava</groupId>
+    		<artifactId>guava</artifactId>
+    		<version>${guava.version}</version>
 		</dependency>
 		
 		<!-- 测试相关框架 -->
