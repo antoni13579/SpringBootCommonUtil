@@ -2,6 +2,7 @@ package com.CommonUtils.ConfigTemplate.RestController;
 
 import java.io.IOException;
 import java.net.URL;
+import java.time.Duration;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -11,6 +12,7 @@ import javax.annotation.Resource;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
@@ -36,12 +38,19 @@ import com.CommonUtils.Utils.StringUtils.StringContants;
 import com.CommonUtils.Utils.StringUtils.StringUtil;
 import com.CommonUtils.Utils.TreeUtils.Bean.TreeNode;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.function.Tuples;
 
 @RestController
 @RequestMapping("/homeRestController")
 @Slf4j
+@Api(value = "核心RestController")
 public class HomeRestController 
 {
 	private String userModulePath = "SystemConfigInfo/UserModule.xls";
@@ -100,6 +109,11 @@ public class HomeRestController
 	}
 	
 	@RequestMapping("/getCurrentUserName")
+	@ApiOperation(value = "获取当前登录用户",notes = "获取当前登录用户")
+	@ApiImplicitParams
+	(
+			{ @ApiImplicitParam(name = "authentication", value = "SpringSecurity用户信息", required = true, dataTypeClass = Authentication.class) }
+	)
 	public Mono<User> getCurrentUserName(Authentication authentication)
 	{
 		UserDetails user = SpringSecurityUtil.getUser(authentication);
@@ -169,6 +183,7 @@ public class HomeRestController
 	 * 其他替代方法一般有WebSocket和客户端定时轮询，前者过于复杂，后者又过于低效而笨拙。SseEmitter属于ResponseBodyEmitter的子类，可以生成text/event-stream格式的信息。
 	 * */
 	@GetMapping("/sseEmitterTest")
+	//@GetMapping(value="/sseEmitterTest",produces = MediaType.TEXT_EVENT_STREAM_VALUE)
 	public SseEmitter sse()
 	{
 		SseEmitter emitter = new SseEmitter(4000L);
@@ -193,5 +208,31 @@ public class HomeRestController
 				}
 		);
 		return emitter;
+	}
+	
+	@GetMapping(value="/countDown",produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+	public Flux<ServerSentEvent<Object>> countDown() 
+	{
+		return Flux.interval(Duration.ofSeconds(1))
+				   .map(seq -> Tuples.of(seq, getCountDownSec()))
+				   .map(data -> ServerSentEvent.<Object>builder()
+						   					   .event("countDown")
+						   					   .id(Long.toString(data.getT1()))
+						   					   .data(data.getT2().toString())
+						   					   .build());
+	}
+	
+	private String getCountDownSec() 
+	{
+		int count_down_sec=3*60*60;
+		if (count_down_sec>0) 
+		{
+			int h = count_down_sec/(60*60);
+			int m = (count_down_sec%(60*60))/60;
+			int s = (count_down_sec%(60*60))%60;
+			count_down_sec--;
+			return "活动倒计时："+h+" 小时 "+m+" 分钟 "+s+" 秒";
+		}
+		return "活动倒计时：0 小时 0 分钟 0 秒";
 	}
 }
