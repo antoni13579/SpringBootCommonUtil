@@ -3,7 +3,7 @@ package com.CommonUtils.Utils.CommonUtils;
 import lombok.ToString;
 
 @ToString
-public class SnowflakeIdFactory 
+public final class SnowflakeIdFactory 
 {
 	//开始时间戳（对应的日期为：2010-11-04 09:42:54）
 	private final long twepoch = 1288834974657L;
@@ -99,7 +99,7 @@ public class SnowflakeIdFactory
      * @param lastTimestamp 上次生成ID的时间截
      * @return 当前时间戳
      */
-    protected long tilNextMillis(long lastTimestamp) 
+    protected long tilNextMillis(final long lastTimestamp) 
     {
         long timestamp = System.currentTimeMillis();;
         while (timestamp <= lastTimestamp) 
