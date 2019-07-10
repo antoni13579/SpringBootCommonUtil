@@ -11,5 +11,5 @@ public class BaseConfig
 {
 	@Bean(name = "commonThreadPool")
 	public ThreadPoolTaskExecutor commonThreadPool()
-	{ return ThreadPoolTaskExecutorConfig.getThreadPoolTaskExecutor(false, 0, 30); }
+	{ return ThreadPoolTaskExecutorConfig.getThreadPoolTaskExecutor(false, 15, 30); }
 }

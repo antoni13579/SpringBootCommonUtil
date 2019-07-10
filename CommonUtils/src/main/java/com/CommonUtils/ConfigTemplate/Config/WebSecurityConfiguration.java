@@ -55,7 +55,8 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter
 			.antMatchers("/webjars/**", 
 						 "/Js/**",
 						 "/Css/**",
-						 "/template/**");
+						 "/template/**",
+						 "/Plugins/**");
 	}
 	
 	@Override
