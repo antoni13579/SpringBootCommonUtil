@@ -256,4 +256,13 @@ public final class StringUtil
 		
 		return "";
 	}
+	
+	/**
+	 * 数字验证
+	 * 
+	 * @param val
+	 * @return 提取的数字。
+	 */
+	public static boolean isNum(final String val) 
+	{ return isStrEmpty(val) ? false : val.matches(StringContants.PATTERN_7); }
 }

@@ -1,6 +1,8 @@
 package com.CommonUtils.Utils.IdCardUtils.Bean;
 
 import java.util.Date;
+import java.util.Optional;
+
 import com.CommonUtils.Utils.DateUtils.DateContants;
 import com.CommonUtils.Utils.DateUtils.DateUtil;
 import com.CommonUtils.Utils.IdCardUtils.EGender;
@@ -24,7 +26,7 @@ public final class ChinaIdCard
 	private String idCard;
 	
 	//用于把birthYear、birthMonth、birthDay转换为实际的出生日期
-	private Date birth;
+	private Optional<Date> birth;
 	
 	//根据gender，判断出实际的性别
 	private EGender eGender;

@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -62,6 +63,13 @@ public final class DateUtil
 		cal.add(type, cnt);
 		Date date = cal.getTime();
 		return date;
+	}
+	
+	public static int getYear(final Date date)
+	{
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+		return cal.get(Calendar.YEAR);
 	}
 	
 	public static Collection<Date> getRangeCondition(final Date start, final Date end, final String timeType, final String ... params)
@@ -158,7 +166,7 @@ public final class DateUtil
 	/**
 	 * 字符串类型格式化输出为对应的日期
 	 * */
-	public static Date formatStrToDate(final String str, final String format)
+	public static Optional<Date> formatStrToDate(final String str, final String format)
 	{
 		if (StringUtil.isStrEmpty(str) || StringUtil.isStrEmpty(format))
 		{ return null; }
@@ -169,7 +177,7 @@ public final class DateUtil
 		catch (Exception ex)
 		{ log.error("字符串转换为日期出现异常，需转换的字符串为{}，日期格式为{}，异常原因为：", str, format, ex); }
 		
-		return date;
+		return Optional.ofNullable(date);
 	}
 	
 	/**模仿Oracle实现的MONTHS_BETWEEN函数*/

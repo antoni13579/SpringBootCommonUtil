@@ -36,6 +36,9 @@ public final class ArrayUtil
 		return false;
 	}
 	
+	/**
+	 * 检测Array是否为空，true为空，false为非空
+	 * */
 	public static boolean isArrayEmpty(final int[] array)
 	{
 		if (null == array || array.length == 0)
@@ -44,6 +47,9 @@ public final class ArrayUtil
 		return false;
 	}
 	
+	/**
+	 * 检测Array是否为空，true为空，false为非空
+	 * */
 	public static boolean isArrayEmpty(final boolean[] array)
 	{
 		if (null == array || array.length == 0)
@@ -52,7 +58,21 @@ public final class ArrayUtil
 		return false;
 	}
 	
+	/**
+	 * 检测Array是否为空，true为空，false为非空
+	 * */
 	public static boolean isArrayEmpty(final byte[] array)
+	{
+		if (null == array || array.length == 0)
+		{ return true; }
+		
+		return false;
+	}
+	
+	/**
+	 * 检测Array是否为空，true为空，false为非空
+	 * */
+	public static boolean isArrayEmpty(final char[] array)
 	{
 		if (null == array || array.length == 0)
 		{ return true; }

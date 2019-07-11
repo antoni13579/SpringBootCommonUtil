@@ -1,5 +1,9 @@
 package com.CommonUtils.Utils.CharacterUtils;
 
+import java.util.Optional;
+
+import com.CommonUtils.Utils.ArrayUtils.ArrayUtil;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -21,5 +25,19 @@ public final class CharacterUtil
 		{ log.error("String转char出现异常，无法转换，异常原因为：", ex); }
 		
 		return result;
+	}
+	
+	public static Optional<int[]> converCharToInt(final char[] ca) 
+	{
+		if (ArrayUtil.isArrayEmpty(ca))
+		{ return Optional.ofNullable(null); }
+		
+		int len = ca.length;
+		int[] iArr = new int[len];
+		
+		for (int i = 0; i < len; i++) 
+		{ iArr[i] = Integer.parseInt(String.valueOf(ca[i])); }
+		
+		return Optional.ofNullable(iArr);
 	}
 }

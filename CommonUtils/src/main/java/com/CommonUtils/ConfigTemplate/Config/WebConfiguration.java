@@ -131,20 +131,30 @@ public class WebConfiguration implements WebMvcConfigurer, WebApplicationInitial
 	@Override
 	public void addCorsMappings(CorsRegistry registry)
 	{
-		registry.addMapping("/**")
-				.allowedOrigins("*")
-				.allowedMethods("GET", "POST", "OPTIONS", "PUT")
-				.allowedHeaders("Content-Type", "X-Requested-With", "accept", "Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers","accessToken")
-				.exposedHeaders("Access-Control-Allow-Origin", "Access-Control-Allow-Credentials")
-				.allowCredentials(true)
-				.maxAge(3600);
+		registry
+			//所有方法都处理跨域请求
+			.addMapping("/**")
+			
+			.allowedOrigins("*")
+			
+			//允许通过的请求数
+			.allowedMethods("GET", "POST", "OPTIONS", "PUT")
+			
+			//表示允许的请求头
+			.allowedHeaders("Content-Type", "X-Requested-With", "accept", "Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers","accessToken")
+			
+			.exposedHeaders("Access-Control-Allow-Origin", "Access-Control-Allow-Credentials")
+			
+			.allowCredentials(true)
+			
+			.maxAge(3600);
 	}
 	
 	@Override
 	public void addFormatters(FormatterRegistry registry)
 	{
 		//加入字符串自动转换为时间的功能，主要是表单提交了时间，后台用bean接收，如果没有这个转换，会报异常		
-		registry.addConverter(String.class, Date.class, (String source) -> { return DateUtil.formatStrToDate(source, DateContants.DATE_FORMAT_3); });
+		registry.addConverter(String.class, Date.class, (String source) -> { return DateUtil.formatStrToDate(source, DateContants.DATE_FORMAT_3).get(); });
 	}
 	
 	@Override

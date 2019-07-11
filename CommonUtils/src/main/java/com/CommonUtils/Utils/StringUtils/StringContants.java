@@ -34,4 +34,7 @@ public final class StringContants
 	
 	/**验证邮箱格式的正则表达式*/
 	public static final String PATTERN_6 = "\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*";
+	
+	/**验证数字的正则表达式*/
+	public static final String PATTERN_7 = "^[0-9]*$";
 }
