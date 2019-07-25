@@ -1,13 +1,17 @@
 package com.CommonUtils.MiddleWare;
 
+import java.io.File;
+import java.io.IOException;
 import java.nio.charset.Charset;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.connector.Connector;
 import org.apache.coyote.http11.AbstractHttp11Protocol;
+import org.apache.coyote.http11.Http11NioProtocol;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
+import org.springframework.core.io.ClassPathResource;
 
 public final class ServletWebServerFactoryConfig 
 {
@@ -46,6 +50,18 @@ public final class ServletWebServerFactoryConfig
 		return tomcat;
 	}
 	
+	public static TomcatServletWebServerFactory getTomcatInstance(final int httpsPort, 
+			  													  final String sslFilePath, 
+			  													  final String keyStorePassword, 
+			  													  final String keyPassword,
+			  													  final boolean goToHttps) throws IOException
+	{
+		TomcatServletWebServerFactory tomcat = new TomcatServletWebServerFactory();
+		addConnectorCustomizers(tomcat);
+        tomcat.addAdditionalTomcatConnectors(getConnector(httpsPort, sslFilePath, keyStorePassword, keyPassword, goToHttps));
+		return tomcat;
+	}
+	
 	/**TOMCAT底层配置*/
 	private static void addConnectorCustomizers(final TomcatServletWebServerFactory tomcat)
 	{
@@ -69,6 +85,7 @@ public final class ServletWebServerFactoryConfig
 		tomcat.setUriEncoding(Charset.forName("utf8"));
 	}
 	
+	/**配置http*/
 	private static Connector getConnector(final int httpPort)
 	{
 		//配置http
@@ -77,6 +94,7 @@ public final class ServletWebServerFactoryConfig
         return connector;
 	}
 	
+	/**配置http与https，同时配置http跳转到https功能，此方式用于application.properties已经配置好https模式，才能使用这个*/
 	private static Connector getConnector(final int httpPort, final int httpsPort)
 	{
 		//配置http
@@ -90,5 +108,36 @@ public final class ServletWebServerFactoryConfig
 		connector.setRedirectPort(httpsPort);
 		
 		return connector;
+	}
+	
+	/**配置http与https，至于配置http跳转到https功能是可选，此方式用于application.properties没有配置https模式，才能使用这个
+	 * @throws IOException */
+	private static Connector getConnector(final int httpsPort, 
+										  final String sslFilePath, 
+										  final String keyStorePassword, 
+										  final String keyPassword,
+										  final boolean goToHttps) throws IOException
+	{
+		Connector connector = new Connector("org.apache.coyote.http11.Http11NioProtocol");
+		connector.setScheme("https");
+        connector.setSecure(true);
+        connector.setPort(httpsPort);
+        
+        Http11NioProtocol protocol = (Http11NioProtocol) connector.getProtocolHandler();
+        protocol.setSSLEnabled(true);
+        
+        ClassPathResource resource = new ClassPathResource(sslFilePath);
+        File file = resource.getFile();
+        protocol.setKeystoreFile(file.getAbsolutePath());
+        protocol.setKeystorePass(keyStorePassword);
+        protocol.setKeyPass(keyPassword);
+        
+        if (goToHttps)
+        {
+        	//设置重定向到https端口
+    		connector.setRedirectPort(httpsPort);
+        }
+        
+        return connector;
 	}
 }

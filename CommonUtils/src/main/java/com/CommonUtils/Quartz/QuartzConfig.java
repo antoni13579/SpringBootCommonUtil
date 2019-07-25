@@ -64,7 +64,7 @@ public final class QuartzConfig
 	{ return getSchedulerFactoryBeanInstance(dataSource, platformTransactionManager, jobFactory, null, JobStoreType.JDBC, instanceName); }
 	
 	public static SchedulerFactoryBean getSchedulerFactoryBeanInstanceInMemory(final JobFactory jobFactory) throws Exception
-	{ return getSchedulerFactoryBeanInstance(null, null, jobFactory, null, JobStoreType.MEMORY, ""); }
+	{ return getSchedulerFactoryBeanInstance(null, null, jobFactory, null, JobStoreType.MEMORY, null); }
 
 	private static SchedulerFactoryBean getSchedulerFactoryBeanInstance(final DataSource dataSource, 
 																	    final PlatformTransactionManager platformTransactionManager,

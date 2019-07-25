@@ -97,6 +97,14 @@ public final class ThreadUtil
 		}
 	}
 	
+	public static void sleep(final long millis)
+	{
+		try
+		{ Thread.sleep(millis); }
+		catch (Exception ex)
+		{ log.error("线程睡眠出现异常，异常原因为：", ex); }
+	}
+	
 	/**
 	 * 
 	 * 判断线程是否结束，true为结束，false为未结束

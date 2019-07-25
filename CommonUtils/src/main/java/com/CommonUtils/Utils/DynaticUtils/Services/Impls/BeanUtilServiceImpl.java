@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.boot.SpringApplication;
@@ -17,6 +18,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Service;
 
+import com.CommonUtils.Utils.CollectionUtils.JavaCollectionsUtil;
 import com.CommonUtils.Utils.StringUtils.StringUtil;
 
 import lombok.extern.slf4j.Slf4j;
@@ -81,6 +83,42 @@ public final class BeanUtilServiceImpl implements ApplicationContextAware
 			defaultListableBeanFactory.initializeBean(bean, beanName);
 		}
 		catch (Exception ex) { log.error("新增Bean异常，异常原因为：", ex); }
+	}
+	
+	public static <T> void addBean(final Class<T> beanClazz, final String beanName, final String initMethodName, final String destroyMethodName, final Map<String, Object> fieldInfo)
+	{
+		try
+		{
+			//创建bean信息.  
+			BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(beanClazz);
+			
+			//设置bean字段信息
+			JavaCollectionsUtil.mapProcessor
+			(
+					fieldInfo, 
+					(final String key, final Object value, final int indx) -> 
+					{ beanDefinitionBuilder.addPropertyValue(key, value); }
+			);
+			
+			if (!StringUtil.isStrEmpty(initMethodName))
+			{ beanDefinitionBuilder.setInitMethodName(initMethodName); }
+			
+			if (!StringUtil.isStrEmpty(destroyMethodName))
+			{ beanDefinitionBuilder.setDestroyMethodName(destroyMethodName); }
+			
+			//获取BeanFactory  
+			DefaultListableBeanFactory defaultListableBeanFactory = (DefaultListableBeanFactory) APPLICATION_CONTEXT.getAutowireCapableBeanFactory();
+			defaultListableBeanFactory.registerBeanDefinition(beanName, beanDefinitionBuilder.getBeanDefinition());
+		}
+		catch (Exception ex) { log.error("新增Bean异常，异常原因为：", ex); }
+	}
+	
+	public static void removeBean(final String beanName)
+	{
+		//获取BeanFactory  
+		DefaultListableBeanFactory defaultListableBeanFactory = (DefaultListableBeanFactory) APPLICATION_CONTEXT.getAutowireCapableBeanFactory();
+		//删除bean.  
+		defaultListableBeanFactory.removeBeanDefinition(beanName);
 	}
 	
 	/**
