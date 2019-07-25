@@ -29,5 +29,5 @@ public class HomeController
 	
 	@RequestMapping("/testJsp")
 	public void testJsp(final HttpServletRequest request, final HttpServletResponse response)
-	{ HttpUtil.jumpPage("/jsp/testJsp.jsp", request, response); }
+	{ HttpUtil.redirectUrl(request, response, "/WEB-INF/jsp/testJsp.jsp"); }
 }

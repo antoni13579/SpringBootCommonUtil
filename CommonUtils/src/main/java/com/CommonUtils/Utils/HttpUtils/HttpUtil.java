@@ -147,20 +147,47 @@ public final class HttpUtil
 	{ httpSession.setAttribute(beanName, beanInstance); }
 	
 	/**
-	 * <p>一般这个方法用于html与jsp并存的情况，主力军html，辅助军jsp</p>
+	 * 支持AJAX的页面跳转
+	 * 
+	 * <p>特殊情况：html与jsp并存，主力军html，辅助军jsp</p>
 	 * 
 	 * <p>jsp存放路径：src/main目录下，建立webapp/WEB-INF目录，接下来就可以存放jsp页面文件了</p>
 	 * <p>访问路径：假设jsp文件存放的路径如下：src/main/webapp/WEB-INF/jsp/testJsp.jsp</p>
-	 * <p>那么path就需要输入为：/jsp/testJsp.jsp</p>
+	 * <p>那么url就需要输入为：/WEB-INF/jsp/testJsp.jsp</p>
 	 * 
-	 * 
-	 * */
-	public static void jumpPage(final String path, final HttpServletRequest request, final HttpServletResponse response)
+	 */
+	public static void redirectUrl(HttpServletRequest request, HttpServletResponse response, String url)
 	{
-		StringBuilder sb = new StringBuilder().append("/WEB-INF").append(path);
+		boolean isforward = false;
 		try 
-		{ request.getRequestDispatcher(sb.toString()).forward(request, response); }
-		catch (Exception ex)
-		{ log.error("跳转网页出现异常，网页路径为：{}，异常原因为：", sb.toString(), ex); }
+		{
+			if (isAjaxRequest(request))
+			{
+				request.getRequestDispatcher(url).forward(request, response); // AJAX不支持Redirect改用Forward
+				isforward = true;
+			}
+			else
+			{
+				response.sendRedirect(request.getContextPath() + url);
+				isforward = false;
+			}
+		} 
+		catch (Exception ex) 
+		{ log.error("{}网页出现异常，网页路径为：{}，异常原因为：", isforward ? "转发" : "重定向", url, ex); }
+	}
+	
+	/**
+	 * 是否是Ajax异步请求
+	 * @param request
+	 */
+	public static boolean isAjaxRequest(HttpServletRequest request)
+	{
+		String accept = request.getHeader(HttpHeaders.ACCEPT.toLowerCase());
+		if (accept != null && accept.indexOf("application/json") != -1) { return true; }
+
+		String xRequestedWith = request.getHeader(com.CommonUtils.Utils.HttpUtils.HttpHeaders.X_REQUESTED_WITH);
+		if (xRequestedWith != null && xRequestedWith.indexOf("XMLHttpRequest") != -1) { return true; }
+		
+		return false;
 	}
 }
