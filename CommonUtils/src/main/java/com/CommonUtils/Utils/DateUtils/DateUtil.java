@@ -65,11 +65,15 @@ public final class DateUtil
 		return date;
 	}
 	
-	public static int getYear(final Date date)
+	/**
+	 * 获取日期指定信息，如年，月等
+	 * @param type 如Calendar.DATE、Calendar.YEAR等
+	 * */
+	public static int getField(final Date date, final int type)
 	{
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(date);
-		return cal.get(Calendar.YEAR);
+		return cal.get(type);
 	}
 	
 	public static Collection<Date> getRangeCondition(final Date start, final Date end, final String timeType, final String ... params)
