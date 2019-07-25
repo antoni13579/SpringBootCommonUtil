@@ -6,6 +6,7 @@ import java.util.Optional;
 import com.CommonUtils.Utils.DateUtils.DateContants;
 import com.CommonUtils.Utils.DateUtils.DateUtil;
 import com.CommonUtils.Utils.IdCardUtils.EGender;
+import com.CommonUtils.Utils.IdCardUtils.IdCardContants;
 import com.CommonUtils.Utils.StringUtils.StringUtil;
 
 import lombok.Getter;
@@ -34,6 +35,8 @@ public final class ChinaIdCard
 	//provinceCode、cityCode、districtCode组装成的行政区划代码
 	private String administrativeAreaCode;
 	
+	private String provinceName;
+	
 	public ChinaIdCard(final String idCard)
 	{
 		this.idCard = idCard;
@@ -42,6 +45,7 @@ public final class ChinaIdCard
 		this.birth = DateUtil.formatStrToDate(StringUtil.substr(this.idCard, 6, 8), DateContants.DATE_FORMAT_1);
 		this.eGender = Integer.parseInt(this.chinaIdCardExtract.getGender()) % 2 != 0 ? EGender.MALE : EGender.FEMALE;
 		this.administrativeAreaCode = this.idCard.substring(0, 6);
+		this.provinceName = IdCardContants.CITY_CODES.getOrDefault(Integer.parseInt(this.idCard.substring(0, 2)), "");
 	}
 	
 	@Getter

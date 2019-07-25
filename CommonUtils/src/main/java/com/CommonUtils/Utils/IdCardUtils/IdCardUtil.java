@@ -1,5 +1,6 @@
 package com.CommonUtils.Utils.IdCardUtils;
 
+import java.util.Calendar;
 import java.util.Date;
 
 import com.CommonUtils.Utils.ArrayUtils.ArrayUtil;
@@ -39,7 +40,7 @@ public final class IdCardUtil
 				Date birthDate = DateUtil.formatStrToDate(birthday, DateContants.DATE_FORMAT_1)
 										 .map(date -> date)
 										 .orElseThrow(() -> new Exception("将15位身份证号码转换为18位，获取15位身份证出生年月日出现异常！"));
-				idCard18 = idCard.substring(0, 6) + String.valueOf(DateUtil.getYear(birthDate)) + idCard.substring(8);
+				idCard18 = idCard.substring(0, 6) + String.valueOf(DateUtil.getField(birthDate, Calendar.YEAR)) + idCard.substring(8);
 				
 				// 转换字符数组
 				char[] cArr = idCard18.toCharArray();
