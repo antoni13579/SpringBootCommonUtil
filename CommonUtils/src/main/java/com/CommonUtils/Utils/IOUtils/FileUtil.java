@@ -4,6 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -20,6 +21,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.web.multipart.MultipartFile;
@@ -432,4 +434,38 @@ public final class FileUtil
 		else
 		{ return false; }
 	}
+	
+	public static Optional<byte[]> toBytes(final File file)
+	{
+		byte[] data = null;
+		FileInputStream input = null;
+        BufferedInputStream bufferInput = null;
+        ByteArrayOutputStream output = null;
+        try 
+        {
+        	input = new FileInputStream(file);
+        	bufferInput = new BufferedInputStream(input);
+        	
+        	output = new ByteArrayOutputStream();
+        	byte[] buf = new byte[1024];
+        	int numBytesRead = 0;
+        	
+        	while ((numBytesRead = bufferInput.read(buf, 0, 1024)) != -1) 
+        	{ output.write(buf, 0, numBytesRead); }
+        	
+        	data = output.toByteArray();
+        }  
+        catch (Exception ex) 
+        { log.error("文件转换字节数组出现异常，异常原因为：", ex); }
+        finally
+        { IOUtil.closeQuietly(output, input, bufferInput); }
+        
+        return Optional.ofNullable(data);
+	}
+	
+	public static Optional<byte[]> toBytes(final Path path)
+	{ return toBytes(path.toFile()); }
+	
+	public static Optional<byte[]> toBytes(final String filePath)
+	{ return toBytes(new File(filePath)); }
 }

@@ -66,6 +66,7 @@
 		<swagger.version>2.9.2</swagger.version>
 		<guava.version>28.0-jre</guava.version>
 		<dingding.api.version>20190716</dingding.api.version>
+		<baidu.api.version>4.11.3</baidu.api.version>
 	</properties>
 
 	<dependencies>
@@ -507,6 +508,13 @@
 			<groupId>com.Utils</groupId>
 			<artifactId>dingtalk-sdk-java</artifactId>
 			<version>${dingding.api.version}</version>
+		</dependency>
+		
+		<!-- 百度API接口 -->
+		<dependency>
+    		<groupId>com.baidu.aip</groupId>
+    		<artifactId>java-sdk</artifactId>
+    		<version>${baidu.api.version}</version>
 		</dependency>
 		
 		<!-- 测试相关框架 -->

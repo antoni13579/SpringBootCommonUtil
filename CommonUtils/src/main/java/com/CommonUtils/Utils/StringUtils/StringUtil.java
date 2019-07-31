@@ -201,15 +201,21 @@ public final class StringUtil
 	
 	public static String searchStr(final String regex, final String string)
 	{
-		StringBuilder sb = new StringBuilder();
+		//StringBuilder sb = new StringBuilder();
 		Pattern p = Pattern.compile(regex);
         Matcher m = p.matcher(string);
+        /*
         while (m.find()) 
         {
             String g = m.group();
             sb.append(g);
         }
         return sb.toString();
+        */
+        
+        String result = m.replaceAll("");
+        if (isStrEmpty(result)) { return ""; }
+        else { return result; }
 	}
 	
 	/**
@@ -220,9 +226,31 @@ public final class StringUtil
 	 * */
 	public static boolean validateRegular(final String string, final String regex)
 	{
-		Pattern p = Pattern.compile(regex);
-        Matcher m = p.matcher(string);
-        return m.find();
+		//Pattern p = Pattern.compile(regex);
+        //Matcher m = p.matcher(string);
+        //return m.find();
+        
+        return Pattern.matches(regex, string);
+        //return m.matches();
+	}
+	
+	public static int getNumberStartPos(final String str)
+	{
+		if (isStrEmpty(str))
+		{ return -1; }
+		
+		int result = -1;
+		for (int i = 0; i < str.length(); i++)
+		{
+			char c = str.charAt(i);
+			if (c >='0' && c <='9')
+			{
+				result = i;
+				break;
+			}
+		}
+		
+		return result;
 	}
 	
 	/**

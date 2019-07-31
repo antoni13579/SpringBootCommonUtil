@@ -16,6 +16,8 @@ public final class DateContants
 	
 	public static final String DATE_FORMAT_6 = "yyyy-MM-dd HH:mm:ss.SSS";
 	
+	public static final String DATE_FORMAT_7 = "yyyy年MM月dd日";
+	
 	public static final String DAY_NAMES[] = { "星期日", "星期一", "星期二", "星期三", "星期四", "星期五","星期六" };  
 	
 	public static final String YEAR_FORMAT = "yyyy";

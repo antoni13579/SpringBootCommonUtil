@@ -173,7 +173,7 @@ public final class DateUtil
 	public static Optional<Date> formatStrToDate(final String str, final String format)
 	{
 		if (StringUtil.isStrEmpty(str) || StringUtil.isStrEmpty(format))
-		{ return null; }
+		{ return Optional.ofNullable(null); }
 		
 		Date date = null;
 		try

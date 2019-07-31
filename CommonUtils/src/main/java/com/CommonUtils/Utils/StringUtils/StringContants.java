@@ -37,4 +37,16 @@ public final class StringContants
 	
 	/**验证数字的正则表达式*/
 	public static final String PATTERN_7 = "^[0-9]*$";
+	
+	/**提取数字的正则表达式*/
+	public static final String PATTERN_8 = "[^0-9]";
+	
+	/**验证国内座机号*/
+	public static final String PATTERN_9 = "[0-9-()（）]{7,18}";
+	
+	/**验证国内座机号*/
+	public static final String PATTERN_10 = "\\d{3}-\\d{8}|\\d{4}-\\{7,8}";
+	
+	/**验证国内手机号*/
+	public static final String PATTERN_11 = "0?(13|14|15|18)[0-9]{9}";
 }

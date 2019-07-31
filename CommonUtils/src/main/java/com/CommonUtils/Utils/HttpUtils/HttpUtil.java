@@ -1,9 +1,12 @@
 package com.CommonUtils.Utils.HttpUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
@@ -17,12 +20,14 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.util.UriUtils;
 
 import com.CommonUtils.Utils.HttpUtils.Bean.DownloadFileInfo;
 import com.CommonUtils.Utils.IOUtils.IOUtil;
+import com.CommonUtils.Utils.StringUtils.StringUtil;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -132,6 +137,30 @@ public final class HttpUtil
 		ServletRequestAttributes attr = (ServletRequestAttributes)RequestContextHolder.currentRequestAttributes();
 		HttpSession session= attr.getRequest().getSession(allowCreateSession); // true == allow create
 		return Optional.ofNullable(session);
+	}
+	
+	public static HttpURLConnection getHttpURLConnection(final String urlPath, 
+														 final RequestMethod requestMethod,
+														 final String contentType,
+														 final boolean keepAlive,
+														 final boolean useCaches,
+														 final boolean doOutput,
+														 final boolean doInput) throws IOException
+	{
+		URL url = new URL(urlPath);
+		HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+		httpURLConnection.setRequestMethod(requestMethod.name());
+		
+		if (!StringUtil.isStrEmpty(contentType))
+		{ httpURLConnection.setRequestProperty("Content-Type", contentType); }
+		
+		if (keepAlive)
+		{ httpURLConnection.setRequestProperty("Connection", "Keep-Alive"); }
+		
+		httpURLConnection.setUseCaches(useCaches);
+		httpURLConnection.setDoOutput(doOutput);
+		httpURLConnection.setDoInput(doInput);
+		return httpURLConnection;
 	}
 	
 	/**
