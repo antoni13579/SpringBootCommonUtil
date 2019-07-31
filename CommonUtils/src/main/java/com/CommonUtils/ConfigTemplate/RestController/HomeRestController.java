@@ -114,9 +114,9 @@ public class HomeRestController
 	(
 			{ @ApiImplicitParam(name = "authentication", value = "SpringSecurity用户信息", required = true, dataTypeClass = Authentication.class) }
 	)
-	public Mono<User> getCurrentUserName(Authentication authentication)
+	public Mono<User> getCurrentUserName(Authentication authentication) throws Exception
 	{
-		UserDetails user = SpringSecurityUtil.getUser(authentication);
+		UserDetails user = SpringSecurityUtil.getUser(authentication).orElseThrow(() -> new Exception("获取验证用户为空！！"));
 		return Mono.just((User)user);
 	}
 	

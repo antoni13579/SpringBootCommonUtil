@@ -30,7 +30,6 @@ import com.CommonUtils.SpringSecurity.Config.Encoder.BCryptPasswordEncoderConfig
 import com.CommonUtils.SpringSecurity.Config.Role.RoleHierarchyConfig;
 import com.CommonUtils.Utils.HttpUtils.HttpUtil;
 import com.CommonUtils.Utils.HttpUtils.Bean.SimpleResponse;
-import com.CommonUtils.Utils.SpringSecurityUtils.SpringSecurityContants;
 import com.CommonUtils.Utils.SpringSecurityUtils.SpringSecurityUtil;
 
 import lombok.extern.slf4j.Slf4j;
@@ -111,11 +110,11 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter
 			    					MediaType.APPLICATION_JSON_UTF8
 			    			);
 			    			
-			    			UserDetails user = SpringSecurityUtil.getUser(authentication);
+			    			UserDetails user = SpringSecurityUtil.getUser(authentication).orElseGet(() -> new User("defaultAdmin", "!@#$%^&*()_+", AuthorityUtils.commaSeparatedStringToAuthorityList("ADMIN")));
 			    			String userName = user.getUsername();
 			    			
 			    			//如果使用了默认用户登录，需要输出警告日志，因为SpringSecurityUtil的getUser如果有问题，会返回一个默认用户，这个需要排查一下问题
-			    			if (SpringSecurityContants.DEFAULT_USER_NAME.equalsIgnoreCase(userName))
+			    			if ("defaultAdmin".equalsIgnoreCase(userName))
 			    			{ log.warn("使用了默认用户登录？请排查一下问题出现在哪"); }
 			    			
 			    			//正常登录
@@ -251,5 +250,5 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter
 	 * */
 	@Resource
 	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception
-	{ auth.inMemoryAuthentication().withUser(SpringSecurityContants.DEFAULT_USER_NAME).password(SpringSecurityContants.DEFAULT_PASS_WORD).roles(SpringSecurityContants.DEFAULT_ROLES); }
+	{ auth.inMemoryAuthentication().withUser("defaultAdmin").password("!@#$%^&*()_+").roles("ADMIN"); }
 }
