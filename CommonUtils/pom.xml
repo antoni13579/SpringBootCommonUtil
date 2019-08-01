@@ -19,17 +19,12 @@
 	<artifactId>CommonUtils</artifactId>
 	<version>1.0.0</version>
 	
-	<!-- 这段有点奇怪，设置为war不报错，jar就会报出Unknown错误 --> 
 	<packaging>war</packaging>
 	
 	<name>commonutils-spring-boot-starter</name>
 	<description>CommonUtils project for Spring Boot</description>
 
 	<properties>
-		<!--  
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		-->
 		<java.version>1.8</java.version>
 		
 		<spring-mybatis.version>2.0.1</spring-mybatis.version>
@@ -48,7 +43,7 @@
 		<commons-collections4.version>4.1</commons-collections4.version>
 		<luaj-jse.version>3.0.1</luaj-jse.version>
 		<dom4j.version>1.6.1</dom4j.version>
-		<xstream.version>1.4.10</xstream.version>
+		<xstream.version>1.4.11.1</xstream.version>
 		<webjars-locator.version>0.32</webjars-locator.version>
 		<webjars-jquery.version>3.3.1</webjars-jquery.version>
 		<webjars-bootstrap.version>4.2.1</webjars-bootstrap.version>
@@ -120,22 +115,6 @@
 			<artifactId>spring-boot-starter-thymeleaf</artifactId>
 		</dependency>
 		
-		<!-- Spring Boot Core模块（这里，官方的Spring Boot生成项目工程，已经没有了如下3个组件，估计是生成的工程默认有了这些组件） -->
-		<!--  
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-aop</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-validation</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.retry</groupId>
-			<artifactId>spring-retry</artifactId>
-		</dependency>
-		-->
-		
 		<!-- Spring Boot Security模块 -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -167,24 +146,20 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
-		<!-- 如果用了MyBatis或JPA，是默认用了JDBC接口，可以不用加载
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-jdbc</artifactId>
 		</dependency>
-		-->
 		<dependency>
 			<groupId>org.mybatis.spring.boot</groupId>
 			<artifactId>mybatis-spring-boot-starter</artifactId>
 			<version>${spring-mybatis.version}</version>
 		</dependency> 
-		<!-- PostgreSql、Mysql、SQL Server的JDBC驱动
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 			<scope>runtime</scope>
 		</dependency>
-		-->
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
@@ -196,14 +171,12 @@
 			<scope>runtime</scope>
 		</dependency>
 		
-		
 		<!-- Spring Boot SQL模块（自定义的数据库驱动，主要是Oracle与Teradata驱动） --> 
 		<dependency>
 			<groupId>com.Oracle</groupId>
 			<artifactId>ojdbc6</artifactId>
 			<version>11G</version>
 		</dependency>
-		<!--
 		<dependency>
 			<groupId>com.Oracle</groupId>
   			<artifactId>ojdbc14</artifactId>
@@ -219,7 +192,6 @@
   			<artifactId>terajdbc4</artifactId>
   			<version>15</version>
 		</dependency>
-		-->
 		
 		<!-- Spring Boot NoSQL模块 -->
 		<dependency>
