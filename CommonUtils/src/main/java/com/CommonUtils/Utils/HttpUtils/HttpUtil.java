@@ -149,7 +149,7 @@ public final class HttpUtil
 	{
 		URL url = new URL(urlPath);
 		HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-		httpURLConnection.setRequestMethod(requestMethod.name());
+		httpURLConnection.setRequestMethod(requestMethod.name().toUpperCase());
 		
 		if (!StringUtil.isStrEmpty(contentType))
 		{ httpURLConnection.setRequestProperty("Content-Type", contentType); }

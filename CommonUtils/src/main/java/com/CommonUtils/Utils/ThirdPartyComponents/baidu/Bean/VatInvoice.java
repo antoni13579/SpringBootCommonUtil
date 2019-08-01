@@ -5,8 +5,11 @@ import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Date;
 
+import org.json.JSONObject;
+
 import com.CommonUtils.Utils.DateUtils.DateContants;
 import com.CommonUtils.Utils.DateUtils.DateUtil;
+import com.CommonUtils.Utils.JsonUtils.JsonUtil;
 import com.CommonUtils.Utils.StringUtils.StringContants;
 import com.CommonUtils.Utils.StringUtils.StringUtil;
 import com.alibaba.fastjson.JSON;
@@ -15,11 +18,14 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import lombok.extern.slf4j.Slf4j;
 
+/**增值税发票Bean*/
 @Getter
 @Setter
 @Accessors(chain = true)
 @ToString
+@Slf4j
 public class VatInvoice 
 {
 	private File file;
@@ -135,6 +141,96 @@ public class VatInvoice
 	
 	public String toJson()
 	{ return JSON.toJSONString(this); }
+	
+	public static VatInvoice getInstance(final String json) throws Exception
+	{
+		log.info("需处理的增值税发票JSON字符串为-----> {}", json);
+		JSONObject jsonObject = new JSONObject(json);
+		JSONObject wordsResult = jsonObject.getJSONObject("words_result");
+		
+		Collection<CommodityTaxRate> commodityTaxRateList = JsonUtil.jsonArrayToCollection
+		(
+				wordsResult.getJSONArray("CommodityTaxRate"), 
+				(paramJsonObject, paramCollection) -> { paramCollection.add(new CommodityTaxRate().setRow(paramJsonObject.getInt("row")).setWord(paramJsonObject.getString("word")).transferTaxRate()); }
+		);
+			
+		Collection<CommodityAmount> commodityAmountList = JsonUtil.jsonArrayToCollection
+		(
+				wordsResult.getJSONArray("CommodityAmount"),
+				(paramJsonObject, paramCollection) -> { paramCollection.add(new CommodityAmount().setRow(paramJsonObject.getInt("row")).setWord(paramJsonObject.getString("word")).transferAmount()); }
+		);
+		
+		Collection<CommodityTax> commodityTaxList = JsonUtil.jsonArrayToCollection
+		(
+				wordsResult.getJSONArray("CommodityTax"), 
+				(paramJsonObject, paramCollection) -> { paramCollection.add(new CommodityTax().setRow(paramJsonObject.getInt("row")).setWord(paramJsonObject.getString("word")).transferTax()); }
+		);
+		
+		Collection<CommodityNum> commodityNumList = JsonUtil.jsonArrayToCollection
+		(
+				wordsResult.getJSONArray("CommodityNum"), 
+				(paramJsonObject, paramCollection) -> { paramCollection.add(new CommodityNum().setRow(paramJsonObject.getInt("row")).setWord(paramJsonObject.getString("word")).transferNum()); }
+		);
+		
+		Collection<CommodityUnit> commodityUnitList = JsonUtil.jsonArrayToCollection
+		(
+				wordsResult.getJSONArray("CommodityUnit"), 
+				(paramJsonObject, paramCollection) -> { paramCollection.add(new CommodityUnit().setRow(paramJsonObject.getInt("row")).setWord(paramJsonObject.getString("word"))); }
+		);
+		
+		Collection<CommodityPrice> commodityPriceList = JsonUtil.jsonArrayToCollection
+		(
+				wordsResult.getJSONArray("CommodityPrice"), 
+				(paramJsonObject, paramCollection) -> { paramCollection.add(new CommodityPrice().setRow(paramJsonObject.getInt("row")).setWord(paramJsonObject.getString("word")).transferPrice()); }
+		);
+		
+		Collection<CommodityName> commodityNameList = JsonUtil.jsonArrayToCollection
+		(
+				wordsResult.getJSONArray("CommodityName"), 
+				(paramJsonObject, paramCollection) -> { paramCollection.add(new CommodityName().setRow(paramJsonObject.getInt("row")).setWord(paramJsonObject.getString("word"))); }
+		);
+		
+		Collection<CommodityType> commodityTypeList = JsonUtil.jsonArrayToCollection
+		(
+				wordsResult.getJSONArray("CommodityType"), 
+				(paramJsonObject, paramCollection) -> { paramCollection.add(new CommodityType().setRow(paramJsonObject.getInt("row")).setWord(paramJsonObject.getString("word"))); }
+		);
+		
+		return new VatInvoice().setLogId(jsonObject.getLong("log_id"))
+				 			   .setDirection(jsonObject.getInt("direction"))
+				 			   .setWordsResultNum(jsonObject.getInt("words_result_num"))
+				 			   .setInvoiceNum(wordsResult.getString("InvoiceNum"))
+				 			   .setSellerName(wordsResult.getString("SellerName"))
+				 			   .setCommodityTaxRate(commodityTaxRateList)
+				 			   .setSellerBank(new SellerBank().setWord(wordsResult.getString("SellerBank")).splitInfo())
+				 			   .setChecker(wordsResult.getString("Checker"))
+				 			   .setNoteDrawer(wordsResult.getString("NoteDrawer"))
+				 			   .setCommodityAmount(commodityAmountList)
+				 			   .setInvoiceDate(new InvoiceDate().setInvoiceDate(wordsResult.getString("InvoiceDate")).transferInvoiceDate())
+				 			   .setCommodityTax(commodityTaxList)
+				 			   .setPurchaserName(wordsResult.getString("PurchaserName"))
+				 			   .setInvoiceTypeOrg(wordsResult.getString("InvoiceTypeOrg"))
+				 			   .setCommodityNum(commodityNumList)
+				 			   .setPurchaserBank(new PurchaserBank().setWord(wordsResult.getString("PurchaserBank")).splitInfo())
+				 			   .setRemarks(wordsResult.getString("Remarks"))
+				 			   .setPassword(wordsResult.getString("Password"))
+				 			   .setSellerAddress(new SellerAddress().setWord(wordsResult.getString("SellerAddress")).splitInfo())
+				 			   .setPurchaserAddress(new PurchaserAddress().setWord(wordsResult.getString("PurchaserAddress")).splitInfo())
+				 			   .setInvoiceCode(wordsResult.getString("InvoiceCode"))
+				 			   .setCommodityUnit(commodityUnitList)
+				 			   .setPayee(wordsResult.getString("Payee"))
+				 			   .setPurchaserRegisterNum(wordsResult.getString("PurchaserRegisterNum"))
+				 			   .setCommodityPrice(commodityPriceList)
+				 			   .setTotalAmount(wordsResult.getBigDecimal("TotalAmount"))
+				 			   .setAmountInWords(wordsResult.getString("AmountInWords"))
+				 			   .setAmountInFiguers(wordsResult.getBigDecimal("AmountInFiguers"))
+				 			   .setTotalTax(wordsResult.getBigDecimal("TotalTax"))
+				 			   .setInvoiceType(wordsResult.getString("InvoiceType"))
+				 			   .setSellerRegisterNum(wordsResult.getString("SellerRegisterNum"))
+				 			   .setCommodityName(commodityNameList)
+				 			   .setCommodityType(commodityTypeList)
+				 			   .setCheckCode(wordsResult.getString("CheckCode"));
+	}
 	
 	/** 开票日期 */
 	@Getter

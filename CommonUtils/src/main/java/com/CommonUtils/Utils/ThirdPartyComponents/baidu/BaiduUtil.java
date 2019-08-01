@@ -9,24 +9,20 @@ import java.net.HttpURLConnection;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.CommonUtils.Utils.CollectionUtils.JavaCollectionsUtil;
-import com.CommonUtils.Utils.CommonUtils.Base64Util;
 import com.CommonUtils.Utils.HttpUtils.HttpUtil;
 import com.CommonUtils.Utils.IOUtils.FileUtil;
 import com.CommonUtils.Utils.IOUtils.IOUtil;
-import com.CommonUtils.Utils.JsonUtils.JsonUtil;
 import com.CommonUtils.Utils.ThirdPartyComponents.baidu.Bean.VatInvoice;
-import com.CommonUtils.Utils.ThirdPartyComponents.baidu.Bean.VatInvoice.*;
+import com.baidu.aip.util.Base64Util;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -154,7 +150,7 @@ public final class BaiduUtil
             while ((getLine = bufferedReader.readLine()) != null) 
             { json.append(getLine); }
             
-            result = generateVatInvoice(json.toString()).setFile(file);
+            result = VatInvoice.getInstance(json.toString()).setFile(file);
 		}
 		catch (Exception ex)
 		{ log.error("获取百度增值税发票识别结果出现异常，异常原因为：", ex); }
@@ -162,103 +158,5 @@ public final class BaiduUtil
 		{ IOUtil.closeQuietly(dataOutputStream, inputStream, inputStreamReader, bufferedReader); }
 		
 		return Optional.ofNullable(result);
-	}
-	
-	private static VatInvoice generateVatInvoice(final String json) throws JSONException, Exception
-	{
-		log.info("需处理的增值税发票JSON字符串为-----> {}", json);
-		JSONObject jsonObject = new JSONObject(json);
-		JSONObject wordsResult = jsonObject.getJSONObject("words_result");
-		
-		Collection<CommodityTaxRate> commodityTaxRateList = JsonUtil.jsonArrayToCollection
-		(
-				wordsResult.getJSONArray("CommodityTaxRate"), 
-				(paramJsonObject, paramCollection) -> 
-				{ paramCollection.add(new CommodityTaxRate().setRow(paramJsonObject.getInt("row")).setWord(paramJsonObject.getString("word")).transferTaxRate()); }
-		);
-			
-		Collection<CommodityAmount> commodityAmountList = JsonUtil.jsonArrayToCollection
-		(
-				wordsResult.getJSONArray("CommodityAmount"),
-				(paramJsonObject, paramCollection) -> 
-				{ paramCollection.add(new CommodityAmount().setRow(paramJsonObject.getInt("row")).setWord(paramJsonObject.getString("word")).transferAmount()); }
-		);
-		
-		Collection<CommodityTax> commodityTaxList = JsonUtil.jsonArrayToCollection
-		(
-				wordsResult.getJSONArray("CommodityTax"), 
-				(paramJsonObject, paramCollection) -> 
-				{ paramCollection.add(new CommodityTax().setRow(paramJsonObject.getInt("row")).setWord(paramJsonObject.getString("word")).transferTax()); }
-		);
-		
-		Collection<CommodityNum> commodityNumList = JsonUtil.jsonArrayToCollection
-		(
-				wordsResult.getJSONArray("CommodityNum"), 
-				(paramJsonObject, paramCollection) -> 
-				{ paramCollection.add(new CommodityNum().setRow(paramJsonObject.getInt("row")).setWord(paramJsonObject.getString("word")).transferNum()); }
-		);
-		
-		Collection<CommodityUnit> commodityUnitList = JsonUtil.jsonArrayToCollection
-		(
-				wordsResult.getJSONArray("CommodityUnit"), 
-				(paramJsonObject, paramCollection) ->
-				{ paramCollection.add(new CommodityUnit().setRow(paramJsonObject.getInt("row")).setWord(paramJsonObject.getString("word"))); }
-		);
-		
-		Collection<CommodityPrice> commodityPriceList = JsonUtil.jsonArrayToCollection
-		(
-				wordsResult.getJSONArray("CommodityPrice"), 
-				(paramJsonObject, paramCollection) ->
-				{ paramCollection.add(new CommodityPrice().setRow(paramJsonObject.getInt("row")).setWord(paramJsonObject.getString("word")).transferPrice()); }
-		);
-		
-		Collection<CommodityName> commodityNameList = JsonUtil.jsonArrayToCollection
-		(
-				wordsResult.getJSONArray("CommodityName"), 
-				(paramJsonObject, paramCollection) ->
-				{ paramCollection.add(new CommodityName().setRow(paramJsonObject.getInt("row")).setWord(paramJsonObject.getString("word"))); }
-		);
-		
-		Collection<CommodityType> commodityTypeList = JsonUtil.jsonArrayToCollection
-		(
-				wordsResult.getJSONArray("CommodityType"), 
-				(paramJsonObject, paramCollection) ->
-				{ paramCollection.add(new CommodityType().setRow(paramJsonObject.getInt("row")).setWord(paramJsonObject.getString("word"))); }
-		);
-		
-		return new VatInvoice().setLogId(jsonObject.getLong("log_id"))
-				 			   .setDirection(jsonObject.getInt("direction"))
-				 			   .setWordsResultNum(jsonObject.getInt("words_result_num"))
-				 			   .setInvoiceNum(wordsResult.getString("InvoiceNum"))
-				 			   .setSellerName(wordsResult.getString("SellerName"))
-				 			   .setCommodityTaxRate(commodityTaxRateList)
-				 			   .setSellerBank(new SellerBank().setWord(wordsResult.getString("SellerBank")).splitInfo())
-				 			   .setChecker(wordsResult.getString("Checker"))
-				 			   .setNoteDrawer(wordsResult.getString("NoteDrawer"))
-				 			   .setCommodityAmount(commodityAmountList)
-				 			   .setInvoiceDate(new InvoiceDate().setInvoiceDate(wordsResult.getString("InvoiceDate")).transferInvoiceDate())
-				 			   .setCommodityTax(commodityTaxList)
-				 			   .setPurchaserName(wordsResult.getString("PurchaserName"))
-				 			   .setInvoiceTypeOrg(wordsResult.getString("InvoiceTypeOrg"))
-				 			   .setCommodityNum(commodityNumList)
-				 			   .setPurchaserBank(new PurchaserBank().setWord(wordsResult.getString("PurchaserBank")).splitInfo())
-				 			   .setRemarks(wordsResult.getString("Remarks"))
-				 			   .setPassword(wordsResult.getString("Password"))
-				 			   .setSellerAddress(new SellerAddress().setWord(wordsResult.getString("SellerAddress")).splitInfo())
-				 			   .setPurchaserAddress(new PurchaserAddress().setWord(wordsResult.getString("PurchaserAddress")).splitInfo())
-				 			   .setInvoiceCode(wordsResult.getString("InvoiceCode"))
-				 			   .setCommodityUnit(commodityUnitList)
-				 			   .setPayee(wordsResult.getString("Payee"))
-				 			   .setPurchaserRegisterNum(wordsResult.getString("PurchaserRegisterNum"))
-				 			   .setCommodityPrice(commodityPriceList)
-				 			   .setTotalAmount(wordsResult.getBigDecimal("TotalAmount"))
-				 			   .setAmountInWords(wordsResult.getString("AmountInWords"))
-				 			   .setAmountInFiguers(wordsResult.getBigDecimal("AmountInFiguers"))
-				 			   .setTotalTax(wordsResult.getBigDecimal("TotalTax"))
-				 			   .setInvoiceType(wordsResult.getString("InvoiceType"))
-				 			   .setSellerRegisterNum(wordsResult.getString("SellerRegisterNum"))
-				 			   .setCommodityName(commodityNameList)
-				 			   .setCommodityType(commodityTypeList)
-				 			   .setCheckCode(wordsResult.getString("CheckCode"));
 	}
 }
