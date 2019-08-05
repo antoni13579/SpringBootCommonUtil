@@ -1,5 +1,8 @@
 package com.CommonUtils.Utils.DBUtils;
 
+import lombok.Getter;
+import lombok.ToString;
+
 public final class DBContants 
 {
 	private DBContants() {}
@@ -20,5 +23,16 @@ public final class DBContants
 	
 	public static final String POSTGRESQL_JDBC_DRIVER = "org.postgresql.Driver";
 	
-	public static final String SQL_SERVER_JDBC_DRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
+	@ToString
+	@Getter
+	public enum SqlServerJdbcDriver
+	{
+		MICROSOFT("com.microsoft.sqlserver.jdbc.SQLServerDriver"),
+		NET_SOURCEFORGE("net.sourceforge.jtds.jdbc.Driver");
+		
+		private final String jdbcDriver;
+		
+		private SqlServerJdbcDriver(final String jdbcDriver)
+		{ this.jdbcDriver = jdbcDriver; }
+	}
 }

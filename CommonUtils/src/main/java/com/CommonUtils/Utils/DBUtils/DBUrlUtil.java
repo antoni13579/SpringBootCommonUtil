@@ -3,7 +3,9 @@ package com.CommonUtils.Utils.DBUtils;
 import com.CommonUtils.Jdbc.Bean.Url.MySqlUrl;
 import com.CommonUtils.Jdbc.Bean.Url.OracleUrl;
 import com.CommonUtils.Jdbc.Bean.Url.PostgreSqlUrl;
+import com.CommonUtils.Jdbc.Bean.Url.SqlServerUrl;
 import com.CommonUtils.Jdbc.Bean.Url.TeradataUrl;
+import com.CommonUtils.Utils.DBUtils.DBContants.SqlServerJdbcDriver;
 import com.CommonUtils.Utils.StringUtils.StringUtil;
 
 public final class DBUrlUtil 
@@ -12,6 +14,8 @@ public final class DBUrlUtil
 	private static final StringBuilder MYSQL_URL = new StringBuilder();
 	private static final String ORACLE_URL = "jdbc:oracle:thin:@";
 	private static final String POSTGRESQL_URL = "jdbc:postgresql://$HOST_IP:$PORT/$DATABASE?charSet=$CHARSET";
+	private static final String SQL_SERVER_URL_BY_MICROSOFT = "jdbc:sqlserver://$HOST_IP:$PORT;databaseName=$DATABASE";
+	private static final String SQL_SERVER_URL_BY_NET_SOURCEFORGE = "jdbc:jtds:sqlserver://$HOST_IP:$PORT/$DATABASE";
 	
 	static
 	{
@@ -102,5 +106,22 @@ public final class DBUrlUtil
 		result = result.replaceAll("\\$DATABASE", postgreSqlUrl.getDataBase());
 		result = result.replaceAll("\\$CHARSET", postgreSqlUrl.getCharSet());
 		return result;
+	}
+	
+	public static String getSqlServerUrl(final SqlServerUrl sqlServerUrl, final SqlServerJdbcDriver jdbcDriver) throws Exception
+	{
+		switch (jdbcDriver)
+		{
+			case MICROSOFT:
+				return SQL_SERVER_URL_BY_MICROSOFT.replaceAll("\\$HOST_IP", sqlServerUrl.getHostIp())
+												  .replaceAll("\\$PORT", Integer.toString(sqlServerUrl.getPort()))
+												  .replaceAll("\\$DATABASE", sqlServerUrl.getDataBase());
+			case NET_SOURCEFORGE:
+				return SQL_SERVER_URL_BY_NET_SOURCEFORGE.replaceAll("\\$HOST_IP", sqlServerUrl.getHostIp())
+						  								.replaceAll("\\$PORT", Integer.toString(sqlServerUrl.getPort()))
+						  								.replaceAll("\\$DATABASE", sqlServerUrl.getDataBase());
+			default:
+				throw new Exception("出现了新的SQL_SERVER的数据库驱动，无法处理！！！");
+		}
 	}
 }
