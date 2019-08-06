@@ -339,7 +339,7 @@ public final class DateUtil
 		JavaCollectionsUtil.collectionProcessor
 		(
 				getRange(startDate, endDate), 
-				(final Date dateRecord, final int indx) -> 
+				(final Date dateRecord, final int indx, final int length) -> 
 				{
 					result.put
 					(

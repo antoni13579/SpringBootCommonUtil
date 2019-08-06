@@ -103,7 +103,7 @@ public final class FileUtil
 			ArrayUtil.arrayProcessor
 			(
 					files, 
-					(final File file, final int indx) -> 
+					(final File file, final int indx, final int length) -> 
 					{
 						try
 						{
@@ -130,7 +130,7 @@ public final class FileUtil
 			ArrayUtil.arrayProcessor
 			(
 					filePaths, 
-					(final String filePath, final int indx) -> 
+					(final String filePath, final int indx, final int length) -> 
 					{ files.add(new File(filePath)); }
 			);
 			
@@ -148,7 +148,7 @@ public final class FileUtil
 			ArrayUtil.arrayProcessor
 			(
 					paths, 
-					(final Path path, final int indx) -> 
+					(final Path path, final int indx, final int length) -> 
 					{ files.add(path.toFile()); }
 			);
 			
@@ -411,7 +411,7 @@ public final class FileUtil
 			ArrayUtil.arrayProcessor
 			(
 					multipartFiles, 
-					(multipartFile, indx) -> 
+					(multipartFile, indx, length) -> 
 					{
 						if (!directory.exists())
 						{ directory.mkdir(); }

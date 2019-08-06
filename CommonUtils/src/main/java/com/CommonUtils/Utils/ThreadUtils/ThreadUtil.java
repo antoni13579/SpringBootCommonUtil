@@ -177,7 +177,7 @@ public final class ThreadUtil
 		return ArrayUtil.arrayProcessor
 		(
 				countDownLatchs, 
-				(countDownLatch, indx) -> 
+				(countDownLatch, indx, length) -> 
 				{
 					while (null != countDownLatch && countDownLatch.getCount() != 0L)
 					{ countDownLatch.countDown(); } 

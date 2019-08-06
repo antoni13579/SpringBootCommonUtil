@@ -209,7 +209,7 @@ public final class KafkaLowStreamConfig
 						ArrayUtil.arrayProcessor
 						(
 								JobProcessor.this.itemProcessors, 
-								(final ItemProcessor itemProcessor, final int indx) -> 
+								(final ItemProcessor itemProcessor, final int indx, final int length) -> 
 								{ itemProcessor.process(tmpValue, JobProcessor.this.processorContext, JobProcessor.this.kvStore); }
 						);
 					}

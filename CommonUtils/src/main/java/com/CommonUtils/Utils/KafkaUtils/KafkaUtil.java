@@ -43,7 +43,7 @@ public final class KafkaUtil
 				ArrayUtil.arrayProcessor
 				(
 						itemProcessorForKeyValueStores, 
-						(final ItemProcessor<K, V> itemProcessorForKeyValueStore, final int inx) -> 
+						(final ItemProcessor<K, V> itemProcessorForKeyValueStore, final int inx, final int length) -> 
 						{ itemProcessorForKeyValueStore.process(entry, kvStore); }
 				);
 			}

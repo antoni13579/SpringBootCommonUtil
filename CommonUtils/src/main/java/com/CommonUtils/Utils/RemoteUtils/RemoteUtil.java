@@ -29,13 +29,13 @@ public final class RemoteUtil
 		ArrayUtil.arrayProcessor
 		(
 				channels, 
-				(channel, index) -> { if (null != channel) { channel.disconnect(); } }
+				(channel, index, length) -> { if (null != channel) { channel.disconnect(); } }
 		);
 		
 		ArrayUtil.arrayProcessor
 		(
 				sessions,
-				(session, indx) -> { if (null != session) { session.disconnect(); } }
+				(session, indx, length) -> { if (null != session) { session.disconnect(); } }
 		);
 	}
 	

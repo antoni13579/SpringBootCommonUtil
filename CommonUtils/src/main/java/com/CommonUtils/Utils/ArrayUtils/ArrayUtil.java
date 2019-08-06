@@ -119,12 +119,13 @@ public final class ArrayUtil
 	{
 		if (!isArrayEmpty(array))
 		{
-			for (int i = 0; i < array.length; i++)
+			int length = array.length;
+			for (int i = 0; i < length; i++)
 			{
 				if (!isArrayEmpty(itemProcessors))
 				{
 					for (ItemProcessor<T> itemProcessor : itemProcessors)
-					{ itemProcessor.process(array[i], i); }
+					{ itemProcessor.process(array[i], i, length); }
 				}
 			}
 			
@@ -139,12 +140,13 @@ public final class ArrayUtil
 	{
 		if (!isArrayEmpty(array))
 		{
-			for (int i = 0; i < array.length; i++)
+			int length = array.length;
+			for (int i = 0; i < length; i++)
 			{
 				if (!isArrayEmpty(itemProcessors))
 				{
 					for (ItemProcessor<Byte> itemProcessor : itemProcessors)
-					{ itemProcessor.process(array[i], i); }
+					{ itemProcessor.process(array[i], i, length); }
 				}
 			}
 			
@@ -156,5 +158,5 @@ public final class ArrayUtil
 	
 	@FunctionalInterface
 	public interface ItemProcessor<T>
-	{ void process(final T value, final int indx); }
+	{ void process(final T value, final int indx, final int length); }
 }

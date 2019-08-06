@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -123,7 +124,7 @@ public final class JavaCollectionsUtil
 	public static <T> T getItem(final Collection<T> items, final int dstIndx)
 	{
 		List<T> result = new ArrayList<T>();
-		collectionProcessor(items, (T item, int indx) -> { if (dstIndx == indx) { result.add(item);} });
+		collectionProcessor(items, (T item, int indx, int length) -> { if (dstIndx == indx) { result.add(item);} });
 		return result.get(0);
 	}
 	
@@ -152,7 +153,8 @@ public final class JavaCollectionsUtil
 	public static <K, V> Collection<String> getMapValues(final Collection<Map<K, V>> records, 
 														 final ResultSetMetaData resultSetMetaData, 
 														 final String delimiter,
-														 final DateFormat dateFomat) throws Exception
+														 final DateFormat dateFomat,
+														 final boolean useColumnName) throws Exception
 	{
 		if (!isCollectionEmpty(records))
 		{
@@ -166,7 +168,12 @@ public final class JavaCollectionsUtil
 					//根据ResultSetMetaData提供的表结构，获取变量record对应的值
 					for (int i = 1; i <= resultSetMetaData.getColumnCount(); i++) 
 					{
-						String columnName = resultSetMetaData.getColumnName(i);
+						String columnName = null;
+						if (useColumnName)
+						{ columnName = resultSetMetaData.getColumnName(i); }
+						else
+						{ columnName = resultSetMetaData.getColumnLabel(i); }
+						
 						Object columnValue = record.get(columnName);
 						
 						String value = null;
@@ -217,7 +224,7 @@ public final class JavaCollectionsUtil
 			collectionProcessor
 			(
 					maps,
-					(Map<K, V> map, int indx) ->
+					(Map<K, V> map, int indx, int length) ->
 					{
 						Collection<V> record = getMapValues(map);
 						if (!isCollectionEmpty(record)) { records.add(record); }
@@ -268,9 +275,14 @@ public final class JavaCollectionsUtil
 		if (!isCollectionEmpty(values))
 		{
 			int indx = 0;
+			int length = values.size();
 			for (T value : values)
 			{
-				if (!ArrayUtil.isArrayEmpty(itemProcessorForCollections)) { for (ItemProcessorForCollection<T> itemProcessorForCollection : itemProcessorForCollections) { itemProcessorForCollection.process(value, indx); } }
+				if (!ArrayUtil.isArrayEmpty(itemProcessorForCollections)) 
+				{
+					for (ItemProcessorForCollection<T> itemProcessorForCollection : itemProcessorForCollections) 
+					{ itemProcessorForCollection.process(value, indx, length); }
+				}
 				indx++;
 			}
 			
@@ -286,7 +298,7 @@ public final class JavaCollectionsUtil
 		return collectionProcessor
 		(
 				records, 
-				(final Map<K, V> record, final int indx) -> 
+				(final Map<K, V> record, final int indx, final int length) -> 
 				{ mapProcessor(record, itemProcessorForMaps); }
 		);
 	}
@@ -337,6 +349,30 @@ public final class JavaCollectionsUtil
 		return new ArrayList<>(set);
 	}
 	
+	public static <V> Map<String, V> mapKeyToUpperCase(final Map<String, V> map)
+	{
+		Map<String, V> result = new HashMap<>();
+		mapProcessor
+		(
+				map, 
+				(final String key, final V value, final int indx) -> 
+				{ result.put(key.toUpperCase(), value); }
+		);
+		return result;
+	}
+	
+	public static <V> Map<String, V> mapKeyToLowerCase(final Map<String, V> map)
+	{
+		Map<String, V> result = new HashMap<>();
+		mapProcessor
+		(
+				map, 
+				(final String key, final V value, final int indx) -> 
+				{ result.put(key.toLowerCase(), value); }
+		);
+		return result;
+	}
+	
 	public enum OperationType 
 	{
 		INTER_SECTION, 		//交集
@@ -351,5 +387,5 @@ public final class JavaCollectionsUtil
 	
 	@FunctionalInterface
 	public interface ItemProcessorForCollection<T>
-	{ void process(final T value, final int indx); }
+	{ void process(final T value, final int indx, final int length); }
 }

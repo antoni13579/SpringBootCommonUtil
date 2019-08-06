@@ -68,7 +68,7 @@ public final class SFtpUtil
 				ArrayUtil.arrayProcessor
 				(
 						localFiles, 
-						(localFile, indx) -> 
+						(localFile, indx, length) -> 
 						{
 							String localFilePath = localFile.getAbsolutePath();
 							String remoteFilePath = remoteDirectory + localFile.getName();
@@ -103,7 +103,7 @@ public final class SFtpUtil
 			ArrayUtil.arrayProcessor
 			(
 					localFileMultipartFiles, 
-					(localFileMultipartFile, indx) -> 
+					(localFileMultipartFile, indx, length) -> 
 					{
 						executeResult.add
 						(
@@ -154,7 +154,7 @@ public final class SFtpUtil
 				ArrayUtil.arrayProcessor
 				(
 						localFiles, 
-						(localFile, indx) -> 
+						(localFile, indx, length) -> 
 						{
 							String localFilePath = localFile.getAbsolutePath();
 							String remoteFilePath = remoteDirectory + localFile.getName();
