@@ -13,4 +13,5 @@ public abstract class AbstractDBInfo
 {
 	protected String sql;
 	protected List<Object[]> bindingParams;
+	protected boolean useColumnName;
 }

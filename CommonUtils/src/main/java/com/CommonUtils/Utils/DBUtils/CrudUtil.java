@@ -101,9 +101,14 @@ public final class CrudUtil
 					Map<String, Object> record = new HashMap<String, Object>();
 					for (int i = 1; i <= resultSetMetaData.getColumnCount(); i++) 
 					{
-						String columnName = resultSetMetaData.getColumnName(i);
+						String columnName = null;
+						if (abstractDBInfo.isUseColumnName())
+						{ columnName = resultSetMetaData.getColumnName(i); }
+						else
+						{ columnName = resultSetMetaData.getColumnLabel(i); }
+						
 						Object columnValue = resultSet.getObject(columnName);
-						record.put(columnName.toUpperCase(), columnValue);
+						record.put(columnName, columnValue);
 					}
 					
 					result.add(record);

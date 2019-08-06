@@ -21,4 +21,5 @@ public final class MySqlUrl
 	private boolean useSSL;
 	private boolean autoReconnect;
 	private boolean allowPublicKeyRetrieval;
+	private String serverTimezone;
 }

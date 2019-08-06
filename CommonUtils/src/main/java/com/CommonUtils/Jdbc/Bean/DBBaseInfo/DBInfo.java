@@ -22,7 +22,8 @@ public final class DBInfo extends AbstractDBInfo
 			  		  final String jdbcUserName, 
 			  		  final String jdbcPassWord, 
 			  		  final String sql, 
-			  		  final List<Object[]> bindingParams)
+			  		  final List<Object[]> bindingParams,
+			  		  final boolean useColumnName)
 	{
 		this.jdbcDriverName = jdbcDriverName;
 		this.jdbcUrl = jdbcUrl;
@@ -30,6 +31,7 @@ public final class DBInfo extends AbstractDBInfo
 		this.jdbcPassWord = jdbcPassWord;
 		super.sql = sql;
 		super.bindingParams = bindingParams;
+		super.useColumnName = useColumnName;
 	}
 	
 	public DBInfo(final String jdbcDriverName, 
@@ -37,19 +39,22 @@ public final class DBInfo extends AbstractDBInfo
 				  final String jdbcUserName, 
 				  final String jdbcPassWord, 
 				  final String sql, 
-				  final List<Object[]> bindingParams)
-	{ init(jdbcDriverName, jdbcUrl, jdbcUserName, jdbcPassWord, sql, bindingParams); }
+				  final List<Object[]> bindingParams,
+				  final boolean useColumnName)
+	{ init(jdbcDriverName, jdbcUrl, jdbcUserName, jdbcPassWord, sql, bindingParams, useColumnName); }
 	
 	public DBInfo(final String jdbcDriverName, 
 			  	  final String jdbcUrl, 
 			  	  final String jdbcUserName, 
 			  	  final String jdbcPassWord, 
-			  	  final String sql)
-	{ init(jdbcDriverName, jdbcUrl, jdbcUserName, jdbcPassWord, sql, Collections.emptyList()); }
+			  	  final String sql,
+			  	  final boolean useColumnName)
+	{ init(jdbcDriverName, jdbcUrl, jdbcUserName, jdbcPassWord, sql, Collections.emptyList(), useColumnName); }
 	
 	public DBInfo(final String jdbcDriverName, 
-			  final String jdbcUrl, 
-			  final String jdbcUserName, 
-			  final String jdbcPassWord)
-	{ init(jdbcDriverName, jdbcUrl, jdbcUserName, jdbcPassWord, "", Collections.emptyList()); }
+			  	  final String jdbcUrl, 
+			  	  final String jdbcUserName, 
+			  	  final String jdbcPassWord,
+			  	  final boolean useColumnName)
+	{ init(jdbcDriverName, jdbcUrl, jdbcUserName, jdbcPassWord, "", Collections.emptyList(), useColumnName); }
 }

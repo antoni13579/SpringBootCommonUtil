@@ -39,7 +39,8 @@ public class MyBatisConfiguration
                         DBContants.ORACLE_JDBC_DRIVER_NEW,
                         DBUrlUtil.getOracleUrl(new OracleUrl()),
                         "username",
-                        "password"
+                        "password",
+                        false
                 ),
                 "scsPlusEdwDataSource",
                 false

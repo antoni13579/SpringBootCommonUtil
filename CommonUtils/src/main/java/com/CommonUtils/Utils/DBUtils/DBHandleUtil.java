@@ -48,8 +48,11 @@ public final class DBHandleUtil
 				{
 					try
 					{
-						connection.setAutoCommit(true);
-						if (commit) { connection.commit(); }
+						if (commit) 
+						{
+							connection.commit();
+							connection.setAutoCommit(true);
+						}
 					}
 					catch (Exception ex)
 					{ log.error("数据库连接还原AutoCommit配置与提交事务出现异常，异常原因为：", ex); }
@@ -104,18 +107,52 @@ public final class DBHandleUtil
 		}
 	}
 	
-	public static String generateBindingParams(final long count)
+	public static String generateInsertSqlWithBindingParams(final String tableName, final long columnCount)
 	{
-		StringBuilder sb = new StringBuilder();
-		sb.append("(");
+		StringBuilder sb = new StringBuilder().append("INSERT INTO ")
+											  .append(tableName)
+											  .append(" VALUES(");
 		
-		for (long i = 0; i < count; i++)
+		for (long i = 0; i < columnCount; i++)
 		{
 			sb.append("?");
-			if (i != count - 1) { sb.append(","); }
+			if (i != columnCount - 1) { sb.append(","); }
 		}
 		
 		sb.append(")");
+		return sb.toString();
+	}
+	
+	public static String generateInsertSqlWithBindingParams(final String tableName, final String ... columnNames) throws Exception
+	{
+		if (ArrayUtil.isArrayEmpty(columnNames))
+		{ throw new Exception("生成INSERT语句，字段名称不能为空！！！"); }
+		
+		StringBuilder sb = new StringBuilder().append("INSERT INTO ")
+											  .append(tableName)
+											  .append("(");
+		ArrayUtil.arrayProcessor
+		(
+				columnNames, 
+				(final String value, final int indx, final int length) -> 
+				{
+					sb.append(value);
+					if (indx != length - 1) { sb.append(","); }
+				}
+		);
+		sb.append(") VALUES(");
+		
+		ArrayUtil.arrayProcessor
+		(
+				columnNames,
+				(final String value, final int indx, final int length) -> 
+				{
+					sb.append("?");
+					if (indx != length - 1) { sb.append(","); }
+				}
+		);
+		sb.append(")");
+		
 		return sb.toString();
 	}
 	
@@ -186,7 +223,8 @@ public final class DBHandleUtil
 	public static void setPreparedStatement(final PreparedStatementOperationType preparedStatementOperationType, 
 											final PreparedStatement preparedStatement, 
 											final ResultSetMetaData resultSetMetaData, 
-											final Collection<Map<String, Object>> params) throws SQLException
+											final Collection<Map<String, Object>> params,
+											final boolean useColumnName) throws SQLException
 	{
 		if (!JavaCollectionsUtil.isCollectionEmpty(params))
 		{
@@ -196,7 +234,12 @@ public final class DBHandleUtil
 				{
 					for (int i = 1; i <= resultSetMetaData.getColumnCount(); i++) 
 					{
-						String columnName = resultSetMetaData.getColumnName(i);
+						String columnName = null;
+						if (useColumnName)
+						{ columnName = resultSetMetaData.getColumnName(i); }
+						else
+						{ columnName = resultSetMetaData.getColumnLabel(i); }
+						
 						Object columnValue = param.get(columnName);
 						preparedStatement.setObject(i, columnValue);
 					}

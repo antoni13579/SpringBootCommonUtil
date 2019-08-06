@@ -46,6 +46,9 @@ public final class DBUrlUtil
 		
 		MYSQL_URL.append("&allowPublicKeyRetrieval=");
 		MYSQL_URL.append("$ALLOW_PUBLIC_KEY_RETRIEVAL");
+		
+		MYSQL_URL.append("&serverTimezone=");
+		MYSQL_URL.append("$SERVER_TIMEZONE");
 	}
 	
 	public static String getTeradataUrl(final TeradataUrl teradataUrl)
@@ -73,6 +76,7 @@ public final class DBUrlUtil
 		result = result.replaceAll("\\$USE_SSL", Boolean.toString(mySqlUrl.isUseSSL()));
 		result = result.replaceAll("\\$AUTO_RECONNECT", Boolean.toString(mySqlUrl.isAutoReconnect()));
 		result = result.replaceAll("\\$ALLOW_PUBLIC_KEY_RETRIEVAL", Boolean.toString(mySqlUrl.isAllowPublicKeyRetrieval()));
+		result = result.replaceAll("\\$SERVER_TIMEZONE", mySqlUrl.getServerTimezone());
 		return result;
 	}
 	

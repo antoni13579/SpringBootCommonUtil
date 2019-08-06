@@ -19,29 +19,38 @@ public final class DBInfoForDataSource extends AbstractDBInfo
 	private DataSource dataSource;
 	private JdbcTemplate jdbcTemplate;
 	
-	private void init(final DataSource dataSource, final JdbcTemplate jdbcTemplate, final String sql, final List<Object[]> bindingParams)
+	private void init(final DataSource dataSource, 
+					  final JdbcTemplate jdbcTemplate, 
+					  final String sql, 
+					  final List<Object[]> bindingParams,
+					  final boolean useColumnName)
 	{
 		this.dataSource = dataSource;
 		this.jdbcTemplate = jdbcTemplate;
 		super.sql = sql;
 		super.bindingParams = bindingParams;
+		super.useColumnName = useColumnName;
 	}
 	
 	public DBInfoForDataSource(final DataSource dataSource, 
 							   final String sql, 
-							   final List<Object[]> bindingParams)
-	{ init(dataSource, new JdbcTemplate(dataSource), sql, bindingParams); }
+							   final List<Object[]> bindingParams,
+							   final boolean useColumnName)
+	{ init(dataSource, new JdbcTemplate(dataSource), sql, bindingParams, useColumnName); }
 	
 	public DBInfoForDataSource(final DataSource dataSource, 
-			   				   final String sql)
-	{ init(dataSource, new JdbcTemplate(dataSource), sql, Collections.emptyList()); }
+			   				   final String sql,
+			   				   final boolean useColumnName)
+	{ init(dataSource, new JdbcTemplate(dataSource), sql, Collections.emptyList(), useColumnName); }
 	
 	public DBInfoForDataSource(final JdbcTemplate jdbcTemplate, 
 							   final String sql, 
-							   final List<Object[]> bindingParams)
-	{ init(jdbcTemplate.getDataSource(), jdbcTemplate, sql, bindingParams); }
+							   final List<Object[]> bindingParams,
+							   final boolean useColumnName)
+	{ init(jdbcTemplate.getDataSource(), jdbcTemplate, sql, bindingParams, useColumnName); }
 	
 	public DBInfoForDataSource(final JdbcTemplate jdbcTemplate, 
-			   				   final String sql)
-	{ init(jdbcTemplate.getDataSource(), jdbcTemplate, sql, Collections.emptyList()); }
+			   				   final String sql,
+			   				   final boolean useColumnName)
+	{ init(jdbcTemplate.getDataSource(), jdbcTemplate, sql, Collections.emptyList(), useColumnName); }
 }

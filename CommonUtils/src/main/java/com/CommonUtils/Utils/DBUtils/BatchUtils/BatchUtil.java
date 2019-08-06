@@ -85,17 +85,22 @@ public final class BatchUtil
 				Map<String, Object> record = new HashMap<String, Object>();
 				for (int i = 1; i <= sourceResultSetMetaData.getColumnCount(); i++) 
 				{
-					String columnName = sourceResultSetMetaData.getColumnName(i);
+					String columnName = null;
+					if (sourceDBInfo.isUseColumnName())
+					{ columnName = sourceResultSetMetaData.getColumnName(i); }
+					else
+					{ columnName = sourceResultSetMetaData.getColumnLabel(i); }
+					
 					Object columnValue = sourceResultSet.getObject(columnName);
-					record.put(columnName.toUpperCase(), columnValue);
+					record.put(columnName, columnValue);
 				}
 				
 				records.add(record);
 				
 				if (records.size() % DBContants.fetchSize == 0)
-				{ processAndWrite(itemProcessors, records, sourceResultSetMetaData, delimiter, bw, dateFomat); }
+				{ processAndWrite(itemProcessors, records, sourceResultSetMetaData, delimiter, bw, dateFomat, sourceDBInfo.isUseColumnName()); }
 			}
-			processAndWrite(itemProcessors, records, sourceResultSetMetaData, delimiter, bw, dateFomat);
+			processAndWrite(itemProcessors, records, sourceResultSetMetaData, delimiter, bw, dateFomat, sourceDBInfo.isUseColumnName());
 			result = true;
 		}
 		catch (Exception ex)
@@ -305,9 +310,14 @@ public final class BatchUtil
 				Map<String, Object> record = new HashMap<String, Object>();
 				for (int i = 1; i <= sourceResultSetMetaData.getColumnCount(); i++) 
 				{
-					String columnName = sourceResultSetMetaData.getColumnName(i);
+					String columnName = null;
+					if (sourceDBInfo.isUseColumnName())
+					{ columnName = sourceResultSetMetaData.getColumnName(i); }
+					else
+					{ columnName = sourceResultSetMetaData.getColumnLabel(i); }
+					
 					Object columnValue = sourceResultSet.getObject(columnName);
-					record.put(columnName.toUpperCase(), columnValue);
+					record.put(columnName, columnValue);
 				}
 				
 				records.add(record);
@@ -333,8 +343,8 @@ public final class BatchUtil
 	
 	@SafeVarargs
 	public static boolean batchFlow(final AbstractDBInfo sourceDBInfo, 
-								 final AbstractDBInfo targetDBInfo, 
-								 final ItemProcessor<Map<String, Object>> ... itemProcessors)
+								 	final AbstractDBInfo targetDBInfo, 
+								 	final ItemProcessor<Map<String, Object>> ... itemProcessors)
 	{
 		Connection sourceConnection = null;
 		Connection targetConnection = null;
@@ -379,9 +389,15 @@ public final class BatchUtil
 				Map<String, Object> record = new HashMap<String, Object>();
 				for (int i = 1; i <= sourceResultSetMetaData.getColumnCount(); i++) 
 				{
-					String columnName = sourceResultSetMetaData.getColumnName(i);
+					String columnName = null;
+					if (sourceDBInfo.isUseColumnName())
+					{ columnName = sourceResultSetMetaData.getColumnName(i); }
+					else
+					{ columnName = sourceResultSetMetaData.getColumnLabel(i); }
+					
 					Object columnValue = sourceResultSet.getObject(columnName);
-					record.put(columnName.toUpperCase(), columnValue);
+					
+					record.put(columnName, columnValue);
 				}
 				
 				records.add(record);
@@ -389,16 +405,16 @@ public final class BatchUtil
 				if (records.size() % DBContants.fetchSize == 0)
 				{
 					if (usePool)
-					{ processAndWrite(itemProcessors, records, sourceResultSetMetaData, targetJdbcTemplate, targetDBinfoForDataSource.getSql()); }
+					{ processAndWrite(itemProcessors, records, sourceResultSetMetaData, targetJdbcTemplate, targetDBinfoForDataSource.getSql(), sourceDBInfo.isUseColumnName()); }
 					else
-					{ processAndWrite(itemProcessors, records, sourceResultSetMetaData, targetPreparedStatement, targetConnection); }
+					{ processAndWrite(itemProcessors, records, sourceResultSetMetaData, targetPreparedStatement, targetConnection, sourceDBInfo.isUseColumnName()); }
 				}
 			}
 			
 			if (usePool)
-			{ processAndWrite(itemProcessors, records, sourceResultSetMetaData, targetJdbcTemplate, targetDBinfoForDataSource.getSql()); }
+			{ processAndWrite(itemProcessors, records, sourceResultSetMetaData, targetJdbcTemplate, targetDBinfoForDataSource.getSql(), sourceDBInfo.isUseColumnName()); }
 			else
-			{ processAndWrite(itemProcessors, records, sourceResultSetMetaData, targetPreparedStatement, targetConnection); }
+			{ processAndWrite(itemProcessors, records, sourceResultSetMetaData, targetPreparedStatement, targetConnection, sourceDBInfo.isUseColumnName()); }
 			
 			result = true;
 		}
@@ -431,11 +447,12 @@ public final class BatchUtil
 										final List<Map<String, Object>> records, 
 										final ResultSetMetaData sourceResultSetMetaData, 
 										final PreparedStatement targetPreparedStatement, 
-										final Connection targetConnection) throws SQLException
+										final Connection targetConnection,
+										final boolean useColumnName) throws SQLException
 	{
 		Collection<Map<String, Object>> newRecords = batchProcess(records, itemProcessors);
 		
-		DBHandleUtil.setPreparedStatement(PreparedStatementOperationType.WRITE, targetPreparedStatement, sourceResultSetMetaData, newRecords);
+		DBHandleUtil.setPreparedStatement(PreparedStatementOperationType.WRITE, targetPreparedStatement, sourceResultSetMetaData, newRecords, useColumnName);
 		DBHandleUtil.commit(new PreparedStatement[] {targetPreparedStatement}, new Connection[] {targetConnection}, true);
 		
 		records.clear();
@@ -445,7 +462,8 @@ public final class BatchUtil
 										final List<Map<String, Object>> records, 
 										final ResultSetMetaData sourceResultSetMetaData, 
 										final JdbcTemplate targetJdbcTemplate, 
-										final String sql) throws SQLException
+										final String sql,
+										final boolean useColumnName) throws SQLException
 	{
 		List<Map<String, Object>> newRecords = batchProcess(records, itemProcessors);
 		
@@ -460,7 +478,12 @@ public final class BatchUtil
 						Map<String, Object> finalRecord = newRecords.get(indx);
 						for (int i = 1; i <= sourceResultSetMetaData.getColumnCount(); i++) 
 						{
-							String columnName = sourceResultSetMetaData.getColumnName(i);
+							String columnName = null;
+							if (useColumnName)
+							{ columnName = sourceResultSetMetaData.getColumnName(i); }
+							else
+							{ columnName = sourceResultSetMetaData.getColumnLabel(i); }
+							
 							Object columnValue = finalRecord.get(columnName);
 							ps.setObject(i, columnValue);
 						}
@@ -520,10 +543,11 @@ public final class BatchUtil
 										final ResultSetMetaData sourceResultSetMetaData,
 										final String delimiter,
 										final BufferedWriter bw,
-										final DateFormat dateFomat) throws Exception
+										final DateFormat dateFomat,
+										final boolean useColumnName) throws Exception
 	{
 		List<Map<String, Object>> newRecords = batchProcess(records, itemProcessors);
-		Collection<String> lines = JavaCollectionsUtil.getMapValues(newRecords, sourceResultSetMetaData, delimiter, dateFomat);
+		Collection<String> lines = JavaCollectionsUtil.getMapValues(newRecords, sourceResultSetMetaData, delimiter, dateFomat, useColumnName);
 		if (!JavaCollectionsUtil.isCollectionEmpty(lines))
 		{
 			for (String line : lines)
