@@ -19,9 +19,13 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
 
+import org.apache.commons.collections4.map.MultiKeyMap;
+
 import com.CommonUtils.Jdbc.Bean.DBBaseInfo.AbstractDBInfo;
 import com.CommonUtils.Jdbc.Bean.DBBaseInfo.DBInfo;
 import com.CommonUtils.Jdbc.Bean.DBBaseInfo.DBInfoForDataSource;
+import com.CommonUtils.Jdbc.Bean.DBTable.Column;
+import com.CommonUtils.Jdbc.Bean.DBTable.Table;
 import com.CommonUtils.Utils.ArrayUtils.ArrayUtil;
 import com.CommonUtils.Utils.CollectionUtils.JavaCollectionsUtil;
 import com.CommonUtils.Utils.DateUtils.DateContants;
@@ -105,6 +109,50 @@ public final class DBHandleUtil
 				}
 			}
 		}
+	}
+	
+	public static Table getColumnBaseInfo(final AbstractDBInfo sourceDBInfo, final String targetTableName)
+	{
+		Connection connection = null;
+		PreparedStatement preparedStatement = null;
+		Table result = new Table().setTableName(targetTableName)
+								  .setColumns(new ArrayList<>());
+		try
+		{
+			connection = DBHandleUtil.getConnection(sourceDBInfo);
+			preparedStatement = DBHandleUtil.getPreparedStatement(PreparedStatementOperationType.READ, connection, sourceDBInfo.getSql());
+			DBHandleUtil.setPreparedStatement(PreparedStatementOperationType.READ, preparedStatement, sourceDBInfo.getBindingParams());
+			ResultSetMetaData resultSetMetaData = preparedStatement.getMetaData();
+			
+			String[] columnNames = new String[resultSetMetaData.getColumnCount()];
+			String[] columnLabels = new String[resultSetMetaData.getColumnCount()];
+			MultiKeyMap<String, Column> record = new MultiKeyMap<>();
+			for (int i = 1; i <= resultSetMetaData.getColumnCount(); i++) 
+			{
+				columnNames[i - 1] = resultSetMetaData.getColumnName(i);
+				columnLabels[i - 1] = resultSetMetaData.getColumnLabel(i);
+				record.put
+				(
+						columnLabels[i - 1], 
+						columnNames[i - 1], 
+						new Column().setColumnLabel(columnLabels[i - 1])
+						  			.setColumnName(columnNames[i - 1])
+						  			.setIndx(i - 1)
+						  			.setColumnTypeForJdbc(resultSetMetaData.getColumnType(i))
+						  			.setColumnTypeNameForJdbc(resultSetMetaData.getColumnTypeName(i))
+						  			.setColumnTypeNameForJava(resultSetMetaData.getColumnClassName(i))
+				);
+			}
+			result.getColumns().add(record);
+			result.setInsertSqlForColumnLabel(generateInsertSqlWithBindingParams(targetTableName, columnLabels))
+				  .setInsertSqlForColumnName(generateInsertSqlWithBindingParams(targetTableName, columnNames));
+		}
+		catch (Exception ex)
+		{ log.error("生成INSERT语句出现异常，异常原因为：", ex); }
+		finally
+		{ ReleaseItemUtil.releaseRelatedResourcesNoDataSource(new Connection[] {connection}, null, new PreparedStatement[] {preparedStatement}); }
+		
+		return result;
 	}
 	
 	public static String generateInsertSqlWithBindingParams(final String tableName, final long columnCount)
