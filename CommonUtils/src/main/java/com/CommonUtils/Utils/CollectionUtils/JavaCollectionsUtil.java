@@ -10,12 +10,15 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.keyvalue.MultiKey;
+import org.apache.commons.collections4.map.MultiKeyMap;
 
 import com.CommonUtils.Utils.ArrayUtils.ArrayUtil;
 import com.CommonUtils.Utils.CommonUtils.CommonUtil;
@@ -69,6 +72,14 @@ public final class JavaCollectionsUtil
 	 * 检测Map是否为空，true为空，false为非空
 	 * */
 	public static <K, V> boolean isMapEmpty(final Map<K, V> map)
+	{
+		if (null == map || map.isEmpty())
+		{ return true; }
+		
+		return false;
+	}
+	
+	public static <K, V> boolean isMapEmpty(final MultiKeyMap<K, V> map)
 	{
 		if (null == map || map.isEmpty())
 		{ return true; }
@@ -216,12 +227,13 @@ public final class JavaCollectionsUtil
 		{ return Collections.emptyList(); }
 	}
 	
-	public static <K, V> Collection<Collection<V>> getMapValues(final Collection<Map<K, V>> maps)
+	@SafeVarargs
+	public static <K, V> Collection<Collection<V>> getMapValues(final Map<K, V> ... maps)
 	{
-		if (!isCollectionEmpty(maps))
+		if (!ArrayUtil.isArrayEmpty(maps))
 		{
 			Collection<Collection<V>> records = new ArrayList<Collection<V>>();			
-			collectionProcessor
+			ArrayUtil.arrayProcessor
 			(
 					maps,
 					(Map<K, V> map, int indx, int length) ->
@@ -266,6 +278,30 @@ public final class JavaCollectionsUtil
 		{ return false; }
 	}
 	
+	@SafeVarargs
+	public static <K, V> boolean mapProcessor(final MultiKeyMap<K, V> map, final ItemProcessorForMultiKeyMap<K, V> ... itemProcessorForMultiKeyMaps)
+	{
+		if (!isMapEmpty(map))
+		{
+			Iterator<Entry<MultiKey<? extends K>, V>> entries = map.entrySet().iterator();
+			int indx = 0;
+			while (entries.hasNext())
+			{
+				Entry<MultiKey<? extends K>, V> entry = entries.next();
+				if (!ArrayUtil.isArrayEmpty(itemProcessorForMultiKeyMaps)) 
+				{
+					for (ItemProcessorForMultiKeyMap<K, V> itemProcessorForMultiKeyMap : itemProcessorForMultiKeyMaps) 
+					{ itemProcessorForMultiKeyMap.process(entry.getKey(), entry.getValue(), indx); }
+				}
+				indx++;
+			}
+			
+			return true;
+		}
+		else
+		{ return false; }
+	}
+	
 	/**
 	 * 针对Collection做的通用型迭代处理
 	 * */
@@ -300,6 +336,17 @@ public final class JavaCollectionsUtil
 				records, 
 				(final Map<K, V> record, final int indx, final int length) -> 
 				{ mapProcessor(record, itemProcessorForMaps); }
+		);
+	}
+	
+	@SafeVarargs
+	public static <K, V> boolean collectionProcessor(final Collection<MultiKeyMap<K, V>> records, final ItemProcessorForMultiKeyMap<K, V> ... itemProcessorForMultiKeyMaps)
+	{
+		return collectionProcessor
+		(
+				records,
+				(final MultiKeyMap<K, V> record, final int indx, final int length) -> 
+				{ mapProcessor(record, itemProcessorForMultiKeyMaps); }
 		);
 	}
 	
@@ -349,6 +396,21 @@ public final class JavaCollectionsUtil
 		return new ArrayList<>(set);
 	}
 	
+	public static <K, V> Map<K, V> toMap(final MultiKeyMap<K, V> map, final int keyIndex)
+	{
+		if (isMapEmpty(map))
+		{ return Collections.emptyMap(); }
+		
+		Map<K, V> result = new HashMap<>();
+		mapProcessor
+		(
+				map, 
+				(final MultiKey<? extends K> key, final V value, final int indx) -> 
+				{ result.put(key.getKey(keyIndex), value); }
+		);
+		return result;
+	}
+	
 	public static <V> Map<String, V> mapKeyToUpperCase(final Map<String, V> map)
 	{
 		Map<String, V> result = new HashMap<>();
@@ -384,6 +446,10 @@ public final class JavaCollectionsUtil
 	@FunctionalInterface
 	public interface ItemProcessorForMap<K, V>
 	{ void process(final K key, final V value, final int indx); }
+	
+	@FunctionalInterface
+	public interface ItemProcessorForMultiKeyMap<K, V>
+	{ void process(final MultiKey<? extends K> key, final V value, final int indx); }
 	
 	@FunctionalInterface
 	public interface ItemProcessorForCollection<T>
