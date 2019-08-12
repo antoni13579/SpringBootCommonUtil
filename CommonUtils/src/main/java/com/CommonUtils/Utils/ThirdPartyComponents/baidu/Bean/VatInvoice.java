@@ -151,49 +151,49 @@ public class VatInvoice
 		Collection<CommodityTaxRate> commodityTaxRateList = JsonUtil.jsonArrayToCollection
 		(
 				wordsResult.getJSONArray("CommodityTaxRate"), 
-				(paramJsonObject, paramCollection) -> { paramCollection.add(new CommodityTaxRate().setRow(paramJsonObject.getInt("row")).setWord(paramJsonObject.getString("word")).transferTaxRate()); }
+				(paramJsonObject) -> { return new CommodityTaxRate().setRow(paramJsonObject.getInt("row")).setWord(paramJsonObject.getString("word")).transferTaxRate(); }
 		);
 			
 		Collection<CommodityAmount> commodityAmountList = JsonUtil.jsonArrayToCollection
 		(
 				wordsResult.getJSONArray("CommodityAmount"),
-				(paramJsonObject, paramCollection) -> { paramCollection.add(new CommodityAmount().setRow(paramJsonObject.getInt("row")).setWord(paramJsonObject.getString("word")).transferAmount()); }
+				(paramJsonObject) -> { return new CommodityAmount().setRow(paramJsonObject.getInt("row")).setWord(paramJsonObject.getString("word")).transferAmount(); }
 		);
 		
 		Collection<CommodityTax> commodityTaxList = JsonUtil.jsonArrayToCollection
 		(
 				wordsResult.getJSONArray("CommodityTax"), 
-				(paramJsonObject, paramCollection) -> { paramCollection.add(new CommodityTax().setRow(paramJsonObject.getInt("row")).setWord(paramJsonObject.getString("word")).transferTax()); }
+				(paramJsonObject) -> { return new CommodityTax().setRow(paramJsonObject.getInt("row")).setWord(paramJsonObject.getString("word")).transferTax(); }
 		);
 		
 		Collection<CommodityNum> commodityNumList = JsonUtil.jsonArrayToCollection
 		(
 				wordsResult.getJSONArray("CommodityNum"), 
-				(paramJsonObject, paramCollection) -> { paramCollection.add(new CommodityNum().setRow(paramJsonObject.getInt("row")).setWord(paramJsonObject.getString("word")).transferNum()); }
+				(paramJsonObject) -> { return new CommodityNum().setRow(paramJsonObject.getInt("row")).setWord(paramJsonObject.getString("word")).transferNum(); }
 		);
 		
 		Collection<CommodityUnit> commodityUnitList = JsonUtil.jsonArrayToCollection
 		(
 				wordsResult.getJSONArray("CommodityUnit"), 
-				(paramJsonObject, paramCollection) -> { paramCollection.add(new CommodityUnit().setRow(paramJsonObject.getInt("row")).setWord(paramJsonObject.getString("word"))); }
+				(paramJsonObject) -> { return new CommodityUnit().setRow(paramJsonObject.getInt("row")).setWord(paramJsonObject.getString("word")); }
 		);
 		
 		Collection<CommodityPrice> commodityPriceList = JsonUtil.jsonArrayToCollection
 		(
 				wordsResult.getJSONArray("CommodityPrice"), 
-				(paramJsonObject, paramCollection) -> { paramCollection.add(new CommodityPrice().setRow(paramJsonObject.getInt("row")).setWord(paramJsonObject.getString("word")).transferPrice()); }
+				(paramJsonObject) -> { return new CommodityPrice().setRow(paramJsonObject.getInt("row")).setWord(paramJsonObject.getString("word")).transferPrice(); }
 		);
 		
 		Collection<CommodityName> commodityNameList = JsonUtil.jsonArrayToCollection
 		(
 				wordsResult.getJSONArray("CommodityName"), 
-				(paramJsonObject, paramCollection) -> { paramCollection.add(new CommodityName().setRow(paramJsonObject.getInt("row")).setWord(paramJsonObject.getString("word"))); }
+				(paramJsonObject) -> { return new CommodityName().setRow(paramJsonObject.getInt("row")).setWord(paramJsonObject.getString("word")); }
 		);
 		
 		Collection<CommodityType> commodityTypeList = JsonUtil.jsonArrayToCollection
 		(
 				wordsResult.getJSONArray("CommodityType"), 
-				(paramJsonObject, paramCollection) -> { paramCollection.add(new CommodityType().setRow(paramJsonObject.getInt("row")).setWord(paramJsonObject.getString("word"))); }
+				(paramJsonObject) -> { return new CommodityType().setRow(paramJsonObject.getInt("row")).setWord(paramJsonObject.getString("word")); }
 		);
 		
 		return new VatInvoice().setLogId(jsonObject.getLong("log_id"))

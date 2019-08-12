@@ -2,6 +2,7 @@ package com.CommonUtils.Utils.JsonUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 
 public final class JsonUtil 
 {
@@ -12,16 +13,19 @@ public final class JsonUtil
 	
 	public static <T> Collection<T> jsonArrayToCollection(final org.json.JSONArray jsonArray, final HandlerForJsonArrayTransferToCollection<T> handlerForJsonArrayTransferToCollection)
 	{
+		if (null == jsonArray || null == handlerForJsonArrayTransferToCollection)
+		{ return Collections.emptyList(); }
+		
 		Collection<T> collection = new ArrayList<>();
-		for (Object obj : jsonArray)
-		{
-			org.json.JSONObject tmpJsonObject = (org.json.JSONObject)obj;
-			handlerForJsonArrayTransferToCollection.process(tmpJsonObject, collection);
-		}
+		jsonArray.forEach
+		(
+				obj -> 
+				{ collection.add(handlerForJsonArrayTransferToCollection.process((org.json.JSONObject)obj)); }
+		);
 		return collection;
 	}
 	
 	@FunctionalInterface
 	public interface HandlerForJsonArrayTransferToCollection<T>
-	{ void process(final org.json.JSONObject jsonObject, final Collection<T> collection); }
+	{ T process(final org.json.JSONObject jsonObject); }
 }
