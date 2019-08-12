@@ -33,7 +33,7 @@ import com.CommonUtils.Utils.HttpUtils.Bean.RegisterInfo;
 import com.CommonUtils.Utils.HttpUtils.Bean.SimpleResponse;
 import com.CommonUtils.Utils.Office.Excel.ExcelUtil;
 import com.CommonUtils.Utils.Office.Excel.Bean.ExcelData;
-import com.CommonUtils.Utils.SpringSecurityUtils.SpringSecurityUtil;
+import com.CommonUtils.Utils.SecurityUtils.SpringSecurityUtil;
 import com.CommonUtils.Utils.StringUtils.StringContants;
 import com.CommonUtils.Utils.StringUtils.StringUtil;
 import com.CommonUtils.Utils.TreeUtils.Bean.TreeNode;
@@ -114,9 +114,9 @@ public class HomeRestController
 	(
 			{ @ApiImplicitParam(name = "authentication", value = "SpringSecurity用户信息", required = true, dataTypeClass = Authentication.class) }
 	)
-	public Mono<User> getCurrentUserName(Authentication authentication) throws Exception
+	public Mono<User> getCurrentUserName(Authentication authentication)
 	{
-		UserDetails user = SpringSecurityUtil.getUser(authentication).orElseThrow(() -> new Exception("获取验证用户为空！！"));
+		UserDetails user = SpringSecurityUtil.getUser(authentication);
 		return Mono.just((User)user);
 	}
 	
