@@ -20,7 +20,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.AuthorityUtils;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
@@ -30,7 +29,7 @@ import com.CommonUtils.SpringSecurity.Config.Encoder.BCryptPasswordEncoderConfig
 import com.CommonUtils.SpringSecurity.Config.Role.RoleHierarchyConfig;
 import com.CommonUtils.Utils.HttpUtils.HttpUtil;
 import com.CommonUtils.Utils.HttpUtils.Bean.SimpleResponse;
-import com.CommonUtils.Utils.SpringSecurityUtils.SpringSecurityUtil;
+import com.CommonUtils.Utils.SecurityUtils.SpringSecurityUtil;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -110,7 +109,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter
 			    					MediaType.APPLICATION_JSON_UTF8
 			    			);
 			    			
-			    			UserDetails user = SpringSecurityUtil.getUser(authentication).orElseGet(() -> new User("defaultAdmin", "!@#$%^&*()_+", AuthorityUtils.commaSeparatedStringToAuthorityList("ADMIN")));
+			    			UserDetails user = SpringSecurityUtil.getUser(authentication);
 			    			String userName = user.getUsername();
 			    			
 			    			//如果使用了默认用户登录，需要输出警告日志，因为SpringSecurityUtil的getUser如果有问题，会返回一个默认用户，这个需要排查一下问题
@@ -214,8 +213,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter
 						String encryptPassword = BCryptPasswordEncoderConfig.getInstance().encode("asd");
 						
 						//本来直接输入密码就可以了，不过由于不是用create bean模式注入，采用函数式编程，因此密码需要自己手工加密再传入
-						User user = new User(username, encryptPassword, AuthorityUtils.commaSeparatedStringToAuthorityList("admin"));
-						return user;
+						return SpringSecurityUtil.getUser(username, encryptPassword, AuthorityUtils.commaSeparatedStringToAuthorityList("admin"));
 					}
 			);
 		
