@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -20,12 +21,17 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.keyvalue.MultiKey;
 import org.apache.commons.collections4.map.MultiKeyMap;
 
+import com.CommonUtils.Jdbc.Bean.DBTable.Column;
+import com.CommonUtils.Jdbc.Bean.DBTable.Table;
 import com.CommonUtils.Utils.ArrayUtils.ArrayUtil;
 import com.CommonUtils.Utils.CommonUtils.CommonUtil;
 import com.CommonUtils.Utils.DateUtils.DateFormat;
 import com.CommonUtils.Utils.StringUtils.StringContants;
 import com.CommonUtils.Utils.StringUtils.StringUtil;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public final class JavaCollectionsUtil 
 {
 	private JavaCollectionsUtil() {}
@@ -66,6 +72,62 @@ public final class JavaCollectionsUtil
 			map.put(key, value);
 			return value;
 		}
+	}
+	
+	@SafeVarargs
+	public static <K, V> Optional<V> getOrElseUpdate(final MultiKeyMap<K, V> map, final V value, final K ... keys)
+	{
+		V result = null;
+		
+		if (!ArrayUtil.isArrayEmpty(keys))
+		{
+			if (keys.length == 1)
+			{ log.warn("使用getOrElseUpdate，key的数量必须2个以上"); }
+			else if (keys.length == 2)
+			{
+				if (map.containsKey(keys[0], keys[1]))
+				{ result = map.get(keys[0], keys[1]); }
+				else
+				{
+					map.put(keys[0], keys[1], value);
+					result = value;
+				}
+			}
+			else if (keys.length == 3)
+			{
+				if (map.containsKey(keys[0], keys[1], keys[2]))
+				{ result = map.get(keys[0], keys[1], keys[2]); }
+				else
+				{
+					map.put(keys[0], keys[1], keys[2], value);
+					result = value;
+				}
+			}
+			else if (keys.length == 4)
+			{
+				if (map.containsKey(keys[0], keys[1], keys[2], keys[3]))
+				{ result = map.get(keys[0], keys[1], keys[2], keys[3]); }
+				else
+				{
+					map.put(keys[0], keys[1], keys[2], keys[3], value);
+					result = value;
+				}
+			}
+			else if (keys.length == 5)
+			{
+				if (map.containsKey(keys[0], keys[1], keys[2], keys[3], keys[4]))
+				{ result = map.get(keys[0], keys[1], keys[2], keys[3], keys[4]); }
+				else
+				{
+					map.put(keys[0], keys[1], keys[2], keys[3], keys[4], value);
+					result = value;
+				}
+			}
+			else
+			{ log.warn("使用getOrElseUpdate，key的数量超过5个，请注意处理"); }
+		}
+		
+		return Optional.ofNullable(result);
 	}
 	
 	/**
@@ -227,31 +289,17 @@ public final class JavaCollectionsUtil
 		{ return Collections.emptyList(); }
 	}
 	
-	@SafeVarargs
-	public static <K, V> Collection<Collection<V>> getMapValues(final Map<K, V> ... maps)
-	{
-		if (!ArrayUtil.isArrayEmpty(maps))
-		{
-			Collection<Collection<V>> records = new ArrayList<Collection<V>>();			
-			ArrayUtil.arrayProcessor
-			(
-					maps,
-					(Map<K, V> map, int indx, int length) ->
-					{
-						Collection<V> record = getMapValues(map);
-						if (!isCollectionEmpty(record)) { records.add(record); }
-					}
-		    );
-			return records;
-		}
-		else
-		{ return Collections.emptyList(); }
-	}
-	
 	public static <K, V> Collection<V> getMapValues(final Map<K, V> map)
 	{
 		Collection<V> records = new ArrayList<V>();
 		mapProcessor(map, (K key, V value, int indx) -> { records.add(value); });
+		return records;
+	}
+	
+	public static <K, V> Collection<V> getMapValues(final MultiKeyMap<K, V> map)
+	{
+		Collection<V> records = new ArrayList<>();
+		mapProcessor(map, (final MultiKey<? extends K> key, final V value, final int indx) -> { records.add(value); });
 		return records;
 	}
 	
@@ -407,6 +455,21 @@ public final class JavaCollectionsUtil
 				map, 
 				(final MultiKey<? extends K> key, final V value, final int indx) -> 
 				{ result.put(key.getKey(keyIndex), value); }
+		);
+		return result;
+	}
+	
+	public static Collection<Map<String, Column>> toMaps(final Table table, final int keyIndex)
+	{
+		if (null == table || isCollectionEmpty(table.getColumns()))
+		{ return Collections.emptyList(); }
+		
+		List<Map<String, Column>> result = new ArrayList<>();
+		collectionProcessor
+		(
+				table.getColumns(),
+				(final MultiKeyMap<String, Column> value, final int indx, final int length) ->
+				{ result.add(toMap(value, keyIndex)); }
 		);
 		return result;
 	}
