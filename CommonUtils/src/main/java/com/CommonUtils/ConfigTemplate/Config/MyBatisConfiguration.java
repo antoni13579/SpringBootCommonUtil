@@ -18,14 +18,13 @@ import com.CommonUtils.Mybatis.Config.SqlSessionFactoryConfig;
 import com.CommonUtils.Utils.DBUtils.DBContants;
 import com.CommonUtils.Utils.DBUtils.DBUrlUtil;
 
-/**
- * 
+/***
 @EnableTransactionManagement
 @Aspect
 @Configuration
 @MapperScan(basePackages = {"com.ExtractDataToTD.MyBatis.ScsPlus.Edw.Dao"},
             sqlSessionTemplateRef = "scsPlusEdwSqlSessionTemplate")
- * */
+**/
 public class MyBatisConfiguration 
 {
 	@Bean(name = "scsPlusEdwDataSource", destroyMethod = "close")

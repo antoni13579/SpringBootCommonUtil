@@ -16,7 +16,7 @@ public final class SqlSessionFactoryConfig
 	{
 		SqlSessionFactoryBean bean = new SqlSessionFactoryBean();
 		bean.setDataSource(dataSource);
-        bean.setPlugins(new Interceptor[] {PageConfig.getInstance()});
+        bean.setPlugins(new Interceptor[] {PageConfig.getGithubPageInterceptor()});
 		bean.setConfiguration(MybatisBaseConfig.getInstance());
 		bean.setMapperLocations(new PathMatchingResourcePatternResolver().getResources(getMapperPath(mapperXmlPath)));
 		return bean.getObject();
@@ -26,7 +26,7 @@ public final class SqlSessionFactoryConfig
 	{
 		com.CommonUtils.Mybatis.Custom.SqlSessionFactoryBean bean = new com.CommonUtils.Mybatis.Custom.SqlSessionFactoryBean();
 		bean.setDataSource(dataSource);
-        bean.setPlugins(new Interceptor[] {PageConfig.getInstance()});
+        bean.setPlugins(new Interceptor[] {PageConfig.getGithubPageInterceptor()});
 		//bean.setConfiguration(MybatisBaseConfig.getInstance());
         // TODO
         // 加载全局的配置文件，如classpath:sqlMapConfig.xml

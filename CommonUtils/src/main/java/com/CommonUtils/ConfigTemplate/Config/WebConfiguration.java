@@ -34,11 +34,15 @@ import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.util.unit.DataSize;
 import org.springframework.web.WebApplicationInitializer;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.servlet.AsyncHandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.config.annotation.AsyncSupportConfigurer;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -110,6 +114,23 @@ public class WebConfiguration implements WebMvcConfigurer, WebApplicationInitial
         return registration;
 	}
 	
+	@Bean
+	public CorsFilter corsFilter() 
+	{
+		final UrlBasedCorsConfigurationSource urlBasedCorsConfigurationSource = new UrlBasedCorsConfigurationSource();
+		final CorsConfiguration corsConfiguration = new CorsConfiguration();
+		/* 是否允许请求带有验证信息 */
+		corsConfiguration.setAllowCredentials(true);
+		/* 允许访问的客户端域名 */
+		corsConfiguration.addAllowedOrigin("*");
+		/* 允许服务端访问的客户端请求头 */
+		corsConfiguration.addAllowedHeader("*");
+		/* 允许访问的方法名,GET POST等 */
+		corsConfiguration.addAllowedMethod("*");
+		urlBasedCorsConfigurationSource.registerCorsConfiguration("/**", corsConfiguration);
+		return new CorsFilter(urlBasedCorsConfigurationSource);
+	}
+	
 	/**
 	  *  解决转码问题Spring @responseBody 问题，设置下载断点续传，
 	 * */
@@ -128,6 +149,7 @@ public class WebConfiguration implements WebMvcConfigurer, WebApplicationInitial
 	/**
 	 * 未使用Spring Security的情况下，开启跨域支持
 	 * */
+	/*
 	@Override
 	public void addCorsMappings(CorsRegistry registry)
 	{
@@ -149,6 +171,7 @@ public class WebConfiguration implements WebMvcConfigurer, WebApplicationInitial
 			
 			.maxAge(3600);
 	}
+	*/
 	
 	@Override
 	public void addFormatters(FormatterRegistry registry)
@@ -189,6 +212,29 @@ public class WebConfiguration implements WebMvcConfigurer, WebApplicationInitial
 	{
 		servletContext.getSessionCookieConfig().setHttpOnly(true);        
 		servletContext.getSessionCookieConfig().setSecure(false); 
+	}
+	
+	/**
+	 * 访问根路径默认跳转 index.html页面 （简化部署方案： 可以把前端打包直接放到项目的 webapp，上面的配置）
+	 */
+	@Override
+	public void addViewControllers(ViewControllerRegistry registry) 
+	{
+		//registry.addViewController("/").setViewName("doc.html");
+		//registry.addViewController("/").setViewName("index.html");
+	}
+	
+	/**
+	 * 静态资源的配置 - 使得可以从磁盘中读取 Html、图片、视频、音频等
+	 */
+	@Override
+	public void addResourceHandlers(ResourceHandlerRegistry registry) 
+	{
+		/*
+		registry.addResourceHandler("/**")
+		.addResourceLocations("file:" + upLoadPath + "//", "file:" + webAppPath + "//")
+		.addResourceLocations(staticLocations.split(","));
+		*/
 	}
 	
 	public final class ShowRequestUrlFilter implements Filter

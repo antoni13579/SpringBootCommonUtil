@@ -1,24 +1,40 @@
 package com.CommonUtils.Mybatis.Config;
 
 import com.CommonUtils.Utils.CollectionUtils.CustomCollections.Properties;
+import com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor;
 import com.github.pagehelper.PageInterceptor;
 
 public final class PageConfig 
 {
-	private static PageInterceptor INSTANCE = null;
+	private static PageInterceptor GITHUB_PAGE_INTERCEPTOR = null;
+	private static PaginationInterceptor BAOMIDOU_PAGINATION_INTERCEPTOR = null;
 	
 	private PageConfig() {}
 	
-	public static PageInterceptor getInstance()
+	public static PaginationInterceptor getBaomidouPaginationInterceptor()
 	{
-		if (null == INSTANCE)
+		if (null == BAOMIDOU_PAGINATION_INTERCEPTOR)
 		{
 			synchronized (PageConfig.class)
 			{
-				if (null == INSTANCE)
+				if (null == BAOMIDOU_PAGINATION_INTERCEPTOR)
+				{ BAOMIDOU_PAGINATION_INTERCEPTOR = new PaginationInterceptor(); }
+			}
+		}
+		
+		return BAOMIDOU_PAGINATION_INTERCEPTOR;
+	}
+	
+	public static PageInterceptor getGithubPageInterceptor()
+	{
+		if (null == GITHUB_PAGE_INTERCEPTOR)
+		{
+			synchronized (PageConfig.class)
+			{
+				if (null == GITHUB_PAGE_INTERCEPTOR)
 				{
-					INSTANCE = new PageInterceptor();			        
-			        INSTANCE.setProperties
+					GITHUB_PAGE_INTERCEPTOR = new PageInterceptor();			        
+					GITHUB_PAGE_INTERCEPTOR.setProperties
 			        (
 			        		new Properties().setProperty("reasonable", "true")
 			        						.setProperty("supportMethodsArguments", "true")
@@ -31,6 +47,6 @@ public final class PageConfig
 			}
 		}
 		
-		return INSTANCE;
+		return GITHUB_PAGE_INTERCEPTOR;
 	}
 }
