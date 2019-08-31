@@ -16,6 +16,14 @@ public final class BytesUtil
 {
 	private BytesUtil() {}
 	
+	public static <T> byte getByte(final T obj) throws Exception
+	{
+		if (obj instanceof Byte)
+		{ return Byte.parseByte(obj.toString()); }
+		else
+		{ throw new Exception("无法转换为byte类型"); }
+	}
+	
 	/**字节数组转换为对象*/
 	public static <T> T fromBytes(byte[] bytes)
 	{

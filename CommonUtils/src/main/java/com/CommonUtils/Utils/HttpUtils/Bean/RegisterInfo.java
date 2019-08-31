@@ -14,4 +14,5 @@ public class RegisterInfo
 	private String registerName;
 	private String registerPassword;
 	private String registerEmail;
+	private String registerMobilePhone;
 }

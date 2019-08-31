@@ -40,4 +40,12 @@ public final class CharacterUtil
 		
 		return Optional.ofNullable(iArr);
 	}
+	
+	public static <T> char getChar(final T obj) throws Exception
+	{
+		if (obj instanceof Character)
+		{ return (char)obj; }
+		else
+		{ throw new Exception("无法转换为char类型"); }
+	}
 }

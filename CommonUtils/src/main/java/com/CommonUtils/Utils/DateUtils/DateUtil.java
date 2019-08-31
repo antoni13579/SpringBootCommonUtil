@@ -3,6 +3,7 @@ package com.CommonUtils.Utils.DateUtils;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
@@ -26,6 +27,22 @@ public final class DateUtil
 {
 	private DateUtil() {}
 	
+	public static <T> java.sql.Date getSqlDate(final T obj) throws Exception
+	{
+		if (obj instanceof java.sql.Date)
+		{ return (java.sql.Date)obj; }
+		else
+		{ throw new Exception("无法转换为java.sql.Date类型"); }
+	}
+	
+	public static <T> java.util.Date getDate(final T obj) throws Exception
+	{
+		if (obj instanceof java.util.Date)
+		{ return (java.util.Date)obj; }
+		else
+		{ throw new Exception("无法转换为java.util.Date类型"); }
+	}
+	
 	/**java.util.Date转换为java.sql.Date*/
 	public static java.sql.Date getDate(final Date date)
 	{ return new java.sql.Date(date.getTime()); }
@@ -43,6 +60,22 @@ public final class DateUtil
 	
 	public static Timestamp getTimestamp(final oracle.sql.TIMESTAMP timestamp) throws SQLException
 	{ return timestamp.timestampValue(); }
+	
+	public static <T> java.sql.Timestamp getTimestamp(final T obj) throws Exception
+	{
+		if (obj instanceof java.sql.Timestamp)
+		{ return (java.sql.Timestamp)obj; }
+		else
+		{ throw new Exception("无法转换为java.sql.Timestamp类型"); }
+	}
+	
+	public static <T> oracle.sql.TIMESTAMP getOracleTimestamp(final T obj) throws Exception
+	{
+		if (obj instanceof oracle.sql.TIMESTAMP)
+		{ return (oracle.sql.TIMESTAMP)obj; }
+		else
+		{ throw new Exception("无法转换为oracle.sql.TIMESTAMP类型"); }
+	}
 	
 	/**
 	 * 指定的日期累加或累减，并返回计算后的日期, type对应于Calendar的常量值，如Calendar.DAY_OF_MONTH
@@ -92,7 +125,7 @@ public final class DateUtil
 				//每月的最后一天
 				if ("MONTHLY_LAST_DAY".equalsIgnoreCase(timeType))
 				{
-					if (date.compareTo(DateUtil.getLastDate(date)) == 0)
+					if (date.compareTo(DateUtil.getLastDate(date, Calendar.DAY_OF_MONTH)) == 0)
 					{ result.add(date); }
 				}
 				
@@ -224,13 +257,15 @@ public final class DateUtil
 	}
 	
 	/**
-	 * 获取月份的最后一天
+	 * 获取最后一天
+	 * type输入为Calendar.DAY_OF_MONTH，获取当月的最后一天
+	 * type输入为Calendar.DAY_OF_YEAR，获取当年的最后一天
 	 * */
-	public static Date getLastDate(final Date stlDate)
+	public static Date getLastDate(final Date stlDate, final int type)
 	{
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(stlDate);
-		cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
+		cal.set(type, cal.getActualMaximum(type));
 		return cal.getTime();
 	}
 	
@@ -353,4 +388,34 @@ public final class DateUtil
 		);
 		return result;
 	}
+	
+	public static int getYear(final Date date)
+	{ return getField(date, Calendar.YEAR); }
+	
+	public static int getMonth(final Date date)
+	{ return getField(date, Calendar.MONTH) + 1; }
+	
+	public static int getDay(final Date date)
+	{ return getField(date, Calendar.DAY_OF_MONTH); }
+	
+	public static int getTotalDayForMonth(final Date date)
+	{ return getTotalDayForMonth(getYear(date), getMonth(date)); }
+	
+	public static int getTotalDayForMonth(final int year, final int month)
+	{
+		Calendar c = Calendar.getInstance();
+		c.set(year, month, 0);
+		return c.get(Calendar.DAY_OF_MONTH);
+	}
+	
+	public static int getTotalDayForYear(final int year)
+	{
+		if (year % 4 == 0)
+		{ return 366; }
+		
+		return 365;
+	}
+	
+	public static int getTotalDayForYear(final Date date)
+	{ return getTotalDayForYear(getYear(date)); }
 }

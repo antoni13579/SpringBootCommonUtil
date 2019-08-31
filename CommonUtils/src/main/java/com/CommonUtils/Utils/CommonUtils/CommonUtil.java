@@ -4,7 +4,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.math.BigDecimal;
 
 import com.CommonUtils.Utils.IOUtils.IOUtil;
 
@@ -61,7 +60,7 @@ public final class CommonUtil
 		return dest;
 	}
 	
-	public static boolean getBoolean(final Object obj) throws Exception
+	public static <T> boolean getBoolean(final T obj) throws Exception
 	{
 		if (obj instanceof Boolean)
 		{ return (boolean)obj; }
@@ -93,83 +92,11 @@ public final class CommonUtil
 		{ throw new Exception("无法转换为float类型"); }
 	}
 	
-	public static <T> double getDouble(final T obj) throws Exception
-	{
-		if (obj instanceof Double)
-		{ return Double.parseDouble(obj.toString()); }
-		else
-		{ throw new Exception("无法转换为double类型"); }
-	}
-	
-	public static char getChar(final Object obj) throws Exception
-	{
-		if (obj instanceof Character)
-		{ return (char)obj; }
-		else
-		{ throw new Exception("无法转换为char类型"); }
-	}
-	
 	public static <T> long getLong(final T obj) throws Exception
 	{
 		if (obj instanceof Long)
 		{ return Long.parseLong(obj.toString()); }
 		else
 		{ throw new Exception("无法转换为long类型"); }
-	}
-	
-	public static <T> byte getByte(final T obj) throws Exception
-	{
-		if (obj instanceof Byte)
-		{ return Byte.parseByte(obj.toString()); }
-		else
-		{ throw new Exception("无法转换为byte类型"); }
-	}
-	
-	public static <T> String getString(final T obj) throws Exception
-	{
-		if (obj instanceof String)
-		{ return String.valueOf(obj); }
-		else
-		{ throw new Exception("无法转换为String类型"); }
-	}
-	
-	public static <T> BigDecimal getBigDecimal(final T obj) throws Exception
-	{
-		if (obj instanceof BigDecimal)
-		{ return new BigDecimal(obj.toString()); }
-		else
-		{ throw new Exception("无法转换为BigDecimal类型"); }
-	}
-	
-	public static <T> java.sql.Date getSqlDate(final T obj) throws Exception
-	{
-		if (obj instanceof java.sql.Date)
-		{ return (java.sql.Date)obj; }
-		else
-		{ throw new Exception("无法转换为java.sql.Date类型"); }
-	}
-	
-	public static <T> java.util.Date getDate(final T obj) throws Exception
-	{
-		if (obj instanceof java.util.Date)
-		{ return (java.util.Date)obj; }
-		else
-		{ throw new Exception("无法转换为java.util.Date类型"); }
-	}
-	
-	public static <T> java.sql.Timestamp getTimestamp(final T obj) throws Exception
-	{
-		if (obj instanceof java.sql.Timestamp)
-		{ return (java.sql.Timestamp)obj; }
-		else
-		{ throw new Exception("无法转换为java.sql.Timestamp类型"); }
-	}
-	
-	public static <T> oracle.sql.TIMESTAMP getOracleTimestamp(final T obj) throws Exception
-	{
-		if (obj instanceof oracle.sql.TIMESTAMP)
-		{ return (oracle.sql.TIMESTAMP)obj; }
-		else
-		{ throw new Exception("无法转换为oracle.sql.TIMESTAMP类型"); }
 	}
 }

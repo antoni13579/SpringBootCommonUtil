@@ -24,8 +24,8 @@ import org.apache.commons.collections4.map.MultiKeyMap;
 import com.CommonUtils.Jdbc.Bean.DBTable.Column;
 import com.CommonUtils.Jdbc.Bean.DBTable.Table;
 import com.CommonUtils.Utils.ArrayUtils.ArrayUtil;
-import com.CommonUtils.Utils.CommonUtils.CommonUtil;
 import com.CommonUtils.Utils.DateUtils.DateFormat;
+import com.CommonUtils.Utils.DateUtils.DateUtil;
 import com.CommonUtils.Utils.StringUtils.StringContants;
 import com.CommonUtils.Utils.StringUtils.StringUtil;
 
@@ -252,22 +252,22 @@ public final class JavaCollectionsUtil
 						String value = null;
 						if (columnValue instanceof java.util.Date)
 						{
-							java.util.Date date = CommonUtil.getDate(columnValue);
+							java.util.Date date = DateUtil.getDate(columnValue);
 							value = StringUtil.toString(date, dateFomat); 
 						}
 						else if (columnValue instanceof java.sql.Date)
 						{
-							java.sql.Date date = CommonUtil.getSqlDate(columnValue);
+							java.sql.Date date = DateUtil.getSqlDate(columnValue);
 							value = StringUtil.toString(date, dateFomat); 
 						}
 						else if (columnValue instanceof java.sql.Timestamp)
 						{
-							java.sql.Timestamp date = CommonUtil.getTimestamp(columnValue);
+							java.sql.Timestamp date = DateUtil.getTimestamp(columnValue);
 							value = StringUtil.toString(date, dateFomat); 
 						}
 						else if (columnValue instanceof oracle.sql.TIMESTAMP)
 						{
-							oracle.sql.TIMESTAMP date = CommonUtil.getOracleTimestamp(columnValue);
+							oracle.sql.TIMESTAMP date = DateUtil.getOracleTimestamp(columnValue);
 							value = StringUtil.toString(date, dateFomat); 
 						}
 						else
@@ -400,7 +400,7 @@ public final class JavaCollectionsUtil
 	
 	public static <T> Collection<T> collectionOperation(final Collection<T> a, final Collection<T> b, final OperationType operationType)
 	{
-		if (isCollectionEmpty(a) || isCollectionEmpty(b) || null == operationType)
+		if (null == a || null == b || null == operationType)
 		{ return Collections.emptyList(); }
 		
 		switch (operationType)

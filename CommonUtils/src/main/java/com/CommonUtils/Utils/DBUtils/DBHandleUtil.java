@@ -13,11 +13,15 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.map.MultiKeyMap;
 
@@ -26,6 +30,7 @@ import com.CommonUtils.Jdbc.Bean.DBBaseInfo.DBInfo;
 import com.CommonUtils.Jdbc.Bean.DBBaseInfo.DBInfoForDataSource;
 import com.CommonUtils.Jdbc.Bean.DBTable.Column;
 import com.CommonUtils.Jdbc.Bean.DBTable.Table;
+
 import com.CommonUtils.Utils.ArrayUtils.ArrayUtil;
 import com.CommonUtils.Utils.CollectionUtils.JavaCollectionsUtil;
 import com.CommonUtils.Utils.DateUtils.DateContants;
@@ -33,6 +38,10 @@ import com.CommonUtils.Utils.DateUtils.DateUtil;
 import com.CommonUtils.Utils.IOUtils.FileUtil;
 import com.CommonUtils.Utils.IOUtils.IOUtil;
 import com.CommonUtils.Utils.StringUtils.StringUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.IService;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -314,6 +323,23 @@ public final class DBHandleUtil
 		return sb.toString();
 	}
 	
+	public static <T, R> List<R> getPrimaryKey(final Function<? super T, ? extends R> mapper, final Collection<T> beans)
+	{
+		if (!JavaCollectionsUtil.isCollectionEmpty(beans))
+		{ return beans.stream().map(mapper).collect(Collectors.toList()); }
+		else
+		{ return Collections.emptyList(); }
+	}
+	
+	@SafeVarargs
+	public static <T, R> List<R> getPrimaryKey(final Function<? super T, ? extends R> mapper, final T ... beans)
+	{
+		if (!ArrayUtil.isArrayEmpty(beans))
+		{ return getPrimaryKey(mapper, Arrays.asList(beans)); }
+		else
+		{ return Collections.emptyList(); }
+	}
+	
 	/**
 	 * 读取文件里面的查询SQL语句，把格式化好的SQL转换为一行SQL语句，可以直接提供给java调用，
 	 * 不过写的粗糙，有如下限制
@@ -359,5 +385,77 @@ public final class DBHandleUtil
 		{ IOUtil.closeQuietly(fis, isr, br); }
 		
 		return result;
+	}
+	
+	@SafeVarargs
+	public static <T> void pageQueryHandlerBeanForMybatisPlus(final double totalDataCount, 
+		  	  												  final double pageSize, 
+		  	  												  final IService<T> service, 
+		  	  												  final QueryWrapper<T> queryWrapper,
+		  	  												  final JavaCollectionsUtil.ItemProcessorForCollection<T> ... itemProcessorForCollections)
+	{ pageQueryHandlerBeanForMybatisPlus(totalDataCount, pageSize, service.getBaseMapper(), queryWrapper, itemProcessorForCollections); }
+	
+	@SafeVarargs
+	public static <T> void pageQueryHandlerBeanForMybatisPlus(final double totalDataCount, 
+														  	  final double pageSize, 
+														  	  final BaseMapper<T> baseMapper, 
+														  	  final QueryWrapper<T> queryWrapper,
+														  	  final JavaCollectionsUtil.ItemProcessorForCollection<T> ... itemProcessorForCollections)
+	{		
+		double totalPage = Math.ceil((totalDataCount + pageSize - 1) / pageSize);
+		for (long pageNo = 1; pageNo < totalPage; pageNo++)
+		{
+			Page<T> page = new Page<T>(pageNo, new Double(pageSize).longValue());
+			List<T> records = baseMapper.selectPage(page, queryWrapper).getRecords();
+			JavaCollectionsUtil.collectionProcessor
+			(
+					records, 
+					(final T value, final int indx, final int length) -> 
+					{
+						ArrayUtil.arrayProcessor
+						(
+								itemProcessorForCollections, 
+								(final JavaCollectionsUtil.ItemProcessorForCollection<T> val, final int inx, final int len) -> 
+								{ val.process(value, indx, length); }
+						);
+					}
+			);
+		}
+	}
+	
+	@SafeVarargs
+	public static <T> void pageQueryHandlerMapForMybatisPlus(final double totalDataCount, 
+				 											 final double pageSize, 
+				 											 final IService<T> service, 
+				 											 final QueryWrapper<T> queryWrapper,
+				 											 final JavaCollectionsUtil.ItemProcessorForMap<String, Object> ... itemProcessorForMaps)
+	{ pageQueryHandlerMapForMybatisPlus(totalDataCount, pageSize, service.getBaseMapper(), queryWrapper, itemProcessorForMaps); }
+	
+	@SafeVarargs
+	public static <T> void pageQueryHandlerMapForMybatisPlus(final double totalDataCount, 
+		  	  												 final double pageSize, 
+		  	  												 final BaseMapper<T> baseMapper, 
+		  	  												 final QueryWrapper<T> queryWrapper,
+		  	  												 final JavaCollectionsUtil.ItemProcessorForMap<String, Object> ... itemProcessorForMaps)
+	{
+		double totalPage = Math.ceil((totalDataCount + pageSize - 1) / pageSize);
+		for (long pageNo = 1; pageNo < totalPage; pageNo++)
+		{
+			Page<T> page = new Page<T>(pageNo, new Double(pageSize).longValue());
+			List<Map<String, Object>> records = baseMapper.selectMapsPage(page, queryWrapper).getRecords();
+			JavaCollectionsUtil.collectionProcessor
+			(
+					records, 
+					(final String key, final Object value, final int indx) -> 
+					{
+						ArrayUtil.arrayProcessor
+						(
+								itemProcessorForMaps, 
+								(final JavaCollectionsUtil.ItemProcessorForMap<String, Object> val, final int inx, final int len) -> 
+								{ val.process(key, value, indx); }
+						);
+					}
+			);
+		}
 	}
 }

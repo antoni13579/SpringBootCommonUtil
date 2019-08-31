@@ -1,5 +1,8 @@
 package com.CommonUtils.Utils.ArrayUtils;
 
+import java.util.Collections;
+import java.util.Map;
+
 import com.CommonUtils.Utils.StringUtils.StringUtil;
 
 public final class ArrayUtil 
@@ -73,6 +76,17 @@ public final class ArrayUtil
 	 * 检测Array是否为空，true为空，false为非空
 	 * */
 	public static boolean isArrayEmpty(final char[] array)
+	{
+		if (null == array || array.length == 0)
+		{ return true; }
+		
+		return false;
+	}
+	
+	/**
+	 * 检测Array是否为空，true为空，false为非空
+	 * */
+	public static boolean isArrayEmpty(final long[] array)
 	{
 		if (null == array || array.length == 0)
 		{ return true; }
@@ -154,6 +168,154 @@ public final class ArrayUtil
 		}
 		else
 		{ return false; }
+	}
+	
+	public static Map<String, Integer> getMaxAndMin(final int ... vals)
+	{
+		if (!isArrayEmpty(vals))
+		{
+			int len = vals.length;
+			int min = vals[0];
+			int max = min;
+			for (int i = 0; i < len; i++)
+			{
+				int val = vals[i];
+				
+				if (min > val) 
+				{ min = val; }
+				
+	            if (max < val) 
+	            { max = val; }
+			}
+			
+			return new com.CommonUtils.Utils.CollectionUtils.CustomCollections.HashMap<String, Integer>()
+					.put("MAX", max)
+					.put("MIN", min)
+					.getMap();
+		}
+		else
+		{ return Collections.emptyMap(); }
+	}
+	
+	public static Map<String, Integer> getMaxAndMin(final Integer ... vals)
+	{
+		if (!isArrayEmpty(vals))
+		{
+			int len = vals.length;
+			Integer min = vals[0];
+			Integer max = min;
+			for (int i = 0; i < len; i++)
+			{
+				Integer val = vals[i];
+				
+				if (min > val) 
+				{ min = val; }
+				
+	            if (max < val) 
+	            { max = val; }
+			}
+			
+			return new com.CommonUtils.Utils.CollectionUtils.CustomCollections.HashMap<String, Integer>()
+					.put("MAX", max)
+					.put("MIN", min)
+					.getMap();
+		}
+		else
+		{ return Collections.emptyMap(); }
+	}
+	
+	public static Map<String, Long> getMaxAndMin(final long ... vals)
+	{
+		if (!isArrayEmpty(vals))
+		{
+			int len = vals.length;
+			long min = vals[0];
+			long max = min;
+			for (int i = 0; i < len; i++)
+			{
+				long val = vals[i];
+				
+				if (min > val) 
+				{ min = val; }
+				
+	            if (max < val) 
+	            { max = val; }
+			}
+			
+			return new com.CommonUtils.Utils.CollectionUtils.CustomCollections.HashMap<String, Long>()
+					.put("MAX", max)
+					.put("MIN", min)
+					.getMap();
+		}
+		else
+		{ return Collections.emptyMap(); }
+	}
+	
+	public static Map<String, Long> getMaxAndMin(final Long ... vals)
+	{
+		if (!isArrayEmpty(vals))
+		{
+			int len = vals.length;
+			Long min = vals[0];
+			Long max = min;
+			for (int i = 0; i < len; i++)
+			{
+				Long val = vals[i];
+				
+				if (min > val) 
+				{ min = val; }
+				
+	            if (max < val) 
+	            { max = val; }
+			}
+			
+			return new com.CommonUtils.Utils.CollectionUtils.CustomCollections.HashMap<String, Long>()
+					.put("MAX", max)
+					.put("MIN", min)
+					.getMap();
+		}
+		else
+		{ return Collections.emptyMap(); }
+	}
+	
+	public static <T> String[] getStringArray(final T obj) throws Exception
+	{
+		if (obj instanceof String[])
+		{ return (String[])obj; }
+		else
+		{ throw new Exception("无法转换为String[]类型"); }
+	}
+	
+	public static <T> Integer[] getIntegerArrayForWrapperClass(final T obj) throws Exception
+	{
+		if (obj instanceof Integer[])
+		{ return (Integer[])obj; }
+		else
+		{ throw new Exception("无法转换为Integer[]类型"); }
+	}
+	
+	public static <T> int[] getIntegerArray(final T obj) throws Exception
+	{
+		if (obj instanceof int[])
+		{ return (int[])obj; }
+		else
+		{ throw new Exception("无法转换为int[]类型"); }
+	}
+	
+	public static <T> Long[] getLongArrayForWrapperClass(final T obj) throws Exception
+	{
+		if (obj instanceof Long[])
+		{ return (Long[])obj; }
+		else
+		{ throw new Exception("无法转换为Long[]类型"); }
+	}
+	
+	public static <T> long[] getLongArray(final T obj) throws Exception
+	{
+		if (obj instanceof long[])
+		{ return (long[])obj; }
+		else
+		{ throw new Exception("无法转换为long[]类型"); }
 	}
 	
 	@FunctionalInterface
