@@ -65,6 +65,7 @@
 		<shiro.version>1.4.0</shiro.version>
 		<mybatisplus.version>3.1.2</mybatisplus.version>
 		<druid.version>1.1.10</druid.version>
+		<jwt.version>3.8.2</jwt.version>
 	</properties>
 
 	<dependencies>
@@ -522,6 +523,13 @@
     		<groupId>com.alibaba</groupId>
     		<artifactId>druid-spring-boot-starter</artifactId>
     		<version>${druid.version}</version>
+		</dependency>
+		
+		<!--JWT-->
+		<dependency>
+			<groupId>com.auth0</groupId>
+			<artifactId>java-jwt</artifactId>
+			<version>${jwt.version}</version>
 		</dependency>
 		
 		<!-- 测试相关框架 -->

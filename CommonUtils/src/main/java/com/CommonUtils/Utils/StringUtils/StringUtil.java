@@ -18,11 +18,15 @@ import org.wltea.analyzer.core.IKSegmenter;
 import org.wltea.analyzer.core.Lexeme;
 
 import com.CommonUtils.Utils.ArrayUtils.ArrayUtil;
+import com.CommonUtils.Utils.BigDecimalUtils.BigDecimalUtil;
+import com.CommonUtils.Utils.BytesUtils.BytesUtil;
+import com.CommonUtils.Utils.CharacterUtils.CharacterUtil;
 import com.CommonUtils.Utils.CollectionUtils.JavaCollectionsUtil;
 import com.CommonUtils.Utils.CommonUtils.CommonUtil;
 import com.CommonUtils.Utils.DateUtils.DateContants;
 import com.CommonUtils.Utils.DateUtils.DateFormat;
 import com.CommonUtils.Utils.DateUtils.DateUtil;
+import com.CommonUtils.Utils.DoubleUtils.DoubleUtil;
 import com.CommonUtils.Utils.StringUtils.Bean.Calculation;
 
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +35,14 @@ import lombok.extern.slf4j.Slf4j;
 public final class StringUtil 
 {
 	private StringUtil() {}
+	
+	public static <T> String getString(final T obj) throws Exception
+	{
+		if (obj instanceof String)
+		{ return String.valueOf(obj); }
+		else
+		{ throw new Exception("无法转换为String类型"); }
+	}
 	
 	/**
 	 * 检测字符串是否为空，true为空，false为非空
@@ -124,13 +136,13 @@ public final class StringUtil
 		}
 		else if (value instanceof Double)
 		{
-			double val = CommonUtil.getDouble(value);
+			double val = DoubleUtil.getDouble(value);
 			String result = Double.toString(val);
 			return result;
 		}
 		else if (value instanceof Character)
 		{
-			char val = CommonUtil.getChar(value);
+			char val = CharacterUtil.getChar(value);
 			String result = Character.toString(val);
 			return result;
 		}
@@ -142,18 +154,18 @@ public final class StringUtil
 		}
 		else if (value instanceof Byte)
 		{
-			byte val = CommonUtil.getByte(value);
+			byte val = BytesUtil.getByte(value);
 			String result = Byte.toString(val);
 			return result;
 		}
 		else if (value instanceof String)
 		{
-			String val = CommonUtil.getString(value);
+			String val = StringUtil.getString(value);
 			return val;
 		}
 		else if (value instanceof BigDecimal)
 		{
-			BigDecimal val = CommonUtil.getBigDecimal(value);
+			BigDecimal val = BigDecimalUtil.getBigDecimal(value);
 			String result = val.toString();
 			return result;
 		}
