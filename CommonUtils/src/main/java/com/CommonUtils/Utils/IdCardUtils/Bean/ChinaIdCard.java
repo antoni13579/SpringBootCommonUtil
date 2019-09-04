@@ -3,11 +3,11 @@ package com.CommonUtils.Utils.IdCardUtils.Bean;
 import java.util.Date;
 import java.util.Optional;
 
-import com.CommonUtils.Utils.DateUtils.DateContants;
-import com.CommonUtils.Utils.DateUtils.DateUtil;
+import com.CommonUtils.Utils.DataTypeUtils.DateUtils.DateContants;
+import com.CommonUtils.Utils.DataTypeUtils.DateUtils.DateUtil;
+import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
 import com.CommonUtils.Utils.IdCardUtils.EGender;
 import com.CommonUtils.Utils.IdCardUtils.IdCardContants;
-import com.CommonUtils.Utils.StringUtils.StringUtil;
 
 import lombok.Getter;
 import lombok.Setter;

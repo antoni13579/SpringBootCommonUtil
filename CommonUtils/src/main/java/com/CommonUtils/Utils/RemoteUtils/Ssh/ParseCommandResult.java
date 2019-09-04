@@ -5,9 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.CommonUtils.Utils.ArrayUtils.ArrayUtil;
-import com.CommonUtils.Utils.CollectionUtils.JavaCollectionsUtil;
-import com.CommonUtils.Utils.StringUtils.StringUtil;
+import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
+import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
+import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
 
 public final class ParseCommandResult
 {	

@@ -2,8 +2,8 @@ package com.CommonUtils.Utils.RemoteUtils;
 
 import java.io.Closeable;
 
-import com.CommonUtils.Utils.ArrayUtils.ArrayUtil;
-import com.CommonUtils.Utils.CollectionUtils.CustomCollections.Properties;
+import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
+import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.CustomCollections.Properties;
 import com.CommonUtils.Utils.IOUtils.IOUtil;
 import com.CommonUtils.Utils.RemoteUtils.Bean.RemoteInfo;
 import com.jcraft.jsch.Channel;

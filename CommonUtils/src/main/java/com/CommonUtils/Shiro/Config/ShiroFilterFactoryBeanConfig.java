@@ -9,7 +9,7 @@ import javax.servlet.Filter;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 
-import com.CommonUtils.Utils.CollectionUtils.JavaCollectionsUtil;
+import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
 
 import lombok.Getter;
 import lombok.ToString;

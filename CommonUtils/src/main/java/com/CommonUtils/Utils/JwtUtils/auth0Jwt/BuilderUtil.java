@@ -6,11 +6,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 
-import com.CommonUtils.Utils.ArrayUtils.ArrayUtil;
 import com.CommonUtils.Utils.CommonUtils.CommonUtil;
-import com.CommonUtils.Utils.DateUtils.DateUtil;
-import com.CommonUtils.Utils.DoubleUtils.DoubleUtil;
-import com.CommonUtils.Utils.StringUtils.StringUtil;
+import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
+import com.CommonUtils.Utils.DataTypeUtils.DateUtils.DateUtil;
+import com.CommonUtils.Utils.DataTypeUtils.DoubleUtils.DoubleUtil;
+import com.CommonUtils.Utils.DataTypeUtils.IntegerUtils.IntegerUtil;
+import com.CommonUtils.Utils.DataTypeUtils.LongUtils.LongUtil;
+import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTCreator.Builder;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -42,10 +44,10 @@ public final class BuilderUtil
 			{ this.builder.withClaim(name, CommonUtil.getBoolean(value)); }
 			
 			else if (value instanceof Integer) 
-			{ this.builder.withClaim(name, CommonUtil.getInteger(value)); }
+			{ this.builder.withClaim(name, IntegerUtil.getInteger(value)); }
 			
 			else if (value instanceof Long) 
-			{ this.builder.withClaim(name, CommonUtil.getLong(value)); }
+			{ this.builder.withClaim(name, LongUtil.getLong(value)); }
 			
 			else if (value instanceof Double) 
 			{ this.builder.withClaim(name, DoubleUtil.getDouble(value)); }

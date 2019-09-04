@@ -25,9 +25,9 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.util.UriUtils;
 
+import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
 import com.CommonUtils.Utils.HttpUtils.Bean.DownloadFileInfo;
 import com.CommonUtils.Utils.IOUtils.IOUtil;
-import com.CommonUtils.Utils.StringUtils.StringUtil;
 
 import lombok.extern.slf4j.Slf4j;
 

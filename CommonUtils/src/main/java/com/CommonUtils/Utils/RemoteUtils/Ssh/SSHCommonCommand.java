@@ -1,7 +1,7 @@
 package com.CommonUtils.Utils.RemoteUtils.Ssh;
 
-import com.CommonUtils.Utils.ArrayUtils.ArrayUtil;
-import com.CommonUtils.Utils.StringUtils.StringUtil;
+import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
+import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
 
 public final class SSHCommonCommand 
 {

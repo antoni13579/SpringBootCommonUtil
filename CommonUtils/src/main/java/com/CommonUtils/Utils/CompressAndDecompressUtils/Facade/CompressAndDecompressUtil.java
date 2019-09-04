@@ -5,10 +5,10 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import com.CommonUtils.Utils.ArrayUtils.ArrayUtil;
-import com.CommonUtils.Utils.CollectionUtils.JavaCollectionsUtil;
 import com.CommonUtils.Utils.CompressAndDecompressUtils.ECompressAndDecompress;
 import com.CommonUtils.Utils.CompressAndDecompressUtils.SubSystem.ZipUtil;
+import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
+import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
 import com.CommonUtils.Utils.IOUtils.FileUtil;
 
 public final class CompressAndDecompressUtil 

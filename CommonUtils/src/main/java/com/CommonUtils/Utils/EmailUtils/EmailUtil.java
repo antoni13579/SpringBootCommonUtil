@@ -6,7 +6,7 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 
-import com.CommonUtils.Utils.ArrayUtils.ArrayUtil;
+import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
 
 import lombok.extern.slf4j.Slf4j;
 

@@ -15,7 +15,7 @@ import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import com.CommonUtils.Jdbc.Bean.DBBaseInfo.AbstractDBInfo;
 import com.CommonUtils.Jdbc.Bean.DBBaseInfo.DBInfo;
 import com.CommonUtils.Jdbc.Bean.DBBaseInfo.DBInfoForDataSource;
-import com.CommonUtils.Utils.CollectionUtils.JavaCollectionsUtil;
+import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
 
 import lombok.extern.slf4j.Slf4j;
 

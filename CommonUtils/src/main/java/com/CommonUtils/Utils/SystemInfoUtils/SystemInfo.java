@@ -1,6 +1,6 @@
 package com.CommonUtils.Utils.SystemInfoUtils;
 
-import com.CommonUtils.Utils.StringUtils.StringUtil;
+import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
 
 public final class SystemInfo 
 {

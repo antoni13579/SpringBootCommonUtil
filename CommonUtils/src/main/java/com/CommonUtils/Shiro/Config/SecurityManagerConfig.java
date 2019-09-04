@@ -9,7 +9,7 @@ import org.apache.shiro.realm.Realm;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 
 import com.CommonUtils.Shiro.Bean.RealmAndCredentialsMatcherDefinition;
-import com.CommonUtils.Utils.ArrayUtils.ArrayUtil;
+import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
 
 public final class SecurityManagerConfig 
 {

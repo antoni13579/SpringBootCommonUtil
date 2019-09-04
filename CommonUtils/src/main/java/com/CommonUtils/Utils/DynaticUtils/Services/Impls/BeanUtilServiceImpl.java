@@ -18,8 +18,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Service;
 
-import com.CommonUtils.Utils.CollectionUtils.JavaCollectionsUtil;
-import com.CommonUtils.Utils.StringUtils.StringUtil;
+import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
+import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
 
 import lombok.extern.slf4j.Slf4j;
 

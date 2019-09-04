@@ -10,7 +10,7 @@ import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.web.context.request.async.DeferredResult;
 
 import com.CommonUtils.ConfigTemplate.Bean.ExcelBean;
-import com.CommonUtils.Utils.CollectionUtils.JavaCollectionsUtil;
+import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
 import com.CommonUtils.Utils.Office.Excel.Bean.ExcelData;
 import com.CommonUtils.Utils.TreeUtils.TreeUtil;
 import com.CommonUtils.Utils.TreeUtils.Bean.TreeNode;

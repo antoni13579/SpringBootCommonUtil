@@ -6,7 +6,7 @@ import com.CommonUtils.Jdbc.Bean.Url.PostgreSqlUrl;
 import com.CommonUtils.Jdbc.Bean.Url.SqlServerUrl;
 import com.CommonUtils.Jdbc.Bean.Url.TeradataUrl;
 import com.CommonUtils.Utils.DBUtils.DBContants.SqlServerJdbcDriver;
-import com.CommonUtils.Utils.StringUtils.StringUtil;
+import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
 
 public final class DBUrlUtil 
 {

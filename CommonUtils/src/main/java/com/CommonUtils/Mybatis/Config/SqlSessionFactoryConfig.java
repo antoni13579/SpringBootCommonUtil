@@ -2,11 +2,16 @@ package com.CommonUtils.Mybatis.Config;
 
 import javax.sql.DataSource;
 
+import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+
+import com.baomidou.mybatisplus.core.MybatisConfiguration;
+import com.baomidou.mybatisplus.core.config.GlobalConfig;
+import com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean;
 
 public final class SqlSessionFactoryConfig 
 {
@@ -17,12 +22,12 @@ public final class SqlSessionFactoryConfig
 		SqlSessionFactoryBean bean = new SqlSessionFactoryBean();
 		bean.setDataSource(dataSource);
         bean.setPlugins(new Interceptor[] {PageConfig.getGithubPageInterceptor()});
-		bean.setConfiguration(MybatisBaseConfig.getInstance());
+		bean.setConfiguration(MybatisBaseConfig.getConfigurationForMyBatis());
 		bean.setMapperLocations(new PathMatchingResourcePatternResolver().getResources(getMapperPath(mapperXmlPath)));
 		return bean.getObject();
 	}
 	
-	public SqlSessionFactory getInstance(final DataSource dataSource, final String mapperXmlPath, final String configPath) throws Exception
+	public static SqlSessionFactory getInstance(final DataSource dataSource, final String mapperXmlPath, final String configPath) throws Exception
 	{
 		com.CommonUtils.Mybatis.Custom.SqlSessionFactoryBean bean = new com.CommonUtils.Mybatis.Custom.SqlSessionFactoryBean();
 		bean.setDataSource(dataSource);
@@ -34,6 +39,40 @@ public final class SqlSessionFactoryConfig
 		bean.setMapperLocations(new PathMatchingResourcePatternResolver().getResources(getMapperPath(mapperXmlPath)));
 		return bean.getObject();
 	}
+	
+	/*
+	@SafeVarargs
+	public static MybatisSqlSessionFactoryBean getInstance(final Class<? extends Log> ... logs)
+	{
+		MybatisConfiguration mybatisConfiguration = MybatisBaseConfig.getConfigurationForMyBatisPlus(logs);
+		mybatisConfiguration.setGlobalConfig(new GlobalConfig().setBanner(false).setDbConfig(dbConfig));
+		
+		MybatisSqlSessionFactoryBean mybatisPlus = new MybatisSqlSessionFactoryBean();
+		mybatisPlus.setCache(cache);
+		//mybatisPlus.setConfigLocation(configLocation);
+		mybatisPlus.setConfiguration(MybatisBaseConfig.getInstance(logs));
+		mybatisPlus.setConfigurationProperties(sqlSessionFactoryProperties);
+		mybatisPlus.setDatabaseIdProvider(databaseIdProvider);
+		mybatisPlus.setDataSource(dataSource);
+		mybatisPlus.setEnvironment(environment);
+		mybatisPlus.setFailFast(failFast);
+		mybatisPlus.setGlobalConfig(globalConfig);
+		mybatisPlus.setMapperLocations(mapperLocations);
+		mybatisPlus.setObjectFactory(objectFactory);
+		mybatisPlus.setObjectWrapperFactory(objectWrapperFactory);
+		mybatisPlus.setPlugins(plugins);
+		mybatisPlus.setSqlSessionFactoryBuilder(sqlSessionFactoryBuilder);
+		mybatisPlus.setTransactionFactory(transactionFactory);
+		mybatisPlus.setTypeAliases(typeAliases);
+		mybatisPlus.setTypeAliasesPackage(typeAliasesPackage);
+		mybatisPlus.setTypeAliasesSuperType(typeAliasesSuperType);
+		mybatisPlus.setTypeEnumsPackage(typeEnumsPackage);
+		mybatisPlus.setTypeHandlers(typeHandlers);
+		mybatisPlus.setTypeHandlersPackage(typeHandlersPackage);
+		mybatisPlus.setVfs(vfs);
+		return mybatisPlus;
+	}
+	*/
 	
 	/**
 	 * 生成mapper xml的路径

@@ -30,14 +30,14 @@ import com.CommonUtils.Jdbc.Bean.DBBaseInfo.DBInfo;
 import com.CommonUtils.Jdbc.Bean.DBBaseInfo.DBInfoForDataSource;
 import com.CommonUtils.Jdbc.Bean.DBTable.Column;
 import com.CommonUtils.Jdbc.Bean.DBTable.Table;
-
-import com.CommonUtils.Utils.ArrayUtils.ArrayUtil;
-import com.CommonUtils.Utils.CollectionUtils.JavaCollectionsUtil;
-import com.CommonUtils.Utils.DateUtils.DateContants;
-import com.CommonUtils.Utils.DateUtils.DateUtil;
+import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
+import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
+import com.CommonUtils.Utils.DataTypeUtils.DateUtils.DateContants;
+import com.CommonUtils.Utils.DataTypeUtils.DateUtils.DateUtil;
+import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
 import com.CommonUtils.Utils.IOUtils.FileUtil;
 import com.CommonUtils.Utils.IOUtils.IOUtil;
-import com.CommonUtils.Utils.StringUtils.StringUtil;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -327,6 +327,15 @@ public final class DBHandleUtil
 	{
 		if (!JavaCollectionsUtil.isCollectionEmpty(beans))
 		{ return beans.stream().map(mapper).collect(Collectors.toList()); }
+		else
+		{ return Collections.emptyList(); }
+	}
+
+	@SafeVarargs
+	public static <R> List<R> getPrimaryKey(final Function<Map<String, Object>, ? extends R> mapper, final Map<String, Object> ... beans)
+	{
+		if (!ArrayUtil.isArrayEmpty(beans))
+		{ return getPrimaryKey(mapper, Arrays.asList(beans)); }
 		else
 		{ return Collections.emptyList(); }
 	}

@@ -12,8 +12,8 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
-import com.CommonUtils.Utils.CollectionUtils.JavaCollectionsUtil;
 import com.CommonUtils.Utils.CommonUtils.CommonUtil;
+import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
 
 import lombok.extern.slf4j.Slf4j;
 

@@ -9,7 +9,7 @@ import org.springframework.transaction.interceptor.RuleBasedTransactionAttribute
 import org.springframework.transaction.interceptor.TransactionAttribute;
 import org.springframework.transaction.interceptor.TransactionAttributeSource;
 
-import com.CommonUtils.Utils.CollectionUtils.CustomCollections.HashMap;
+import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.CustomCollections.HashMap;
 
 public final class TransactionAttributeConfig 
 {

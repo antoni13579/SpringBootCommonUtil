@@ -14,7 +14,7 @@ import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.scheduling.quartz.SpringBeanJobFactory;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import com.CommonUtils.Utils.CollectionUtils.CustomCollections.Properties;
+import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.CustomCollections.Properties;
 
 /**
  * 使用此配置类，记得使用create bean功能，

@@ -8,9 +8,9 @@ import java.util.Set;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import com.CommonUtils.Utils.ArrayUtils.ArrayUtil;
-import com.CommonUtils.Utils.CollectionUtils.JavaCollectionsUtil;
 import com.CommonUtils.Utils.CommonUtils.CommonUtil;
+import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
+import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
 import com.CommonUtils.Utils.IOUtils.DirectoryUtil;
 import com.CommonUtils.Utils.IOUtils.FileUtil;
 import com.CommonUtils.Utils.IOUtils.IOUtil;

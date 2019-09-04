@@ -6,7 +6,7 @@ import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.interceptor.TransactionInterceptor;
 
-import com.CommonUtils.Utils.ArrayUtils.ArrayUtil;
+import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
 
 public final class TxAdviceAdvisorConfig 
 {

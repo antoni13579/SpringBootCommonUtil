@@ -7,9 +7,9 @@ import java.util.Iterator;
 import org.dom4j.Attribute;
 import org.dom4j.Element;
 
-import com.CommonUtils.Utils.CollectionUtils.JavaCollectionsUtil;
 import com.CommonUtils.Utils.CommonUtils.CommonUtil;
-import com.CommonUtils.Utils.StringUtils.StringUtil;
+import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
+import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
 import com.alibaba.fastjson.JSON;
 
 import lombok.Getter;

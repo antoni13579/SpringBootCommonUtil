@@ -6,7 +6,7 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 
-import com.CommonUtils.Utils.CollectionUtils.CustomCollections.HashMap;
+import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.CustomCollections.HashMap;
 
 /**使用此类，记得进行create bean动作，并加入@EnableKafka注解*/
 public final class ProducerRelatedConfig 

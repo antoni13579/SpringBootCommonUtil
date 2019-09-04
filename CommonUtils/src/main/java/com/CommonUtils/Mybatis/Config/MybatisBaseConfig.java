@@ -5,7 +5,10 @@ import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.LocalCacheScope;
 
-import com.CommonUtils.Utils.ArrayUtils.ArrayUtil;
+import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
+import com.baomidou.mybatisplus.core.MybatisConfiguration;
+import com.baomidou.mybatisplus.core.config.GlobalConfig;
+import com.baomidou.mybatisplus.core.config.GlobalConfig.DbConfig;
 
 public final class MybatisBaseConfig 
 {	
@@ -16,7 +19,7 @@ public final class MybatisBaseConfig
 	 * ExecutorType设置为Batch，使用批处理DML
 	 * */
 	@SafeVarargs
-	public static Configuration getInstance(final Class<? extends Log> ... logs) throws Exception
+	public static Configuration getConfigurationForMyBatis(final Class<? extends Log> ... logs) throws Exception
 	{
 		Configuration instance = new Configuration();
 		instance.setCacheEnabled(true);
@@ -37,6 +40,41 @@ public final class MybatisBaseConfig
 			else
 			{ throw new Exception("MybatisBaseConfig配置不正确，指定MyBatis执行输出日志的类只能是一个！！"); }
 		}
+		
+		return instance;
+	}
+	
+	public static MybatisConfiguration getConfigurationForMyBatisPlus(final Class<? extends Log> ... logs) throws Exception
+	{
+		MybatisConfiguration instance = new MybatisConfiguration();
+		instance.setCacheEnabled(true);
+		instance.setMultipleResultSetsEnabled(true);
+		
+		instance.setLocalCacheScope(LocalCacheScope.STATEMENT);
+		
+		instance.setUseColumnLabel(false);
+		
+		instance.setUseGeneratedKeys(true);
+		instance.setDefaultExecutorType(ExecutorType.BATCH);
+		instance.setDefaultStatementTimeout(25000);
+		
+		if (!ArrayUtil.isArrayEmpty(logs))
+		{
+			if (logs.length == 1)
+			{ instance.setLogImpl(logs[0]); }
+			else
+			{ throw new Exception("MybatisBaseConfig配置不正确，指定MyBatis执行输出日志的类只能是一个！！"); }
+		}
+		
+		instance.setGlobalConfig
+		(
+				new GlobalConfig()
+					.setBanner(false)
+					.setDbConfig
+					(
+							new DbConfig().setTableUnderline(true)
+					)
+		);
 		
 		return instance;
 	}

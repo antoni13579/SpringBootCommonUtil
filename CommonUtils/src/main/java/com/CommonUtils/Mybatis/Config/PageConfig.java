@@ -1,6 +1,6 @@
 package com.CommonUtils.Mybatis.Config;
 
-import com.CommonUtils.Utils.CollectionUtils.CustomCollections.Properties;
+import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.CustomCollections.Properties;
 import com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor;
 import com.github.pagehelper.PageInterceptor;
 

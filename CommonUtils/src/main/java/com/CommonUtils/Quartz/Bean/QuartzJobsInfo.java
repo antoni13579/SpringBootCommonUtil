@@ -5,8 +5,8 @@ import java.util.Map;
 
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
+import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
 import com.CommonUtils.Utils.ReflectUtils.ReflectUtil;
-import com.CommonUtils.Utils.StringUtils.StringUtil;
 
 import lombok.Getter;
 import lombok.Setter;

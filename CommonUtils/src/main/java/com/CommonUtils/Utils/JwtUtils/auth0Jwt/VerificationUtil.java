@@ -5,11 +5,13 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.CommonUtils.Utils.ArrayUtils.ArrayUtil;
 import com.CommonUtils.Utils.CommonUtils.CommonUtil;
-import com.CommonUtils.Utils.DateUtils.DateUtil;
-import com.CommonUtils.Utils.DoubleUtils.DoubleUtil;
-import com.CommonUtils.Utils.StringUtils.StringUtil;
+import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
+import com.CommonUtils.Utils.DataTypeUtils.DateUtils.DateUtil;
+import com.CommonUtils.Utils.DataTypeUtils.DoubleUtils.DoubleUtil;
+import com.CommonUtils.Utils.DataTypeUtils.IntegerUtils.IntegerUtil;
+import com.CommonUtils.Utils.DataTypeUtils.LongUtils.LongUtil;
+import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -38,10 +40,10 @@ public final class VerificationUtil
 			{ this.verification.withClaim(name, CommonUtil.getBoolean(value)); }
 			
 			else if (value instanceof Integer) 
-			{ this.verification.withClaim(name, CommonUtil.getInteger(value)); }
+			{ this.verification.withClaim(name, IntegerUtil.getInteger(value)); }
 			
 			else if (value instanceof Long) 
-			{ this.verification.withClaim(name, CommonUtil.getLong(value)); }
+			{ this.verification.withClaim(name, LongUtil.getLong(value)); }
 			
 			else if (value instanceof Double) 
 			{ this.verification.withClaim(name, DoubleUtil.getDouble(value)); }

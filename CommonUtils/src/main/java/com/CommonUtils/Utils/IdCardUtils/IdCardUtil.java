@@ -3,11 +3,11 @@ package com.CommonUtils.Utils.IdCardUtils;
 import java.util.Calendar;
 import java.util.Date;
 
-import com.CommonUtils.Utils.ArrayUtils.ArrayUtil;
-import com.CommonUtils.Utils.CharacterUtils.CharacterUtil;
-import com.CommonUtils.Utils.DateUtils.DateContants;
-import com.CommonUtils.Utils.DateUtils.DateUtil;
-import com.CommonUtils.Utils.StringUtils.StringUtil;
+import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
+import com.CommonUtils.Utils.DataTypeUtils.CharacterUtils.CharacterUtil;
+import com.CommonUtils.Utils.DataTypeUtils.DateUtils.DateContants;
+import com.CommonUtils.Utils.DataTypeUtils.DateUtils.DateUtil;
+import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
 
 import lombok.extern.slf4j.Slf4j;
 

@@ -5,7 +5,7 @@ import javax.servlet.MultipartConfigElement;
 import org.springframework.boot.web.servlet.MultipartConfigFactory;
 import org.springframework.util.unit.DataSize;
 
-import com.CommonUtils.Utils.StringUtils.StringUtil;
+import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
 
 /**在使用这个配置类的时候，需要进行create bean操作*/
 public final class MultipartConfigElementConfig 

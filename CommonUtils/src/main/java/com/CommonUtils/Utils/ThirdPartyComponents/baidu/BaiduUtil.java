@@ -17,7 +17,7 @@ import org.json.JSONObject;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.CommonUtils.Utils.CollectionUtils.JavaCollectionsUtil;
+import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
 import com.CommonUtils.Utils.HttpUtils.HttpUtil;
 import com.CommonUtils.Utils.IOUtils.FileUtil;
 import com.CommonUtils.Utils.IOUtils.IOUtil;

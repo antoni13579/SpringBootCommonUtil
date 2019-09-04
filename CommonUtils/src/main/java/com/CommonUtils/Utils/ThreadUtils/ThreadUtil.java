@@ -18,8 +18,8 @@ import java.util.function.Supplier;
 
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
-import com.CommonUtils.Utils.ArrayUtils.ArrayUtil;
-import com.CommonUtils.Utils.CollectionUtils.JavaCollectionsUtil;
+import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
+import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;

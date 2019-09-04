@@ -14,8 +14,8 @@ import java.util.Iterator;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 
-import com.CommonUtils.Utils.CollectionUtils.JavaCollectionsUtil;
 import com.CommonUtils.Utils.CommonUtils.CommonUtil;
+import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
 import com.CommonUtils.Utils.XmlUtils.Bean.XmlNode;
 import com.alibaba.fastjson.JSON;
 import com.thoughtworks.xstream.XStream;

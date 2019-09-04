@@ -2,7 +2,7 @@ package com.CommonUtils.Utils.IdCardUtils;
 
 import java.util.Map;
 
-import com.CommonUtils.Utils.CollectionUtils.CustomCollections.HashMap;
+import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.CustomCollections.HashMap;
 
 public final class IdCardContants 
 {

@@ -7,10 +7,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.CommonUtils.Utils.CollectionUtils.JavaCollectionsUtil;
+import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
+import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
 import com.CommonUtils.Utils.RemoteUtils.RemoteUtil;
 import com.CommonUtils.Utils.RemoteUtils.Bean.RemoteInfo;
-import com.CommonUtils.Utils.StringUtils.StringUtil;
+
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.Session;
 

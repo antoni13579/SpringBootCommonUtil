@@ -8,7 +8,7 @@ import org.springframework.kafka.config.KafkaListenerContainerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 
-import com.CommonUtils.Utils.CollectionUtils.CustomCollections.HashMap;
+import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.CustomCollections.HashMap;
 
 /**使用此类，记得进行create bean动作，并加入@EnableKafka注解*/
 public final class ConsumerRelatedConfig 

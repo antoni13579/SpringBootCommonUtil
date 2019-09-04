@@ -2,7 +2,7 @@ package com.CommonUtils.Utils.TreeUtils.Bean;
 
 import java.util.Collection;
 
-import com.CommonUtils.Utils.CollectionUtils.JavaCollectionsUtil;
+import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
 
 import lombok.Getter;
 import lombok.Setter;

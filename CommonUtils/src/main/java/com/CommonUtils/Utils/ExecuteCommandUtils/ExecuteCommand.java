@@ -1,6 +1,6 @@
 package com.CommonUtils.Utils.ExecuteCommandUtils;
 
-import com.CommonUtils.Utils.StringUtils.StringUtil;
+import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
 import com.CommonUtils.Utils.SystemInfoUtils.SystemInfo;
 import com.CommonUtils.Utils.SystemInfoUtils.SystemPlatform;
 

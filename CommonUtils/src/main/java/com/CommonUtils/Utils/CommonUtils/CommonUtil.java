@@ -68,14 +68,6 @@ public final class CommonUtil
 		{ throw new Exception("无法转换为boolean类型"); }
 	}
 	
-	public static <T> int getInteger(final T obj) throws Exception
-	{
-		if (obj instanceof Integer)
-		{ return Integer.parseInt(obj.toString()); }
-		else
-		{ throw new Exception("无法转换为int类型"); }
-	}
-	
 	public static <T> short getShort(final T obj) throws Exception
 	{
 		if (obj instanceof Short)
@@ -90,13 +82,5 @@ public final class CommonUtil
 		{ return Float.parseFloat(obj.toString()); }
 		else
 		{ throw new Exception("无法转换为float类型"); }
-	}
-	
-	public static <T> long getLong(final T obj) throws Exception
-	{
-		if (obj instanceof Long)
-		{ return Long.parseLong(obj.toString()); }
-		else
-		{ throw new Exception("无法转换为long类型"); }
 	}
 }
