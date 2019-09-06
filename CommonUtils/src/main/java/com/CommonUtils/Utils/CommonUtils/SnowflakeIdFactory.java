@@ -1,8 +1,9 @@
 package com.CommonUtils.Utils.CommonUtils;
 
-import lombok.ToString;
-
-@ToString
+/**
+ * 已过时，请使用com.baomidou.mybatisplus.core.toolkit.IdWorker这个类实现分布式ID
+ * */
+@Deprecated
 public final class SnowflakeIdFactory 
 {
 	//开始时间戳（对应的日期为：2010-11-04 09:42:54）

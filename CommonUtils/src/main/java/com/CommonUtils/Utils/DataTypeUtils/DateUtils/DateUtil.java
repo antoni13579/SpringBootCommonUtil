@@ -17,6 +17,7 @@ import java.util.TreeSet;
 import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
 import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
 import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.CustomCollections.ArrayList;
+import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.CustomCollections.HashMap;
 import com.CommonUtils.Utils.DataTypeUtils.DateUtils.Bean.RetailTimeIndicatorEntry;
 import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
 
@@ -418,4 +419,33 @@ public final class DateUtil
 	
 	public static int getTotalDayForYear(final Date date)
 	{ return getTotalDayForYear(getYear(date)); }
+	
+	public static Map<String, Date> getMaxAndMin(final Collection<Date> dates)
+	{
+		if (!JavaCollectionsUtil.isCollectionEmpty(dates))
+		{ return getMaxAndMin(dates.toArray(new Date[dates.size()])); }
+		else
+		{ return Collections.emptyMap(); }
+	}
+	
+	public static Map<String, Date> getMaxAndMin(final Date ... dates)
+	{
+		if (!ArrayUtil.isArrayEmpty(dates))
+		{
+			Date min = dates[0];
+			Date max = min;			
+			for (int i = 0; i < dates.length; i++)
+			{
+				if (min.compareTo(dates[i]) == 1) 
+				{ min = dates[i]; }
+				
+	            if (max.compareTo(dates[i]) == -1) 
+	            { max = dates[i]; }
+			}
+			
+			return new HashMap<String, Date>().put("MAX", max).put("MIN", min).getMap();
+		}
+		else
+		{ return Collections.emptyMap(); }
+	}
 }

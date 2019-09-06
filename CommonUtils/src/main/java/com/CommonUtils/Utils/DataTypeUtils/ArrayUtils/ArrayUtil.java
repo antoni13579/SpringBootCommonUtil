@@ -1,8 +1,5 @@
 package com.CommonUtils.Utils.DataTypeUtils.ArrayUtils;
 
-import java.util.Collections;
-import java.util.Map;
-
 import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
 
 public final class ArrayUtil 
@@ -94,6 +91,14 @@ public final class ArrayUtil
 		return false;
 	}
 	
+	public static boolean isArrayEmpty(final double[] array)
+	{
+		if (null == array || array.length == 0)
+		{ return true; }
+		
+		return false;
+	}
+	
 	public static boolean arrayEquals(final String[] array1, final String[] array2)
     {
     	//两个数组都是空，则为相等
@@ -168,114 +173,6 @@ public final class ArrayUtil
 		}
 		else
 		{ return false; }
-	}
-	
-	public static Map<String, Integer> getMaxAndMin(final int ... vals)
-	{
-		if (!isArrayEmpty(vals))
-		{
-			int len = vals.length;
-			int min = vals[0];
-			int max = min;
-			for (int i = 0; i < len; i++)
-			{
-				int val = vals[i];
-				
-				if (min > val) 
-				{ min = val; }
-				
-	            if (max < val) 
-	            { max = val; }
-			}
-			
-			return new com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.CustomCollections.HashMap<String, Integer>()
-					.put("MAX", max)
-					.put("MIN", min)
-					.getMap();
-		}
-		else
-		{ return Collections.emptyMap(); }
-	}
-	
-	public static Map<String, Integer> getMaxAndMin(final Integer ... vals)
-	{
-		if (!isArrayEmpty(vals))
-		{
-			int len = vals.length;
-			Integer min = vals[0];
-			Integer max = min;
-			for (int i = 0; i < len; i++)
-			{
-				Integer val = vals[i];
-				
-				if (min > val) 
-				{ min = val; }
-				
-	            if (max < val) 
-	            { max = val; }
-			}
-			
-			return new com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.CustomCollections.HashMap<String, Integer>()
-					.put("MAX", max)
-					.put("MIN", min)
-					.getMap();
-		}
-		else
-		{ return Collections.emptyMap(); }
-	}
-	
-	public static Map<String, Long> getMaxAndMin(final long ... vals)
-	{
-		if (!isArrayEmpty(vals))
-		{
-			int len = vals.length;
-			long min = vals[0];
-			long max = min;
-			for (int i = 0; i < len; i++)
-			{
-				long val = vals[i];
-				
-				if (min > val) 
-				{ min = val; }
-				
-	            if (max < val) 
-	            { max = val; }
-			}
-			
-			return new com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.CustomCollections.HashMap<String, Long>()
-					.put("MAX", max)
-					.put("MIN", min)
-					.getMap();
-		}
-		else
-		{ return Collections.emptyMap(); }
-	}
-	
-	public static Map<String, Long> getMaxAndMin(final Long ... vals)
-	{
-		if (!isArrayEmpty(vals))
-		{
-			int len = vals.length;
-			Long min = vals[0];
-			Long max = min;
-			for (int i = 0; i < len; i++)
-			{
-				Long val = vals[i];
-				
-				if (min > val) 
-				{ min = val; }
-				
-	            if (max < val) 
-	            { max = val; }
-			}
-			
-			return new com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.CustomCollections.HashMap<String, Long>()
-					.put("MAX", max)
-					.put("MIN", min)
-					.getMap();
-		}
-		else
-		{ return Collections.emptyMap(); }
 	}
 	
 	public static <T> String[] getStringArray(final T obj) throws Exception

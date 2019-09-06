@@ -2,7 +2,12 @@ package com.CommonUtils.Utils.DataTypeUtils.LongUtils;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.LongSummaryStatistics;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.function.ToLongFunction;
+import java.util.stream.Collectors;
 
 import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
 import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
@@ -11,27 +16,43 @@ public final class LongUtil
 {
 	private LongUtil() {}
 	
-	public static <T> long sum(final Long ... params)
-	{ return sum((x) -> { return x; }, params); }
-	
-	public static <T> long sum(final Collection<Long> coll)
-	{ return sum((x) -> { return x; }, coll); }
-	
-	public static <T> long sum(final ToLongFunction<? super T> mapper, final Collection<T> coll)
+	public static LongSummaryStatistics aggregation(final Long ... params)
 	{
-		if (!JavaCollectionsUtil.isCollectionEmpty(coll))
-		{ return coll.stream().mapToLong(mapper).sum(); }
+		Map<String, LongSummaryStatistics> map = groupBy((x) -> { return "ALL_AGGREGATION"; }, (x) -> { return x; }, params);
+		if (!JavaCollectionsUtil.isMapEmpty(map))
+		{ return map.get("ALL_AGGREGATION"); }
 		else
-		{ return 0L; }
+		{ return new LongSummaryStatistics(); }
+	}
+	
+	public static LongSummaryStatistics aggregation(final Collection<Long> coll)
+	{
+		Map<String, LongSummaryStatistics> map = groupBy((x) -> { return "ALL_AGGREGATION"; }, (x) -> { return x; }, coll);
+		if (!JavaCollectionsUtil.isMapEmpty(map))
+		{ return map.get("ALL_AGGREGATION"); }
+		else
+		{ return new LongSummaryStatistics(); }
 	}
 	
 	@SafeVarargs
-	public static <T> long sum(final ToLongFunction<? super T> mapper, final T ... params)
+	public static <T> Map<String, LongSummaryStatistics> groupBy(final Function<? super T, String> classifier, 
+																 final ToLongFunction<? super T> mapper, 
+			   													 final T ... params)
 	{
 		if (!ArrayUtil.isArrayEmpty(params))
-		{ return sum(mapper, Arrays.asList(params)); }
+		{ return groupBy(classifier, mapper, Arrays.asList(params)); }
 		else
-		{ return 0L; }
+		{ return Collections.emptyMap(); }
+	}
+	
+	public static <T> Map<String, LongSummaryStatistics> groupBy(final Function<? super T, String> classifier, 
+																 final ToLongFunction<? super T> mapper, 
+																 final Collection<T> coll)
+	{
+		if (!JavaCollectionsUtil.isCollectionEmpty(coll))
+		{ return coll.stream().collect(Collectors.groupingBy(classifier, Collectors.summarizingLong(mapper))); }
+		else
+		{ return Collections.emptyMap(); }
 	}
 	
 	public static <T> long getLong(final T obj) throws Exception

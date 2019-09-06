@@ -2,7 +2,12 @@ package com.CommonUtils.Utils.DataTypeUtils.IntegerUtils;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.IntSummaryStatistics;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.function.ToIntFunction;
+import java.util.stream.Collectors;
 
 import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
 import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
@@ -11,27 +16,43 @@ public final class IntegerUtil
 {
 	private IntegerUtil() {}
 	
-	public static <T> int sum(final Integer ... params)
-	{ return sum((x) -> { return x; }, params); }
-	
-	public static <T> int sum(final Collection<Integer> coll)
-	{ return sum((x) -> { return x; }, coll); }
-	
-	public static <T> int sum(final ToIntFunction<? super T> mapper, final Collection<T> coll)
+	public static IntSummaryStatistics aggregation(final Integer ... params)
 	{
-		if (!JavaCollectionsUtil.isCollectionEmpty(coll))
-		{ return coll.stream().mapToInt(mapper).sum(); }
+		Map<String, IntSummaryStatistics> map = groupBy((x) -> { return "ALL_AGGREGATION"; }, (x) -> { return x; }, params);
+		if (!JavaCollectionsUtil.isMapEmpty(map))
+		{ return map.get("ALL_AGGREGATION"); }
 		else
-		{ return 0; }
+		{ return new IntSummaryStatistics(); }
+	}
+	
+	public static IntSummaryStatistics aggregation(final Collection<Integer> coll)
+	{
+		Map<String, IntSummaryStatistics> map = groupBy((x) -> { return "ALL_AGGREGATION"; }, (x) -> { return x; }, coll);
+		if (!JavaCollectionsUtil.isMapEmpty(map))
+		{ return map.get("ALL_AGGREGATION"); }
+		else
+		{ return new IntSummaryStatistics(); }
 	}
 	
 	@SafeVarargs
-	public static <T> int sum(final ToIntFunction<? super T> mapper, final T ... params)
+	public static <T> Map<String, IntSummaryStatistics> groupBy(final Function<? super T, String> classifier, 
+																final ToIntFunction<? super T> mapper, 
+			   													final T ... params)
 	{
 		if (!ArrayUtil.isArrayEmpty(params))
-		{ return sum(mapper, Arrays.asList(params)); }
+		{ return groupBy(classifier, mapper, Arrays.asList(params)); }
 		else
-		{ return 0; }
+		{ return Collections.emptyMap(); }
+	}
+	
+	public static <T> Map<String, IntSummaryStatistics> groupBy(final Function<? super T, String> classifier, 
+																final ToIntFunction<? super T> mapper, 
+																final Collection<T> coll)
+	{
+		if (!JavaCollectionsUtil.isCollectionEmpty(coll))
+		{ return coll.stream().collect(Collectors.groupingBy(classifier, Collectors.summarizingInt(mapper))); }
+		else
+		{ return Collections.emptyMap(); }
 	}
 	
 	public static <T> int getInteger(final T obj) throws Exception

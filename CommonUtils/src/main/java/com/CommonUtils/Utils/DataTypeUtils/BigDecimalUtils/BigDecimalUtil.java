@@ -2,10 +2,15 @@ package com.CommonUtils.Utils.DataTypeUtils.BigDecimalUtils;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Optional;
+import java.util.Collections;
+import java.util.Map;
 import java.util.function.Function;
+
+import org.eclipse.collections.impl.collector.BigDecimalSummaryStatistics;
+import org.eclipse.collections.impl.collector.Collectors2;
 
 import com.CommonUtils.Utils.CommonUtils.CommonUtil;
 import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
@@ -18,87 +23,43 @@ public final class BigDecimalUtil
 {
 	private BigDecimalUtil() {}
 	
-	public static <T> Optional<BigDecimal> sum(final BigDecimal ... params)
-	{ return sum((x)-> { return x; }, params); }
-	
-	public static <T> Optional<BigDecimal> sum(final Collection<BigDecimal> coll)
-	{ return sum((x)-> { return x; }, coll); }
-	
-	public static <T> Optional<BigDecimal> sum(final Function<? super T, BigDecimal> mapper, final Collection<T> coll)
+	public static BigDecimalSummaryStatistics aggregation(final BigDecimal ... params)
 	{
-		if (!JavaCollectionsUtil.isCollectionEmpty(coll))
-		{
-			BigDecimal result = coll.stream().map(mapper).reduce(BigDecimal.ZERO, BigDecimal::add);
-			return Optional.ofNullable(result);
-		}
+		Map<String, BigDecimalSummaryStatistics> map = groupBy((x) -> { return "ALL_AGGREGATION"; }, (x) -> { return x; }, params);
+		if (!JavaCollectionsUtil.isMapEmpty(map))
+		{ return map.get("ALL_AGGREGATION"); }
 		else
-		{ return Optional.ofNullable(null); }
+		{ return new BigDecimalSummaryStatistics(); }
+	}
+	
+	public static BigDecimalSummaryStatistics aggregation(final Collection<BigDecimal> coll)
+	{
+		Map<String, BigDecimalSummaryStatistics> map = groupBy((x) -> { return "ALL_AGGREGATION"; }, (x) -> { return x; }, coll);
+		if (!JavaCollectionsUtil.isMapEmpty(map))
+		{ return map.get("ALL_AGGREGATION"); }
+		else
+		{ return new BigDecimalSummaryStatistics(); }
 	}
 	
 	@SafeVarargs
-	public static <T> Optional<BigDecimal> sum(final Function<? super T, BigDecimal> mapper, final T ... params)
+	public static <T> Map<String, BigDecimalSummaryStatistics> groupBy(final Function<? super T, String> classifier, 
+			   														   final org.eclipse.collections.api.block.function.Function<? super T, BigDecimal> mapper, 
+			   														   final T ... params)
 	{
 		if (!ArrayUtil.isArrayEmpty(params))
-		{ return sum(mapper, Arrays.asList(params)); }
+		{ return groupBy(classifier, mapper, Arrays.asList(params)); }
 		else
-		{ return Optional.ofNullable(null); }
+		{ return Collections.emptyMap(); }
 	}
 	
-	public static BigDecimal calculate(final BigDecimalCalculate bigDecimalCalculate, final BigDecimal ... params)
+	public static <T> Map<String, BigDecimalSummaryStatistics> groupBy(final Function<? super T, String> classifier, 
+																	   final org.eclipse.collections.api.block.function.Function<? super T, BigDecimal> mapper, 
+																	   final Collection<T> coll)
 	{
-		BigDecimal result = new BigDecimal(Double.toString(0));
-		if (!ArrayUtil.isArrayEmpty(params))
-		{
-			for (int i = 0; i < params.length; i++)
-			{
-				BigDecimal param1 = null == params[i] ? new BigDecimal(Double.toString(0)) : params[i];
-				
-				BigDecimal param2;
-				if (i != (params.length - 1))
-				{ param2 = null == params[i + 1] ? new BigDecimal(Double.toString(0)) : params[i + 1]; }
-				else
-				{ param2 = null == params[i] ? new BigDecimal(Double.toString(0)) : params[i]; }
-				
-				switch (bigDecimalCalculate)
-				{
-					case ADD:
-						if (i == 0)
-						{ result = param1.add(param2); }
-						else if (i > 1)
-						{ result = result.add(param1); }
-						
-						break;
-						
-					case SUBTRACT:
-						if (i == 0)
-						{ result = param1.subtract(param2); }
-						else if (i > 1)
-						{ result = result.subtract(param1); }
-						
-						break;
-						
-					case MULTIPLY:
-						if (i == 0)
-						{ result = param1.multiply(param2); }
-						else if (i > 1)
-						{ result = result.multiply(param1); }
-						
-						break;
-						
-					case DIVIDE:
-						if (i == 0)
-						{ result = param1.divide(param2); }
-						else if (i > 1)
-						{ result = result.divide(param1); }
-						
-						break;
-						
-					default:
-						break;
-				}
-			}
-		}
-		return result;
+		if (!JavaCollectionsUtil.isCollectionEmpty(coll))
+		{ return coll.stream().collect(java.util.stream.Collectors.groupingBy(classifier, Collectors2.summarizingBigDecimal(mapper))); }
+		else
+		{ return Collections.emptyMap(); }
 	}
 	
 	public static <T> BigDecimal ifNull(final T t)
