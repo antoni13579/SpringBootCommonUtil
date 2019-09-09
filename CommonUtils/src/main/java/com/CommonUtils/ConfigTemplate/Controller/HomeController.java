@@ -6,7 +6,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.CommonUtils.Utils.HttpUtils.HttpUtil;
+import com.CommonUtils.Utils.NetworkUtils.HttpUtils.HttpUtil;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

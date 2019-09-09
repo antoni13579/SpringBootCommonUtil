@@ -25,11 +25,11 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.map.MultiKeyMap;
 
-import com.CommonUtils.Jdbc.Bean.DBBaseInfo.AbstractDBInfo;
-import com.CommonUtils.Jdbc.Bean.DBBaseInfo.DBInfo;
-import com.CommonUtils.Jdbc.Bean.DBBaseInfo.DBInfoForDataSource;
-import com.CommonUtils.Jdbc.Bean.DBTable.Column;
-import com.CommonUtils.Jdbc.Bean.DBTable.Table;
+import com.CommonUtils.Utils.DBUtils.Bean.DBBaseInfo.AbstractDBInfo;
+import com.CommonUtils.Utils.DBUtils.Bean.DBBaseInfo.DBInfo;
+import com.CommonUtils.Utils.DBUtils.Bean.DBBaseInfo.DBInfoForDataSource;
+import com.CommonUtils.Utils.DBUtils.Bean.DBTable.Column;
+import com.CommonUtils.Utils.DBUtils.Bean.DBTable.Table;
 import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
 import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
 import com.CommonUtils.Utils.DataTypeUtils.DateUtils.DateContants;

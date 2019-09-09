@@ -12,9 +12,9 @@ import java.util.Map;
 
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 
-import com.CommonUtils.Jdbc.Bean.DBBaseInfo.AbstractDBInfo;
-import com.CommonUtils.Jdbc.Bean.DBBaseInfo.DBInfo;
-import com.CommonUtils.Jdbc.Bean.DBBaseInfo.DBInfoForDataSource;
+import com.CommonUtils.Utils.DBUtils.Bean.DBBaseInfo.AbstractDBInfo;
+import com.CommonUtils.Utils.DBUtils.Bean.DBBaseInfo.DBInfo;
+import com.CommonUtils.Utils.DBUtils.Bean.DBBaseInfo.DBInfoForDataSource;
 import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
 
 import lombok.extern.slf4j.Slf4j;

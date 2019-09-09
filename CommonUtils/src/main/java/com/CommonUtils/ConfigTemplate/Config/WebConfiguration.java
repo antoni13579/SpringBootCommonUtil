@@ -46,10 +46,10 @@ import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import com.CommonUtils.MiddleWare.ServletWebServerFactoryConfig;
-import com.CommonUtils.MiddleWare.GracefulShutdowns.GracefulShutdownTomcat;
 import com.CommonUtils.Utils.IOUtils.IOUtil;
-import com.CommonUtils.Web.MultipartConfigElementConfig;
+import com.CommonUtils.Config.MiddleWare.ServletWebServerFactoryConfig;
+import com.CommonUtils.Config.MiddleWare.GracefulShutdowns.GracefulShutdownTomcat;
+import com.CommonUtils.Config.Web.MultipartConfigElementConfig;
 import com.CommonUtils.Utils.DataTypeUtils.DateUtils.DateContants;
 import com.CommonUtils.Utils.DataTypeUtils.DateUtils.DateUtil;
 

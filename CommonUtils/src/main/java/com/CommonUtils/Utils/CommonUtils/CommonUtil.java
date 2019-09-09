@@ -59,28 +59,4 @@ public final class CommonUtil
 		{ IOUtil.closeQuietly(ois, oos, bais, baos); }
 		return dest;
 	}
-	
-	public static <T> boolean getBoolean(final T obj) throws Exception
-	{
-		if (obj instanceof Boolean)
-		{ return (boolean)obj; }
-		else
-		{ throw new Exception("无法转换为boolean类型"); }
-	}
-	
-	public static <T> short getShort(final T obj) throws Exception
-	{
-		if (obj instanceof Short)
-		{ return Short.parseShort(obj.toString()); }
-		else
-		{ throw new Exception("无法转换为short类型"); }
-	}
-	
-	public static <T> float getFloat(final T obj) throws Exception
-	{
-		if (obj instanceof Float)
-		{ return Float.parseFloat(obj.toString()); }
-		else
-		{ throw new Exception("无法转换为float类型"); }
-	}
 }

@@ -6,8 +6,8 @@ import java.util.concurrent.TimeUnit;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.data.redis.core.RedisTemplate;
 
-import com.CommonUtils.Redis.Bean.RedisEntry;
-import com.CommonUtils.Utils.RedisUtils.RedisUtil;
+import com.CommonUtils.Utils.DBUtils.Bean.RedisEntry;
+import com.CommonUtils.Utils.DBUtils.RedisUtils.RedisUtil;
 
 import lombok.extern.slf4j.Slf4j;
 

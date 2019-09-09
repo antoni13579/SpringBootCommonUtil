@@ -1,11 +1,11 @@
 package com.CommonUtils.Utils.DBUtils;
 
-import com.CommonUtils.Jdbc.Bean.Url.MySqlUrl;
-import com.CommonUtils.Jdbc.Bean.Url.OracleUrl;
-import com.CommonUtils.Jdbc.Bean.Url.PostgreSqlUrl;
-import com.CommonUtils.Jdbc.Bean.Url.SqlServerUrl;
-import com.CommonUtils.Jdbc.Bean.Url.TeradataUrl;
 import com.CommonUtils.Utils.DBUtils.DBContants.SqlServerJdbcDriver;
+import com.CommonUtils.Utils.DBUtils.Bean.Url.MySqlUrl;
+import com.CommonUtils.Utils.DBUtils.Bean.Url.OracleUrl;
+import com.CommonUtils.Utils.DBUtils.Bean.Url.PostgreSqlUrl;
+import com.CommonUtils.Utils.DBUtils.Bean.Url.SqlServerUrl;
+import com.CommonUtils.Utils.DBUtils.Bean.Url.TeradataUrl;
 import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
 
 public final class DBUrlUtil 

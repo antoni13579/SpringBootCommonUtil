@@ -26,9 +26,9 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.keyvalue.MultiKey;
 import org.apache.commons.collections4.map.MultiKeyMap;
 
-import com.CommonUtils.Jdbc.Bean.DBTable.Column;
-import com.CommonUtils.Jdbc.Bean.DBTable.Table;
 import com.CommonUtils.Utils.CommonUtils.CommonUtil;
+import com.CommonUtils.Utils.DBUtils.Bean.DBTable.Column;
+import com.CommonUtils.Utils.DBUtils.Bean.DBTable.Table;
 import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
 import com.CommonUtils.Utils.DataTypeUtils.DateUtils.DateFormat;
 import com.CommonUtils.Utils.DataTypeUtils.DateUtils.DateUtil;

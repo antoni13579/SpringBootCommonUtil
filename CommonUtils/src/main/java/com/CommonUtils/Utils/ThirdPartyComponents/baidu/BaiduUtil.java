@@ -18,9 +18,10 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
-import com.CommonUtils.Utils.HttpUtils.HttpUtil;
+
 import com.CommonUtils.Utils.IOUtils.FileUtil;
 import com.CommonUtils.Utils.IOUtils.IOUtil;
+import com.CommonUtils.Utils.NetworkUtils.HttpUtils.HttpUtil;
 import com.CommonUtils.Utils.ThirdPartyComponents.baidu.Bean.VatInvoice;
 import com.baidu.aip.util.Base64Util;
 

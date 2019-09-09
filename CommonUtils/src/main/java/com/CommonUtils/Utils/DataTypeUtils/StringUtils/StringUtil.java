@@ -17,9 +17,9 @@ import java.util.regex.Pattern;
 import org.wltea.analyzer.core.IKSegmenter;
 import org.wltea.analyzer.core.Lexeme;
 
-import com.CommonUtils.Utils.CommonUtils.CommonUtil;
 import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
 import com.CommonUtils.Utils.DataTypeUtils.BigDecimalUtils.BigDecimalUtil;
+import com.CommonUtils.Utils.DataTypeUtils.BooleanUtils.BooleanUtil;
 import com.CommonUtils.Utils.DataTypeUtils.BytesUtils.BytesUtil;
 import com.CommonUtils.Utils.DataTypeUtils.CharacterUtils.CharacterUtil;
 import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
@@ -27,8 +27,10 @@ import com.CommonUtils.Utils.DataTypeUtils.DateUtils.DateContants;
 import com.CommonUtils.Utils.DataTypeUtils.DateUtils.DateFormat;
 import com.CommonUtils.Utils.DataTypeUtils.DateUtils.DateUtil;
 import com.CommonUtils.Utils.DataTypeUtils.DoubleUtils.DoubleUtil;
+import com.CommonUtils.Utils.DataTypeUtils.FloatUtils.FloatUtil;
 import com.CommonUtils.Utils.DataTypeUtils.IntegerUtils.IntegerUtil;
 import com.CommonUtils.Utils.DataTypeUtils.LongUtils.LongUtil;
+import com.CommonUtils.Utils.DataTypeUtils.ShortUtils.ShortUtil;
 import com.CommonUtils.Utils.DataTypeUtils.StringUtils.Bean.Calculation;
 
 import lombok.extern.slf4j.Slf4j;
@@ -114,7 +116,7 @@ public final class StringUtil
 		{ throw new Exception("toString(final T value)不能处理时间类型，请使用toString(final oracle.sql.TIMESTAMP date, final DateFomat dateFomat)或toString(final java.util.Date date, final DateFomat dateFomat)"); }
 		else if (value instanceof Boolean)
 		{
-			boolean val = CommonUtil.getBoolean(value);
+			boolean val = BooleanUtil.getBoolean(value);
 			String result = Boolean.toString(val);
 			return result;
 		}
@@ -126,13 +128,13 @@ public final class StringUtil
 		}
 		else if (value instanceof Short)
 		{
-			short val = CommonUtil.getShort(value);
+			short val = ShortUtil.getShort(value);
 			String result = Short.toString(val);
 			return result;
 		}
 		else if (value instanceof Float)
 		{
-			float val = CommonUtil.getFloat(value);
+			float val = FloatUtil.getFloat(value);
 			String result = Float.toString(val);
 			return result;
 		}

@@ -1,8 +1,8 @@
 package com.CommonUtils.Utils.ExecuteCommandUtils;
 
 import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
-import com.CommonUtils.Utils.SystemInfoUtils.SystemInfo;
-import com.CommonUtils.Utils.SystemInfoUtils.SystemPlatform;
+import com.CommonUtils.Utils.SystemUtils.SystemInfoUtils.SystemInfo;
+import com.CommonUtils.Utils.SystemUtils.SystemInfoUtils.SystemInfo.SystemPlatform;
 
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;

@@ -10,13 +10,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 
-import com.CommonUtils.Jdbc.TxAdviceAdvisorConfig;
-import com.CommonUtils.Jdbc.Bean.DBBaseInfo.DBInfo;
-import com.CommonUtils.Jdbc.Bean.Url.OracleUrl;
-import com.CommonUtils.Jdbc.DataSources.HikariDataSourceConfig;
-import com.CommonUtils.Mybatis.Config.SqlSessionFactoryConfig;
+import com.CommonUtils.Config.Jdbc.TxAdviceAdvisorConfig;
+import com.CommonUtils.Config.Jdbc.DataSources.HikariDataSourceConfig;
+import com.CommonUtils.Config.Mybatis.Config.SqlSessionFactoryConfig;
 import com.CommonUtils.Utils.DBUtils.DBContants;
 import com.CommonUtils.Utils.DBUtils.DBUrlUtil;
+import com.CommonUtils.Utils.DBUtils.Bean.DBBaseInfo.DBInfo;
+import com.CommonUtils.Utils.DBUtils.Bean.Url.OracleUrl;
 
 /***
 @EnableTransactionManagement

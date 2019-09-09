@@ -4,7 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
-import com.CommonUtils.ThreadPool.ThreadPoolTaskExecutorConfig;
+import com.CommonUtils.Config.ThreadPool.ThreadPoolTaskExecutorConfig;
 
 @Configuration
 public class BaseConfig 

@@ -1,0 +1,18 @@
+package com.CommonUtils.Utils.NetworkUtils.HttpUtils.Bean;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.experimental.Accessors;
+
+@Getter
+@Setter
+@Accessors(chain = true)
+@ToString
+public class RegisterInfo 
+{
+	private String registerName;
+	private String registerPassword;
+	private String registerEmail;
+	private String registerMobilePhone;
+}

@@ -27,15 +27,14 @@ import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.kafka.core.KafkaTemplate;
 
-import com.CommonUtils.Jdbc.Bean.DBBaseInfo.AbstractDBInfo;
-import com.CommonUtils.Jdbc.Bean.DBBaseInfo.DBInfo;
-import com.CommonUtils.Jdbc.Bean.DBBaseInfo.DBInfoForDataSource;
-
 import com.CommonUtils.Utils.CommonUtils.CommonUtil;
 import com.CommonUtils.Utils.DBUtils.DBContants;
 import com.CommonUtils.Utils.DBUtils.DBHandleUtil;
 import com.CommonUtils.Utils.DBUtils.PreparedStatementOperationType;
 import com.CommonUtils.Utils.DBUtils.ReleaseItemUtil;
+import com.CommonUtils.Utils.DBUtils.Bean.DBBaseInfo.AbstractDBInfo;
+import com.CommonUtils.Utils.DBUtils.Bean.DBBaseInfo.DBInfo;
+import com.CommonUtils.Utils.DBUtils.Bean.DBBaseInfo.DBInfoForDataSource;
 import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
 import com.CommonUtils.Utils.DataTypeUtils.BytesUtils.BytesUtil;
 import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
