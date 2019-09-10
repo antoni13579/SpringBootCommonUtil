@@ -8,7 +8,7 @@ import java.lang.annotation.Retention;
 
 import org.springframework.stereotype.Component;
 
-import com.CommonUtils.Utils.DistributedLocks.DistributedLockType;
+import com.CommonUtils.Utils.DistributedLocksUtils.DistributedLockType;
 
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)

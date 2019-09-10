@@ -31,7 +31,7 @@ import com.CommonUtils.Utils.CommonUtils.CommonUtil;
 import com.CommonUtils.Utils.DBUtils.DBContants;
 import com.CommonUtils.Utils.DBUtils.DBHandleUtil;
 import com.CommonUtils.Utils.DBUtils.PreparedStatementOperationType;
-import com.CommonUtils.Utils.DBUtils.ReleaseItemUtil;
+
 import com.CommonUtils.Utils.DBUtils.Bean.DBBaseInfo.AbstractDBInfo;
 import com.CommonUtils.Utils.DBUtils.Bean.DBBaseInfo.DBInfo;
 import com.CommonUtils.Utils.DBUtils.Bean.DBBaseInfo.DBInfoForDataSource;
@@ -111,7 +111,7 @@ public final class BatchUtil
 		finally
 		{
 			IOUtil.closeQuietly(fos, osw, bw);
-			ReleaseItemUtil.releaseRelatedResourcesNoDataSource(new Connection[] { sourceConnection }, new ResultSet[] { sourceResultSet }, new PreparedStatement[] { sourcePreparedStatement });
+			DBHandleUtil.releaseRelatedResourcesNoDataSource(new Connection[] { sourceConnection }, new ResultSet[] { sourceResultSet }, new PreparedStatement[] { sourcePreparedStatement });
 		}
 		
 		return result;
@@ -196,7 +196,7 @@ public final class BatchUtil
 		finally
 		{
 			IOUtil.closeQuietly(csvReader, br, isr, bis, fos);
-			ReleaseItemUtil.releaseRelatedResourcesNoDataSource(new Connection[] {targetConnection}, null, new PreparedStatement[] {targetPreparedStatement});
+			DBHandleUtil.releaseRelatedResourcesNoDataSource(new Connection[] {targetConnection}, null, new PreparedStatement[] {targetPreparedStatement});
 		}
 		
 		return result;
@@ -276,7 +276,7 @@ public final class BatchUtil
 		finally
 		{
 			IOUtil.closeQuietly(fis, isr, br);
-			ReleaseItemUtil.releaseRelatedResourcesNoDataSource(new Connection[] {targetConnection}, null, new PreparedStatement[] {targetPreparedStatement});
+			DBHandleUtil.releaseRelatedResourcesNoDataSource(new Connection[] {targetConnection}, null, new PreparedStatement[] {targetPreparedStatement});
 		}
 		
 		return result;
@@ -336,7 +336,7 @@ public final class BatchUtil
 			result = false;
 		}
 		finally
-		{ ReleaseItemUtil.releaseRelatedResourcesNoDataSource(new Connection[] {sourceConnection}, new ResultSet[] {sourceResultSet}, new PreparedStatement[] {sourcePreparedStatement}); }
+		{ DBHandleUtil.releaseRelatedResourcesNoDataSource(new Connection[] {sourceConnection}, new ResultSet[] {sourceResultSet}, new PreparedStatement[] {sourcePreparedStatement}); }
 		
 		return result;
 	}
@@ -427,7 +427,7 @@ public final class BatchUtil
 			result = false;
 		}
 		finally
-		{ ReleaseItemUtil.releaseRelatedResourcesNoDataSource(new Connection[] {sourceConnection, targetConnection}, new ResultSet[] {sourceResultSet}, new PreparedStatement[] {sourcePreparedStatement, targetPreparedStatement}); }
+		{ DBHandleUtil.releaseRelatedResourcesNoDataSource(new Connection[] {sourceConnection, targetConnection}, new ResultSet[] {sourceResultSet}, new PreparedStatement[] {sourcePreparedStatement, targetPreparedStatement}); }
 		
 		return result;
 	}

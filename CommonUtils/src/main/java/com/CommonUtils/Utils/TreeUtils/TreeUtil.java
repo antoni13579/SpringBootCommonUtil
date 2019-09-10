@@ -8,7 +8,7 @@ import java.util.Objects;
 
 import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
 import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
-import com.CommonUtils.Utils.Office.Excel.Bean.ExcelData;
+import com.CommonUtils.Utils.OfficeUtils.ExcelUtils.Bean.ExcelData;
 import com.CommonUtils.Utils.TreeUtils.Bean.TreeNode;
 import com.alibaba.fastjson.JSON;
 

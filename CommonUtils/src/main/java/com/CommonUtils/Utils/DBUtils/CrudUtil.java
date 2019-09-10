@@ -76,7 +76,7 @@ public final class CrudUtil
 			{ DBHandleUtil.rollback(connection); }
 		}
 		finally
-		{ ReleaseItemUtil.releaseRelatedResourcesNoDataSource(new Connection[] {connection}, null, new PreparedStatement[] {preparedStatement}); }
+		{ DBHandleUtil.releaseRelatedResourcesNoDataSource(new Connection[] {connection}, null, new PreparedStatement[] {preparedStatement}); }
 	}
 	
 	public static List<Map<String, Object>> getRecords(final AbstractDBInfo abstractDBInfo)
@@ -128,7 +128,7 @@ public final class CrudUtil
 		catch (Exception ex)
 		{ log.error("获取数据库记录出现异常，异常为：", ex); }
 		finally
-		{ ReleaseItemUtil.releaseRelatedResourcesNoDataSource(new Connection[] {connection}, new ResultSet[] {resultSet}, new PreparedStatement[] {preparedStatement}); }
+		{ DBHandleUtil.releaseRelatedResourcesNoDataSource(new Connection[] {connection}, new ResultSet[] {resultSet}, new PreparedStatement[] {preparedStatement}); }
 		
 		return result;
 	}

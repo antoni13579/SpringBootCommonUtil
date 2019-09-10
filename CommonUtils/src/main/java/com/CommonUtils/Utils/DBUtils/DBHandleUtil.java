@@ -24,6 +24,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.map.MultiKeyMap;
+import org.springframework.jdbc.support.JdbcUtils;
 
 import com.CommonUtils.Utils.DBUtils.Bean.DBBaseInfo.AbstractDBInfo;
 import com.CommonUtils.Utils.DBUtils.Bean.DBBaseInfo.DBInfo;
@@ -159,7 +160,7 @@ public final class DBHandleUtil
 		catch (Exception ex)
 		{ log.error("生成INSERT语句出现异常，异常原因为：", ex); }
 		finally
-		{ ReleaseItemUtil.releaseRelatedResourcesNoDataSource(new Connection[] {connection}, null, new PreparedStatement[] {preparedStatement}); }
+		{ releaseRelatedResourcesNoDataSource(new Connection[] {connection}, null, new PreparedStatement[] {preparedStatement}); }
 		
 		return result;
 	}
@@ -466,5 +467,16 @@ public final class DBHandleUtil
 					}
 			);
 		}
+	}
+	
+	/**
+	 * 释放相关资源，但不包含数据库连接池
+	 * */
+	public static void releaseRelatedResourcesNoDataSource(final Connection[] connections, final ResultSet[] resultSets, final PreparedStatement[] preparedStatements)
+	{
+		DBHandleUtil.resetConnectionsSetting(true, connections);
+		if (null != resultSets && resultSets.length > 0) { Arrays.asList(resultSets).forEach(resultSet -> { JdbcUtils.closeResultSet(resultSet); }); }
+		if (null != preparedStatements && preparedStatements.length > 0) { Arrays.asList(preparedStatements).forEach(preparedStatement -> { JdbcUtils.closeStatement(preparedStatement); }); }
+		if (null != connections && connections.length > 0) { Arrays.asList(connections).forEach(connection -> { JdbcUtils.closeConnection(connection); }); }
 	}
 }

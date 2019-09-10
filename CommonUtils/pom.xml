@@ -33,7 +33,7 @@
 		<kettle.version>7.1.0.0-12</kettle.version>
 		<jython.version>2.7.0</jython.version>
 		<commons-compress.version>1.18</commons-compress.version>
-		<curator-framework.version>4.0.1</curator-framework.version>
+		<curator-framework.version>4.2.0</curator-framework.version>
 		<fastjson.version>1.2.49</fastjson.version>
 		<commons-lang3.version>3.8.1</commons-lang3.version>
 		<commons-collections4.version>4.1</commons-collections4.version>
@@ -304,7 +304,7 @@
 		<dependency>
     		<groupId>com.jcraft</groupId>
     		<artifactId>jsch</artifactId>
-    		<version>${jsch.version}</version>
+    		<version>${jsch.version}</version> <!--$NO-MVN-MAN-VER$-->
 		</dependency>
 		
 		<!-- MyBatis分页组件 -->
@@ -377,7 +377,7 @@
 		<dependency>
     		<groupId>org.apache.curator</groupId>
     		<artifactId>curator-framework</artifactId>
-    		<version>${curator-framework.version}</version>
+    		<version>${curator-framework.version}</version> <!--$NO-MVN-MAN-VER$-->
 		</dependency>
 		
 		<!-- 阿里的Json工具 -->
@@ -419,7 +419,7 @@
 		<dependency>
     		<groupId>com.thoughtworks.xstream</groupId>
     		<artifactId>xstream</artifactId>
-    		<version>${xstream.version}</version>
+    		<version>${xstream.version}</version> <!--$NO-MVN-MAN-VER$-->
 		</dependency>
 		
 		<!-- WebJars统一管理前端框架 -->
