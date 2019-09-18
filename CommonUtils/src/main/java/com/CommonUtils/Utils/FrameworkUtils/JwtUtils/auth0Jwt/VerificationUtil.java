@@ -5,17 +5,12 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
-import com.CommonUtils.Utils.DataTypeUtils.BooleanUtils.BooleanUtil;
-import com.CommonUtils.Utils.DataTypeUtils.DateUtils.DateUtil;
-import com.CommonUtils.Utils.DataTypeUtils.DoubleUtils.DoubleUtil;
-import com.CommonUtils.Utils.DataTypeUtils.IntegerUtils.IntegerUtil;
-import com.CommonUtils.Utils.DataTypeUtils.LongUtils.LongUtil;
-import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.Verification;
+
+import cn.hutool.core.convert.Convert;
 
 public final class VerificationUtil 
 {
@@ -37,28 +32,28 @@ public final class VerificationUtil
 			Object value = entry.getValue();
 			
 			if (value instanceof Boolean) 
-			{ this.verification.withClaim(name, BooleanUtil.getBoolean(value)); }
+			{ this.verification.withClaim(name, Convert.toBool(value)); }
 			
 			else if (value instanceof Integer) 
-			{ this.verification.withClaim(name, IntegerUtil.getInteger(value)); }
+			{ this.verification.withClaim(name, Convert.toInt(value)); }
 			
 			else if (value instanceof Long) 
-			{ this.verification.withClaim(name, LongUtil.getLong(value)); }
+			{ this.verification.withClaim(name, Convert.toLong(value)); }
 			
 			else if (value instanceof Double) 
-			{ this.verification.withClaim(name, DoubleUtil.getDouble(value)); }
+			{ this.verification.withClaim(name, Convert.toDouble(value)); }
 			
 			else if (value instanceof String) 
-			{ this.verification.withClaim(name, StringUtil.getString(value)); }
+			{ this.verification.withClaim(name, Convert.toStr(value)); }
 			
 			else if (value instanceof Date) 
-			{ this.verification.withClaim(name, DateUtil.getDate(value)); }
+			{ this.verification.withClaim(name, Convert.toDate(value)); }
 			
 			else if (value instanceof String[]) 
-			{ this.verification.withArrayClaim(name, ArrayUtil.getStringArray(value)); }
+			{ this.verification.withArrayClaim(name, Convert.toStrArray(value)); }
 			
 			else if (value instanceof Integer[]) 
-			{ this.verification.withArrayClaim(name, ArrayUtil.getIntegerArrayForWrapperClass(value)); }
+			{ this.verification.withArrayClaim(name, Convert.toIntArray(value)); }
 			
 			else 
 			{ throw new Exception("设置jwt token自定义payload的数据类型不符合要求！！！异常的数据类型为：" + value.getClass()); }

@@ -12,9 +12,10 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
-import com.CommonUtils.Utils.CommonUtils.CommonUtil;
 import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
 
+import cn.hutool.core.convert.Convert;
+import cn.hutool.core.lang.TypeReference;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -135,7 +136,7 @@ public final class ReflectUtil
 	public static <T1, T2> Class<T2> getCastResult(final Class<T1> srcClazz, final Class<T2> targetClazz)
 	{
 		if (getTypeCompareResult(srcClazz, targetClazz))
-		{ return CommonUtil.cast(srcClazz); }
+		{ return Convert.convert(new TypeReference<Class<T2>>() {}, srcClazz); }
 		else
 		{ return null; }
 	}

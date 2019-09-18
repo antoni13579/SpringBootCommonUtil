@@ -18,21 +18,14 @@ import org.wltea.analyzer.core.IKSegmenter;
 import org.wltea.analyzer.core.Lexeme;
 
 import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
-import com.CommonUtils.Utils.DataTypeUtils.BigDecimalUtils.BigDecimalUtil;
-import com.CommonUtils.Utils.DataTypeUtils.BooleanUtils.BooleanUtil;
-import com.CommonUtils.Utils.DataTypeUtils.BytesUtils.BytesUtil;
-import com.CommonUtils.Utils.DataTypeUtils.CharacterUtils.CharacterUtil;
+
 import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
 import com.CommonUtils.Utils.DataTypeUtils.DateUtils.DateContants;
 import com.CommonUtils.Utils.DataTypeUtils.DateUtils.DateFormat;
 import com.CommonUtils.Utils.DataTypeUtils.DateUtils.DateUtil;
-import com.CommonUtils.Utils.DataTypeUtils.DoubleUtils.DoubleUtil;
-import com.CommonUtils.Utils.DataTypeUtils.FloatUtils.FloatUtil;
-import com.CommonUtils.Utils.DataTypeUtils.IntegerUtils.IntegerUtil;
-import com.CommonUtils.Utils.DataTypeUtils.LongUtils.LongUtil;
-import com.CommonUtils.Utils.DataTypeUtils.ShortUtils.ShortUtil;
 import com.CommonUtils.Utils.DataTypeUtils.StringUtils.Bean.Calculation;
 
+import cn.hutool.core.convert.Convert;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -40,6 +33,8 @@ public final class StringUtil
 {
 	private StringUtil() {}
 	
+	/**建议使用cn.hutool.core.convert.Convert.toStr*/ 
+	@Deprecated
 	public static <T> String getString(final T obj) throws Exception
 	{
 		if (obj instanceof String)
@@ -116,49 +111,49 @@ public final class StringUtil
 		{ throw new Exception("toString(final T value)不能处理时间类型，请使用toString(final oracle.sql.TIMESTAMP date, final DateFomat dateFomat)或toString(final java.util.Date date, final DateFomat dateFomat)"); }
 		else if (value instanceof Boolean)
 		{
-			boolean val = BooleanUtil.getBoolean(value);
+			boolean val = Convert.toBool(value);
 			String result = Boolean.toString(val);
 			return result;
 		}
 		else if (value instanceof Integer)
 		{
-			int val = IntegerUtil.getInteger(value);
+			int val = Convert.toInt(value);
 			String result = Integer.toString(val);
 			return result;
 		}
 		else if (value instanceof Short)
 		{
-			short val = ShortUtil.getShort(value);
+			short val = Convert.toShort(value);
 			String result = Short.toString(val);
 			return result;
 		}
 		else if (value instanceof Float)
 		{
-			float val = FloatUtil.getFloat(value);
+			float val = Convert.toFloat(value);
 			String result = Float.toString(val);
 			return result;
 		}
 		else if (value instanceof Double)
 		{
-			double val = DoubleUtil.getDouble(value);
+			double val = Convert.toDouble(value);
 			String result = Double.toString(val);
 			return result;
 		}
 		else if (value instanceof Character)
 		{
-			char val = CharacterUtil.getChar(value);
+			char val = Convert.toChar(value);
 			String result = Character.toString(val);
 			return result;
 		}
 		else if (value instanceof Long)
 		{
-			long val = LongUtil.getLong(value);
+			long val = Convert.toLong(value);
 			String result = Long.toString(val);
 			return result;
 		}
 		else if (value instanceof Byte)
 		{
-			byte val = BytesUtil.getByte(value);
+			byte val = Convert.toByte(value);
 			String result = Byte.toString(val);
 			return result;
 		}
@@ -169,7 +164,7 @@ public final class StringUtil
 		}
 		else if (value instanceof BigDecimal)
 		{
-			BigDecimal val = BigDecimalUtil.getBigDecimal(value);
+			BigDecimal val = Convert.toBigDecimal(value);
 			String result = val.toString();
 			return result;
 		}

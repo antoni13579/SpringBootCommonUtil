@@ -27,7 +27,6 @@ import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.kafka.core.KafkaTemplate;
 
-import com.CommonUtils.Utils.CommonUtils.CommonUtil;
 import com.CommonUtils.Utils.DBUtils.DBContants;
 import com.CommonUtils.Utils.DBUtils.DBHandleUtil;
 import com.CommonUtils.Utils.DBUtils.PreparedStatementOperationType;
@@ -47,6 +46,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.opencsv.CSVReader;
 
+import cn.hutool.core.util.ObjectUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -580,7 +580,7 @@ public final class BatchUtil
 				{
 					for (T record : records)
 					{
-						T deepCopyRecords = CommonUtil.deepCopy(record);
+						T deepCopyRecords = ObjectUtil.cloneByStream(record);
 						T newRecord = itemProcessors[i].process(deepCopyRecords);
 						newRecords.add(newRecord);
 					}
@@ -591,7 +591,7 @@ public final class BatchUtil
 					
 					for (T newRecord : newRecords)
 					{
-						T deepCopyRecords = CommonUtil.deepCopy(newRecord);
+						T deepCopyRecords = ObjectUtil.cloneByStream(newRecord);
 						T tempRecord = itemProcessors[i].process(deepCopyRecords);
 						tempRecords.add(tempRecord);
 					}

@@ -14,12 +14,13 @@ import java.util.Iterator;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 
-import com.CommonUtils.Utils.CommonUtils.CommonUtil;
 import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
 import com.CommonUtils.Utils.XmlUtils.Bean.XmlNode;
 import com.alibaba.fastjson.JSON;
 import com.thoughtworks.xstream.XStream;
 
+import cn.hutool.core.convert.Convert;
+import cn.hutool.core.lang.TypeReference;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -102,7 +103,8 @@ public final class XmlUtil
 	
 	private static void recursionGenerateNode(final XmlNode xmlNode)
 	{
-		Iterator<Element> externalIter = CommonUtil.cast(xmlNode.toElement().elementIterator());
+		Iterator<Element> externalIter = Convert.convert(new TypeReference<Iterator<Element>>() {}, xmlNode.toElement().elementIterator());
+		
 		while (externalIter.hasNext())
 		{
 			if (JavaCollectionsUtil.isCollectionEmpty(xmlNode.getChildren()))
@@ -112,7 +114,7 @@ public final class XmlUtil
 			XmlNode paramXmlNode = new XmlNode(element);
 			xmlNode.getChildren().add(paramXmlNode);
 			
-			Iterator<Element> internalIter = CommonUtil.cast(element.elementIterator());
+			Iterator<Element> internalIter = Convert.convert(new TypeReference<Iterator<Element>>() {}, element.elementIterator());
 			if (internalIter.hasNext())
 			{ recursionGenerateNode(paramXmlNode); }
 		}
@@ -129,12 +131,7 @@ public final class XmlUtil
 		try
 		{
 			Collection<XmlNode> result = new ArrayList<>();
-			Iterator<Element> iter = CommonUtil.cast
-			(
-					getInstanceForSAXReader().read(xmlFile)
-					   						 .getRootElement()
-					   						 .elementIterator()
-			);
+			Iterator<Element> iter = Convert.convert(new TypeReference<Iterator<Element>>() {}, getInstanceForSAXReader().read(xmlFile).getRootElement().elementIterator());
 			
 			while (iter.hasNext())
 			{

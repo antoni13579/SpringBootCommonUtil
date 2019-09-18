@@ -55,6 +55,8 @@ public final class LongUtil
 		{ return Collections.emptyMap(); }
 	}
 	
+	/**建议使用cn.hutool.core.convert.Convert.toLong*/ 
+	@Deprecated
 	public static <T> long getLong(final T obj) throws Exception
 	{
 		if (obj instanceof Long)

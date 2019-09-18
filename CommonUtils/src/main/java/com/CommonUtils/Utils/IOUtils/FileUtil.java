@@ -27,10 +27,11 @@ import java.util.Set;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
-import com.CommonUtils.Utils.DataTypeUtils.BytesUtils.BytesUtil;
+
 import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
 import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
 
+import cn.hutool.core.convert.Convert;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -326,7 +327,7 @@ public final class FileUtil
 			fis = new FileInputStream(file);
 			byte[] b = new byte[100];
 			fis.read(b, 0, b.length);
-			result = BytesUtil.byteArrayToHex(b);
+			result = Convert.toHex(b);
 		}
 		catch (Exception ex)
 		{ log.error("获取文件头出现异常，异常原因为：{}", ex); }

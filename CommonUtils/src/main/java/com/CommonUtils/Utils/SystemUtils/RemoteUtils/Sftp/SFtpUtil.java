@@ -8,7 +8,6 @@ import java.util.Set;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import com.CommonUtils.Utils.CommonUtils.CommonUtil;
 import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
 import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
 import com.CommonUtils.Utils.IOUtils.DirectoryUtil;
@@ -20,6 +19,8 @@ import com.CommonUtils.Utils.SystemUtils.RemoteUtils.Sftp.Impl.SftpProgressMonit
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.Session;
 
+import cn.hutool.core.convert.Convert;
+import cn.hutool.core.lang.TypeReference;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -173,11 +174,12 @@ public final class SFtpUtil
 	public synchronized static Collection<ChannelSftp.LsEntry> getFiles(final RemoteInfo remoteInfo, final String remotePath)
 	{
 		Collection<ChannelSftp.LsEntry> result = new HashSet<>();
+		
 		execute
 		(
 				remoteInfo, 
 				(ChannelSftp channel, InputStream is) -> 
-				{ result.addAll(CommonUtil.cast(channel.ls(remotePath))); }
+				{ result.addAll(Convert.convert(new TypeReference<Collection<? extends ChannelSftp.LsEntry> >() {}, channel.ls(remotePath))); }
 		);
 		return result;
 	}

@@ -6,16 +6,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 
-import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
-import com.CommonUtils.Utils.DataTypeUtils.BooleanUtils.BooleanUtil;
-import com.CommonUtils.Utils.DataTypeUtils.DateUtils.DateUtil;
-import com.CommonUtils.Utils.DataTypeUtils.DoubleUtils.DoubleUtil;
-import com.CommonUtils.Utils.DataTypeUtils.IntegerUtils.IntegerUtil;
-import com.CommonUtils.Utils.DataTypeUtils.LongUtils.LongUtil;
-import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTCreator.Builder;
 import com.auth0.jwt.algorithms.Algorithm;
+
+import cn.hutool.core.convert.Convert;
 
 public final class BuilderUtil 
 {
@@ -41,31 +36,31 @@ public final class BuilderUtil
 			Object value = entry.getValue();
 			
 			if (value instanceof Boolean) 
-			{ this.builder.withClaim(name, BooleanUtil.getBoolean(value)); }
+			{ this.builder.withClaim(name, Convert.toBool(value)); }
 			
 			else if (value instanceof Integer) 
-			{ this.builder.withClaim(name, IntegerUtil.getInteger(value)); }
+			{ this.builder.withClaim(name, Convert.toInt(value)); }
 			
 			else if (value instanceof Long) 
-			{ this.builder.withClaim(name, LongUtil.getLong(value)); }
+			{ this.builder.withClaim(name, Convert.toLong(value)); }
 			
 			else if (value instanceof Double) 
-			{ this.builder.withClaim(name, DoubleUtil.getDouble(value)); }
+			{ this.builder.withClaim(name, Convert.toDouble(value)); }
 			
 			else if (value instanceof String) 
-			{ this.builder.withClaim(name, StringUtil.getString(value)); }
+			{ this.builder.withClaim(name, Convert.toStr(value)); }
 			
 			else if (value instanceof Date) 
-			{ this.builder.withClaim(name, DateUtil.getDate(value)); }
+			{ this.builder.withClaim(name, Convert.toDate(value)); }
 			
 			else if (value instanceof String[]) 
-			{ this.builder.withArrayClaim(name, ArrayUtil.getStringArray(value)); }
+			{ this.builder.withArrayClaim(name, Convert.toStrArray(value)); }
 			
 			else if (value instanceof Integer[]) 
-			{ this.builder.withArrayClaim(name, ArrayUtil.getIntegerArrayForWrapperClass(value)); }
+			{ this.builder.withArrayClaim(name, Convert.toIntArray(value)); }
 			
 			else if (value instanceof Long[]) 
-			{ this.builder.withArrayClaim(name, ArrayUtil.getLongArrayForWrapperClass(value)); }
+			{ this.builder.withArrayClaim(name, Convert.toLongArray(value)); }
 			
 			else 
 			{ throw new Exception("设置jwt token自定义payload的数据类型不符合要求！！！异常的数据类型为：" + value.getClass()); }

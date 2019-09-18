@@ -7,11 +7,12 @@ import java.util.Iterator;
 import org.dom4j.Attribute;
 import org.dom4j.Element;
 
-import com.CommonUtils.Utils.CommonUtils.CommonUtil;
 import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
 import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
 import com.alibaba.fastjson.JSON;
 
+import cn.hutool.core.convert.Convert;
+import cn.hutool.core.lang.TypeReference;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -46,7 +47,7 @@ public class XmlNode
 		this.nodeValue = !StringUtil.isStrEmpty(element.getTextTrim()) ? element.getTextTrim() : "";
 		this.element = element;
 
-		Iterator<Attribute> iter = CommonUtil.cast(element.attributeIterator());
+		Iterator<Attribute> iter = Convert.convert(new TypeReference<Iterator<Attribute>>() {}, element.attributeIterator());
 		while (iter.hasNext())
 		{
 			Attribute attribute = iter.next();
