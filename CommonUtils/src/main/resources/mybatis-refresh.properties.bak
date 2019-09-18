@@ -1,0 +1,8 @@
+#enable refresh thread
+enabled=true  
+#delay to start refresh thread seconds
+delaySeconds=60  
+#sleep seconds
+sleepSeconds=3  
+#scan mapper file resource path
+mappingPath=mappings
