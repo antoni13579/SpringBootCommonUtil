@@ -51,7 +51,7 @@
 		<webjars-stomp-websocket.version>2.3.4</webjars-stomp-websocket.version>
 		<jackson-databind.version>2.9.9.2</jackson-databind.version>
 		<jasypt.version>1.9.2</jasypt.version>
-		<hutool.version>4.4.5</hutool.version>
+		<hutool.version>4.6.6</hutool.version>
 		<google.zxing.core.version>3.3.3</google.zxing.core.version>
 		<ikanalyzer.version>2012_u6</ikanalyzer.version>
 		<swagger.version>2.9.2</swagger.version>
