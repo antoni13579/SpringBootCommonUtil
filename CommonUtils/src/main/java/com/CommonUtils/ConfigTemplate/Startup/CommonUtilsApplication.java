@@ -7,20 +7,26 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.boot.autoconfigure.jdbc.XADataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.integration.annotation.IntegrationComponentScan;
 import org.springframework.integration.config.EnableIntegration;
 
 import com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure;
+import com.baomidou.dynamic.datasource.spring.boot.autoconfigure.DynamicDataSourceAutoConfiguration;
 
 @SpringBootApplication
 @EnableAutoConfiguration
 (
-		exclude=
+		exclude= 
 		{
 				DataSourceAutoConfiguration.class, 
+				XADataSourceAutoConfiguration.class,
+				
 				DruidDataSourceAutoConfigure.class,
+				
+				DynamicDataSourceAutoConfiguration.class,
 				
 				ThymeleafAutoConfiguration.class,
 				
@@ -28,7 +34,7 @@ import com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure;
 				ShiroAnnotationProcessorAutoConfiguration.class
 		}
 )
-@ComponentScan(basePackages= {"com.CommonUtils"})
+@ComponentScan(basePackages= { "com.CommonUtils" })
 @IntegrationComponentScan("com.CommonUtils")
 @EnableIntegration
 public class CommonUtilsApplication 

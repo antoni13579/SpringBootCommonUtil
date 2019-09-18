@@ -59,8 +59,9 @@
 		<dingding.api.version>20190716</dingding.api.version>
 		<baidu.api.version>4.11.3</baidu.api.version>
 		<shiro.version>1.4.0</shiro.version>
-		<mybatisplus.version>3.1.2</mybatisplus.version>
-		<druid.version>1.1.10</druid.version>
+		<mybatisplus.version>3.2.0</mybatisplus.version>
+		<mybatisplus.dynamic-datasource.version>2.5.6</mybatisplus.dynamic-datasource.version>
+		<druid.version>1.1.20</druid.version>
 		<jwt.version>3.8.2</jwt.version>
 		<eclipse-collections.version>10.0.0</eclipse-collections.version>
 	</properties>
@@ -174,6 +175,12 @@
 			<groupId>com.microsoft.sqlserver</groupId>
 			<artifactId>mssql-jdbc</artifactId>
 			<scope>runtime</scope>
+		</dependency>
+		
+		<!-- 分布式事务atomikos -->  
+		<dependency>    
+    		<groupId>org.springframework.boot</groupId>    
+    		<artifactId>spring-boot-starter-jta-atomikos</artifactId>    
 		</dependency>
 		
 		<!-- Spring Boot SQL模块（自定义的数据库驱动，主要是Oracle与Teradata驱动） --> 
@@ -569,6 +576,13 @@
     		<groupId>com.baomidou</groupId>
     		<artifactId>mybatis-plus-boot-starter</artifactId>
    		 	<version>${mybatisplus.version}</version>
+		</dependency>
+		
+		<!-- MyBatis Plus之动态数据源 -->
+		<dependency>
+    		<groupId>com.baomidou</groupId>
+    		<artifactId>dynamic-datasource-spring-boot-starter</artifactId>
+    		<version>${mybatisplus.dynamic-datasource.version}</version>
 		</dependency>
 		
 		<!-- Druid数据库连接池 -->

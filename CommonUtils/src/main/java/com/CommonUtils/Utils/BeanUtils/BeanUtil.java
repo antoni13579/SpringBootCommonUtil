@@ -1,13 +1,20 @@
 package com.CommonUtils.Utils.BeanUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.cglib.beans.BeanMap;
 
+import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
+import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
 import com.CommonUtils.Utils.ReflectUtils.ReflectUtil;
 import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -27,6 +34,7 @@ public final class BeanUtil
 	/**
 	 * bean转map
 	 * */
+	@Deprecated
 	public static <T> Map<String, Object> beanToMap(final T bean, final boolean isGetAll) throws IllegalArgumentException, IllegalAccessException
 	{
 		if (isGetAll)
@@ -43,6 +51,7 @@ public final class BeanUtil
 	}
 	
 	/**map转bean*/
+	@Deprecated
 	public static <T> T mapToBean(final Map<String, Object> map, final T bean)
 	{
 		BeanMap beanMap = BeanMap.create(bean);
@@ -53,6 +62,7 @@ public final class BeanUtil
 	/**
 	 * List<T>转换为List<Map<String, Object>> 
 	 * */
+	@Deprecated
 	public static <T> List<Map<String, Object>> beanListToMapList(final List<T> objectList, final boolean isGetAll) throws IllegalArgumentException, IllegalAccessException
 	{
 		List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
@@ -69,6 +79,7 @@ public final class BeanUtil
 	
 	/**List<Map<String,Object>>转换为List<T> 
 	 * */
+	@Deprecated
 	public static <T> List<T> mapListToBeanList(final List<Map<String,Object>> mapList, final Class<T> clazz) throws InstantiationException, IllegalAccessException
 	{
 		List<T> result = new ArrayList<T>();
@@ -82,6 +93,23 @@ public final class BeanUtil
 			}
 		}
 		return result;
+	}
+	
+	public static <T, R> List<R> getFields(final Function<? super T, ? extends R> mapper, final Collection<T> beans)
+	{
+		if (!JavaCollectionsUtil.isCollectionEmpty(beans))
+		{ return beans.stream().map(mapper).collect(Collectors.toList()); }
+		else
+		{ return Collections.emptyList(); }
+	}
+	
+	@SafeVarargs
+	public static <T, R> List<R> getFields(final Function<? super T, ? extends R> mapper, final T ... beans)
+	{
+		if (!ArrayUtil.isArrayEmpty(beans))
+		{ return getFields(mapper, Arrays.asList(beans)); }
+		else
+		{ return Collections.emptyList(); }
 	}
 	
 	/**

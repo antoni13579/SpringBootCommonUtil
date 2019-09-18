@@ -8,6 +8,10 @@ import org.apache.tomcat.dbcp.dbcp.BasicDataSourceFactory;
 
 import com.CommonUtils.Utils.DBUtils.Bean.DBBaseInfo.DBInfo;
 
+/**
+ * 已过时，最新的Tomcat已经不支持这个数据库连接池了
+ * */
+@Deprecated
 public final class TomcatOldDataSourceConfig
 {
 	private TomcatOldDataSourceConfig() {}

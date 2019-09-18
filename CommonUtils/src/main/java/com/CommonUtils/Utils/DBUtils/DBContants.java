@@ -13,21 +13,56 @@ public final class DBContants
 	
 	public static final int fetchSize = 10000;
 	
-	public static final String ORACLE_JDBC_DRIVER_NEW = "oracle.jdbc.OracleDriver";
-	public static final String ORACLE_JDBC_DRIVER_OLD = "oracle.jdbc.driver.OracleDriver";
-	
 	public static final String TERADATA_JDBC_DRIVER = "com.teradata.jdbc.TeraDriver";
 	
-	public static final String MYSQL_JDBC_DRIVER_NEW = "com.mysql.cj.jdbc.Driver";
-	public static final String MYSQL_JDBC_DRIVER_OLD = "com.mysql.jdbc.Driver";
+	@ToString
+	@Getter
+	public enum OracleJdbcDriver
+	{
+		ORACLE_NEW("oracle.jdbc.OracleDriver"),
+		ORACLE_OLD("oracle.jdbc.driver.OracleDriver"),
+		ORACLE_XA_NEW("oracle.jdbc.xa.client.OracleXADataSource"),
+		ORACLE_XA_OLD("oracle.jdbc.xa.OracleXADataSource");
+		
+		private final String jdbcDriver;
+		
+		private OracleJdbcDriver(final String jdbcDriver)
+		{ this.jdbcDriver = jdbcDriver; }
+	}
 	
-	public static final String POSTGRESQL_JDBC_DRIVER = "org.postgresql.Driver";
+	@ToString
+	@Getter
+	public enum MySqlJdbcDriver
+	{
+		MYSQL_NEW("com.mysql.cj.jdbc.Driver"),
+		MYSQL_OLD("com.mysql.jdbc.Driver"),
+		MYSQL_XA("com.mysql.cj.jdbc.MysqlXADataSource");
+		
+		private final String jdbcDriver;
+		
+		private MySqlJdbcDriver(final String jdbcDriver)
+		{ this.jdbcDriver = jdbcDriver; }
+	}
+	
+	@ToString
+	@Getter
+	public enum PostgresqlJdbcDriver
+	{
+		POSTGRESQL("org.postgresql.Driver"),
+		POSTGRESQL_XA("org.postgresql.xa.PGXADataSource");
+		
+		private final String jdbcDriver;
+		
+		private PostgresqlJdbcDriver(final String jdbcDriver)
+		{ this.jdbcDriver = jdbcDriver; }
+	}
 	
 	@ToString
 	@Getter
 	public enum SqlServerJdbcDriver
 	{
 		MICROSOFT("com.microsoft.sqlserver.jdbc.SQLServerDriver"),
+		MICROSOFT_XA("com.microsoft.sqlserver.jdbc.SQLServerXADataSource"),
 		NET_SOURCEFORGE("net.sourceforge.jtds.jdbc.Driver");
 		
 		private final String jdbcDriver;

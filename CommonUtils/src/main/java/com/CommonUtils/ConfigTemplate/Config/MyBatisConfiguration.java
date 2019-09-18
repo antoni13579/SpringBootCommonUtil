@@ -19,7 +19,7 @@ import com.CommonUtils.Utils.DBUtils.Bean.DBBaseInfo.DBInfo;
 import com.CommonUtils.Utils.DBUtils.Bean.Url.OracleUrl;
 
 /***
-@EnableTransactionManagement
+@EnableTransactionManagement @EnableTransactionManagement(proxyTargetClass = true)
 @Aspect
 @Configuration
 @MapperScan(basePackages = {"com.ExtractDataToTD.MyBatis.ScsPlus.Edw.Dao"},
@@ -35,7 +35,7 @@ public class MyBatisConfiguration
         (
                 new DBInfo
                 (
-                        DBContants.ORACLE_JDBC_DRIVER_NEW,
+                        DBContants.OracleJdbcDriver.ORACLE_NEW.getJdbcDriver(),
                         DBUrlUtil.getOracleUrl(new OracleUrl()),
                         "username",
                         "password",

@@ -57,4 +57,10 @@ public final class DBInfo extends AbstractDBInfo
 			  	  final String jdbcPassWord,
 			  	  final boolean useColumnName)
 	{ init(jdbcDriverName, jdbcUrl, jdbcUserName, jdbcPassWord, "", Collections.emptyList(), useColumnName); }
+	
+	public DBInfo(final String jdbcUrl, 
+		  	  	  final String jdbcUserName, 
+		  	  	  final String jdbcPassWord,
+		  	  	  final boolean useColumnName)
+	{ init("", jdbcUrl, jdbcUserName, jdbcPassWord, "", Collections.emptyList(), useColumnName); }
 }

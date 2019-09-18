@@ -7,6 +7,7 @@ import com.CommonUtils.Utils.SystemUtils.SystemInfoUtils.SystemInfo.SystemPlatfo
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
+@Deprecated
 @Slf4j
 @Setter
 /**

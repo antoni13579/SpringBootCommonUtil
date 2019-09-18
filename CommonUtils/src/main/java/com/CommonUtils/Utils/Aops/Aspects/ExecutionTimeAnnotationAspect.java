@@ -12,6 +12,7 @@ import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
 
 import lombok.extern.slf4j.Slf4j;
 
+@Deprecated
 @Aspect
 @Component
 @Slf4j

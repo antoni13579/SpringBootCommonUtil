@@ -17,13 +17,13 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.map.MultiKeyMap;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.support.JdbcUtils;
 
 import com.CommonUtils.Utils.DBUtils.Bean.DBBaseInfo.AbstractDBInfo;
@@ -38,11 +38,6 @@ import com.CommonUtils.Utils.DataTypeUtils.DateUtils.DateUtil;
 import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
 import com.CommonUtils.Utils.IOUtils.FileUtil;
 import com.CommonUtils.Utils.IOUtils.IOUtil;
-
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.extension.service.IService;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -324,32 +319,6 @@ public final class DBHandleUtil
 		return sb.toString();
 	}
 	
-	public static <T, R> List<R> getPrimaryKey(final Function<? super T, ? extends R> mapper, final Collection<T> beans)
-	{
-		if (!JavaCollectionsUtil.isCollectionEmpty(beans))
-		{ return beans.stream().map(mapper).collect(Collectors.toList()); }
-		else
-		{ return Collections.emptyList(); }
-	}
-
-	@SafeVarargs
-	public static <R> List<R> getPrimaryKey(final Function<Map<String, Object>, ? extends R> mapper, final Map<String, Object> ... beans)
-	{
-		if (!ArrayUtil.isArrayEmpty(beans))
-		{ return getPrimaryKey(mapper, Arrays.asList(beans)); }
-		else
-		{ return Collections.emptyList(); }
-	}
-	
-	@SafeVarargs
-	public static <T, R> List<R> getPrimaryKey(final Function<? super T, ? extends R> mapper, final T ... beans)
-	{
-		if (!ArrayUtil.isArrayEmpty(beans))
-		{ return getPrimaryKey(mapper, Arrays.asList(beans)); }
-		else
-		{ return Collections.emptyList(); }
-	}
-	
 	/**
 	 * 读取文件里面的查询SQL语句，把格式化好的SQL转换为一行SQL语句，可以直接提供给java调用，
 	 * 不过写的粗糙，有如下限制
@@ -397,78 +366,6 @@ public final class DBHandleUtil
 		return result;
 	}
 	
-	@SafeVarargs
-	public static <T> void pageQueryHandlerBeanForMybatisPlus(final double totalDataCount, 
-		  	  												  final double pageSize, 
-		  	  												  final IService<T> service, 
-		  	  												  final QueryWrapper<T> queryWrapper,
-		  	  												  final JavaCollectionsUtil.ItemProcessorForCollection<T> ... itemProcessorForCollections)
-	{ pageQueryHandlerBeanForMybatisPlus(totalDataCount, pageSize, service.getBaseMapper(), queryWrapper, itemProcessorForCollections); }
-	
-	@SafeVarargs
-	public static <T> void pageQueryHandlerBeanForMybatisPlus(final double totalDataCount, 
-														  	  final double pageSize, 
-														  	  final BaseMapper<T> baseMapper, 
-														  	  final QueryWrapper<T> queryWrapper,
-														  	  final JavaCollectionsUtil.ItemProcessorForCollection<T> ... itemProcessorForCollections)
-	{		
-		double totalPage = Math.ceil((totalDataCount + pageSize - 1) / pageSize);
-		for (long pageNo = 1; pageNo < totalPage; pageNo++)
-		{
-			Page<T> page = new Page<T>(pageNo, new Double(pageSize).longValue());
-			List<T> records = baseMapper.selectPage(page, queryWrapper).getRecords();
-			JavaCollectionsUtil.collectionProcessor
-			(
-					records, 
-					(final T value, final int indx, final int length) -> 
-					{
-						ArrayUtil.arrayProcessor
-						(
-								itemProcessorForCollections, 
-								(final JavaCollectionsUtil.ItemProcessorForCollection<T> val, final int inx, final int len) -> 
-								{ val.process(value, indx, length); }
-						);
-					}
-			);
-		}
-	}
-	
-	@SafeVarargs
-	public static <T> void pageQueryHandlerMapForMybatisPlus(final double totalDataCount, 
-				 											 final double pageSize, 
-				 											 final IService<T> service, 
-				 											 final QueryWrapper<T> queryWrapper,
-				 											 final JavaCollectionsUtil.ItemProcessorForMap<String, Object> ... itemProcessorForMaps)
-	{ pageQueryHandlerMapForMybatisPlus(totalDataCount, pageSize, service.getBaseMapper(), queryWrapper, itemProcessorForMaps); }
-	
-	@SafeVarargs
-	public static <T> void pageQueryHandlerMapForMybatisPlus(final double totalDataCount, 
-		  	  												 final double pageSize, 
-		  	  												 final BaseMapper<T> baseMapper, 
-		  	  												 final QueryWrapper<T> queryWrapper,
-		  	  												 final JavaCollectionsUtil.ItemProcessorForMap<String, Object> ... itemProcessorForMaps)
-	{
-		double totalPage = Math.ceil((totalDataCount + pageSize - 1) / pageSize);
-		for (long pageNo = 1; pageNo < totalPage; pageNo++)
-		{
-			Page<T> page = new Page<T>(pageNo, new Double(pageSize).longValue());
-			List<Map<String, Object>> records = baseMapper.selectMapsPage(page, queryWrapper).getRecords();
-			JavaCollectionsUtil.collectionProcessor
-			(
-					records, 
-					(final String key, final Object value, final int indx) -> 
-					{
-						ArrayUtil.arrayProcessor
-						(
-								itemProcessorForMaps, 
-								(final JavaCollectionsUtil.ItemProcessorForMap<String, Object> val, final int inx, final int len) -> 
-								{ val.process(key, value, indx); }
-						);
-					}
-			);
-		}
-	}
-	
 	/**
 	 * 释放相关资源，但不包含数据库连接池
 	 * */
@@ -478,5 +375,114 @@ public final class DBHandleUtil
 		if (null != resultSets && resultSets.length > 0) { Arrays.asList(resultSets).forEach(resultSet -> { JdbcUtils.closeResultSet(resultSet); }); }
 		if (null != preparedStatements && preparedStatements.length > 0) { Arrays.asList(preparedStatements).forEach(preparedStatement -> { JdbcUtils.closeStatement(preparedStatement); }); }
 		if (null != connections && connections.length > 0) { Arrays.asList(connections).forEach(connection -> { JdbcUtils.closeConnection(connection); }); }
+	}
+	
+	public static void batchWrite(final AbstractDBInfo abstractDBInfo)
+	{		
+		Connection connection = null;
+		PreparedStatement preparedStatement = null;
+		boolean usePool = false;
+		try
+		{
+			if (abstractDBInfo instanceof DBInfo)
+			{
+				connection = DBHandleUtil.getConnection(abstractDBInfo);			
+				preparedStatement = DBHandleUtil.getPreparedStatement(PreparedStatementOperationType.WRITE, connection, abstractDBInfo.getSql());
+				DBHandleUtil.setPreparedStatement(PreparedStatementOperationType.WRITE, preparedStatement, abstractDBInfo.getBindingParams());
+				DBHandleUtil.commit(new PreparedStatement[] {preparedStatement}, new Connection[] {connection}, true);
+			}
+			else if (abstractDBInfo instanceof DBInfoForDataSource)
+			{
+				DBInfoForDataSource dbInfoForDataSource = (DBInfoForDataSource)abstractDBInfo;
+				usePool = true;
+				if (!JavaCollectionsUtil.isCollectionEmpty(dbInfoForDataSource.getBindingParams()))
+				{
+					dbInfoForDataSource.getJdbcTemplate().batchUpdate
+					(
+							dbInfoForDataSource.getSql(), 
+							new BatchPreparedStatementSetter() 
+							{
+								@Override
+								public void setValues(PreparedStatement ps, int indx) throws SQLException 
+								{
+									Object[] finalRecord = dbInfoForDataSource.getBindingParams().get(indx);
+									for (int i = 1; i <= finalRecord.length; i++)
+									{ ps.setObject(i, finalRecord[i - 1]); }
+								}
+
+								@Override
+								public int getBatchSize() 
+								{ return dbInfoForDataSource.getBindingParams().size(); }
+							}
+				    ); 
+				}
+				else
+				{ dbInfoForDataSource.getJdbcTemplate().batchUpdate(dbInfoForDataSource.getSql()); }
+			}
+			else
+			{ throw new Exception("出现了新的AbstractDBInfo继承子类，请及时处理"); }
+		}
+		catch (Exception ex)
+		{
+			log.error("对数据库进行DML处理出现异常，异常为：", ex);
+			if (!usePool)
+			{ DBHandleUtil.rollback(connection); }
+		}
+		finally
+		{ DBHandleUtil.releaseRelatedResourcesNoDataSource(new Connection[] {connection}, null, new PreparedStatement[] {preparedStatement}); }
+	}
+	
+	public static List<Map<String, Object>> getRecords(final AbstractDBInfo abstractDBInfo)
+	{
+		Connection connection = null;
+		PreparedStatement preparedStatement = null;
+		ResultSet resultSet = null;
+		List<Map<String, Object>> result = null;
+		try
+		{
+			if (abstractDBInfo instanceof DBInfo)
+			{
+				result = new ArrayList<>();
+				connection = DBHandleUtil.getConnection(abstractDBInfo);
+				preparedStatement = DBHandleUtil.getPreparedStatement(PreparedStatementOperationType.READ, connection, abstractDBInfo.getSql());
+				DBHandleUtil.setPreparedStatement(PreparedStatementOperationType.READ, preparedStatement, abstractDBInfo.getBindingParams());
+				
+				resultSet = preparedStatement.executeQuery();
+				ResultSetMetaData resultSetMetaData = preparedStatement.getMetaData();
+				while (resultSet.next())
+				{
+					Map<String, Object> record = new HashMap<String, Object>();
+					for (int i = 1; i <= resultSetMetaData.getColumnCount(); i++) 
+					{
+						String columnName = null;
+						if (abstractDBInfo.isUseColumnName())
+						{ columnName = resultSetMetaData.getColumnName(i); }
+						else
+						{ columnName = resultSetMetaData.getColumnLabel(i); }
+						
+						Object columnValue = resultSet.getObject(columnName);
+						record.put(columnName, columnValue);
+					}
+					
+					result.add(record);
+				}
+			}
+			else if (abstractDBInfo instanceof DBInfoForDataSource)
+			{
+				DBInfoForDataSource dbInfoForDataSource = (DBInfoForDataSource)abstractDBInfo;
+				if (!JavaCollectionsUtil.isCollectionEmpty(dbInfoForDataSource.getBindingParams()))
+				{ result = dbInfoForDataSource.getJdbcTemplate().queryForList(dbInfoForDataSource.getSql(), dbInfoForDataSource.getBindingParams().get(0)); }
+				else
+				{ result = dbInfoForDataSource.getJdbcTemplate().queryForList(dbInfoForDataSource.getSql()); }
+			}
+			else
+			{ throw new Exception("出现了新的AbstractDBInfo继承子类，请及时处理"); }
+		}
+		catch (Exception ex)
+		{ log.error("获取数据库记录出现异常，异常为：", ex); }
+		finally
+		{ DBHandleUtil.releaseRelatedResourcesNoDataSource(new Connection[] {connection}, new ResultSet[] {resultSet}, new PreparedStatement[] {preparedStatement}); }
+		
+		return result;
 	}
 }

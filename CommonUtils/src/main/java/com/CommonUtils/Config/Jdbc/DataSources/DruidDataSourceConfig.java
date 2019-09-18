@@ -1,17 +1,37 @@
 package com.CommonUtils.Config.Jdbc.DataSources;
 
 import javax.sql.DataSource;
+import javax.sql.XADataSource;
 
 import com.CommonUtils.Utils.DBUtils.Bean.DBBaseInfo.DBInfo;
+
 import com.alibaba.druid.pool.DruidDataSource;
+import com.alibaba.druid.pool.xa.DruidXADataSource;
 
 public final class DruidDataSourceConfig 
 {
 	private DruidDataSourceConfig() {}
 	
+	/**
+	 * 已过时，Druid与Atomikos集成有问题
+	 * */
+	@Deprecated
+	public static XADataSource getXADataSource(final DBInfo dbInfo, final String validationQuery)
+	{
+		DruidXADataSource dataSource = new DruidXADataSource();
+		setDataSource(dataSource, dbInfo, validationQuery);
+		return dataSource;
+	}
+	
 	public static DataSource getDataSource(final DBInfo dbInfo, final String validationQuery)
 	{
 		DruidDataSource dataSource = new DruidDataSource();
+		setDataSource(dataSource, dbInfo, validationQuery);
+		return dataSource;
+	}
+	
+	private static void setDataSource(final DruidDataSource dataSource, final DBInfo dbInfo, final String validationQuery)
+	{
 		dataSource.setUrl(dbInfo.getJdbcUrl());
 		dataSource.setUsername(dbInfo.getJdbcUserName());
 		dataSource.setPassword(dbInfo.getJdbcPassWord());
@@ -102,6 +122,5 @@ public final class DruidDataSourceConfig
 		
 		//指定发生removeabandoned的时候，是否记录当前线程的堆栈信息到日志中
 		//dataSource.setLogAbandoned(logAbandoned);
-		return dataSource;
 	}
 }

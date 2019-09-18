@@ -8,6 +8,7 @@ import com.CommonUtils.Utils.IOUtils.IOUtil;
 
 import lombok.extern.slf4j.Slf4j;
 
+@Deprecated
 @Slf4j
 public final class StreamListener extends Thread
 {

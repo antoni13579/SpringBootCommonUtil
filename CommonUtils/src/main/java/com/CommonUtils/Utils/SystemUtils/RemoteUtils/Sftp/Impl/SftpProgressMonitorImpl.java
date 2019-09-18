@@ -11,6 +11,8 @@ public final class SftpProgressMonitorImpl implements SftpProgressMonitor
     private long max = 0;       //最终文件大小
     private long percent = -1;  //进度
     private String msg;
+    private String src;
+    private String dest;
     
 	@Override
 	public void init(int op, String src, String dest, long max) 
@@ -18,6 +20,8 @@ public final class SftpProgressMonitorImpl implements SftpProgressMonitor
 		this.max = max;
         this.count = 0;
         this.percent = -1;
+        this.src = src;
+        this.dest = dest;
         
         if (op == SftpProgressMonitor.GET)
 		{ this.msg = "下载"; }
@@ -35,12 +39,11 @@ public final class SftpProgressMonitorImpl implements SftpProgressMonitor
 		{ return true; }
 		
 		this.percent = this.count / this.max * 100;
-		log.info("总大小为{}，当前{}了{}，进度为{}%", this.max, this.msg, this.count, this.percent);
+		log.info("总大小为{}，当前{}了{}，进度为{}%，源路径为{}，目录路径为{}", this.max, this.msg, this.count, this.percent, this.src, this.dest);
 		
 		return false;
 	}
 
 	@Override
-	public void end() 
-	{}
+	public void end() {}
 }

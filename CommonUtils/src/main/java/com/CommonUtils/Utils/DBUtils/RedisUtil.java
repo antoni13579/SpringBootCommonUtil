@@ -1,4 +1,4 @@
-package com.CommonUtils.Utils.DBUtils.RedisUtils;
+package com.CommonUtils.Utils.DBUtils;
 
 import java.nio.ByteBuffer;
 import java.time.Duration;
