@@ -175,6 +175,8 @@ public final class ArrayUtil
 		{ return false; }
 	}
 	
+	/**建议使用cn.hutool.core.convert.Convert.toStrArray*/ 
+	@Deprecated
 	public static <T> String[] getStringArray(final T obj) throws Exception
 	{
 		if (obj instanceof String[])
@@ -183,6 +185,8 @@ public final class ArrayUtil
 		{ throw new Exception("无法转换为String[]类型"); }
 	}
 	
+	/**建议使用cn.hutool.core.convert.Convert.toIntArray*/ 
+	@Deprecated
 	public static <T> Integer[] getIntegerArrayForWrapperClass(final T obj) throws Exception
 	{
 		if (obj instanceof Integer[])
@@ -199,6 +203,8 @@ public final class ArrayUtil
 		{ throw new Exception("无法转换为int[]类型"); }
 	}
 	
+	/**建议使用cn.hutool.core.convert.Convert.toLongArray*/ 
+	@Deprecated
 	public static <T> Long[] getLongArrayForWrapperClass(final T obj) throws Exception
 	{
 		if (obj instanceof Long[])

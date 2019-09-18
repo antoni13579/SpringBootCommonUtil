@@ -6,9 +6,10 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.nio.ByteBuffer;
 
-import com.CommonUtils.Utils.CommonUtils.CommonUtil;
 import com.CommonUtils.Utils.IOUtils.IOUtil;
 
+import cn.hutool.core.convert.Convert;
+import cn.hutool.core.lang.TypeReference;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -16,6 +17,8 @@ public final class BytesUtil
 {
 	private BytesUtil() {}
 	
+	/**建议使用cn.hutool.core.convert.Convert.toByte*/ 
+	@Deprecated
 	public static <T> byte getByte(final T obj) throws Exception
 	{
 		if (obj instanceof Byte)
@@ -34,7 +37,7 @@ public final class BytesUtil
         {
             bis = new ByteArrayInputStream (bytes);
             ois = new ObjectInputStream (bis);
-            obj = CommonUtil.cast(ois.readObject());
+            obj = Convert.convert(new TypeReference<T>() {}, ois.readObject());
 
         } 
         catch (Exception ex) 
@@ -76,26 +79,31 @@ public final class BytesUtil
 		return bytes;
 	}
 	
-	/**byte[]与转换为int*/ 
+	/**byte[]与转换为int，建议使用cn.hutool.core.convert.Convert.bytesToInt*/ 
+	@Deprecated
 	public static int byteArrayToInt(byte[] b)
 	{ return b[3] & 0xFF | (b[2] & 0xFF) << 8 | (b[1] & 0xFF) << 16 | (b[0] & 0xFF) << 24; }  
 	
-	/**int转换为byte[]*/ 
+	/**int转换为byte[]，建议使用cn.hutool.core.convert.Convert.intToBytes*/ 
+	@Deprecated
 	public static byte[] intToByteArray(int a) 
 	{ return new byte[] { (byte) ((a >> 24) & 0xFF), (byte) ((a >> 16) & 0xFF), (byte) ((a >> 8) & 0xFF), (byte) (a & 0xFF) }; }
 	
-	/**int转换为byte*/ 
+	/**int转换为byte，建议使用cn.hutool.core.convert.Convert.intToByte*/ 
+	@Deprecated
 	public static byte intToByte(int x) 
 	{ return (byte) x; }  
 	
-	/**byte转换为int*/
+	/**byte转换为int，建议使用cn.hutool.core.convert.Convert.byteToUnsignedInt*/
+	@Deprecated
 	public static int byteToInt(byte b) 
 	{  
 	    //Java 总是把 byte 当做有符处理；我们可以通过将其和 0xFF 进行二进制与得到它的无符值  
 	    return b & 0xFF;
 	}
 
-	/**long转换为byte[]*/
+	/**long转换为byte[]，建议使用cn.hutool.core.convert.Convert.longToBytes*/
+	@Deprecated
 	public static byte[] longToByteArray(long x)
 	{
 		ByteBuffer buffer = ByteBuffer.allocate(10);
@@ -103,7 +111,8 @@ public final class BytesUtil
 	    return buffer.array();
 	}  
 	
-	/**byte[]转换为long*/
+	/**byte[]转换为long，建议使用cn.hutool.core.convert.Convert.bytesToLong*/
+	@Deprecated
 	public static long byteArrayToLong(byte[] bytes)
 	{
 		ByteBuffer buffer = ByteBuffer.allocate(10);
@@ -112,6 +121,8 @@ public final class BytesUtil
 		return buffer.getLong(); 
 	}
 	
+	/**建议使用cn.hutool.core.convert.Convert.toHex*/
+	@Deprecated
 	public static String byteArrayToHex(final byte[] src)
 	{
 		char[] buf = new char[src.length * 2];

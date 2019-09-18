@@ -14,12 +14,13 @@ import org.apache.kafka.streams.processor.Punctuator;
 import org.apache.kafka.streams.state.KeyValueStore;
 import org.apache.kafka.streams.state.Stores;
 
-import com.CommonUtils.Utils.CommonUtils.CommonUtil;
 import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
 import com.CommonUtils.Utils.DataTypeUtils.BytesUtils.BytesUtil;
 import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.CustomCollections.Properties;
 import com.CommonUtils.Utils.SystemUtils.KafkaUtils.KafkaUtil;
 
+import cn.hutool.core.convert.Convert;
+import cn.hutool.core.lang.TypeReference;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -188,7 +189,7 @@ public final class KafkaLowStreamConfig
 						}
 				);
 				
-				JobProcessor.this.kvStore = CommonUtil.cast(context.getStateStore("Counts"));
+				JobProcessor.this.kvStore = Convert.convert(new TypeReference<KeyValueStore<String, byte[]>>() {}, context.getStateStore("Counts"));
 			}
 
 			//会被作用于每条收到的记录

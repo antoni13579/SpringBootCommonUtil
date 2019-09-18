@@ -10,10 +10,12 @@ import com.CommonUtils.Utils.IOUtils.IOUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@Deprecated
 public final class CommonUtil 
 {
 	private CommonUtil() {}
 	
+	/**建议使用cn.hutool.core.convert.Convert.convert*/
 	@SuppressWarnings("unchecked")
 	public static <T> T cast(final Object obj)
 	{
@@ -33,10 +35,10 @@ public final class CommonUtil
 	}
 	
 	/**
-	 * 深度拷贝
+	 * 深度拷贝，由于别人已经实现了，建议使用cn.hutool.core.util.ObjectUtil.cloneByStream，代码逻辑都是一样的
 	 * */
 	public static <T> T deepCopy(final T src)
-	{		
+	{
 		T dest = null;
 		
 		ByteArrayOutputStream baos = null;

@@ -1,9 +1,11 @@
 package com.CommonUtils.Utils.DataTypeUtils.BooleanUtils;
 
+@Deprecated
 public final class BooleanUtil 
 {
 	private BooleanUtil() {}
 	
+	/**建议使用cn.hutool.core.convert.Convert.toBool*/ 
 	public static <T> boolean getBoolean(final T obj) throws Exception
 	{
 		if (obj instanceof Boolean)

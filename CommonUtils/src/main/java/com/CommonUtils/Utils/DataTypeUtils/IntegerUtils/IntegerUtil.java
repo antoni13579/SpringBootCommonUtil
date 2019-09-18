@@ -55,6 +55,8 @@ public final class IntegerUtil
 		{ return Collections.emptyMap(); }
 	}
 	
+	/**建议使用cn.hutool.core.convert.Convert.toInt*/ 
+	@Deprecated
 	public static <T> int getInteger(final T obj) throws Exception
 	{
 		if (obj instanceof Integer)

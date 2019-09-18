@@ -12,10 +12,10 @@ import java.util.function.Function;
 import org.eclipse.collections.impl.collector.BigDecimalSummaryStatistics;
 import org.eclipse.collections.impl.collector.Collectors2;
 
-import com.CommonUtils.Utils.CommonUtils.CommonUtil;
 import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
 import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
 
+import cn.hutool.core.util.ObjectUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -79,7 +79,7 @@ public final class BigDecimalUtil
 			if (null != t)
 			{
 				if (t instanceof BigDecimal)
-				{ result = CommonUtil.deepCopy((BigDecimal)t); }
+				{ result = ObjectUtil.cloneByStream((BigDecimal)t); }
 				
 				else if (t instanceof char[])
 				{ result = new BigDecimal((char[])t); }
@@ -110,6 +110,8 @@ public final class BigDecimalUtil
 		return result;
 	}
 	
+	/**建议使用cn.hutool.core.convert.Convert.toBigDecimal*/ 
+	@Deprecated
 	public static <T> BigDecimal getBigDecimal(final T obj) throws Exception
 	{
 		if (obj instanceof BigDecimal)

@@ -65,6 +65,8 @@ public final class DoubleUtil
 		{ return Collections.emptyMap(); }
 	}
 	
+	/**建议使用cn.hutool.core.convert.Convert.toDouble*/ 
+	@Deprecated
 	public static <T> double getDouble(final T obj) throws Exception
 	{
 		if (obj instanceof Double)

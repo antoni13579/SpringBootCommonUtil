@@ -36,6 +36,8 @@ public final class DateUtil
 		{ throw new Exception("无法转换为java.sql.Date类型"); }
 	}
 	
+	/**建议使用cn.hutool.core.convert.Convert.toDate*/ 
+	@Deprecated
 	public static <T> java.util.Date getDate(final T obj) throws Exception
 	{
 		if (obj instanceof java.util.Date)

@@ -41,6 +41,8 @@ public final class CharacterUtil
 		return Optional.ofNullable(iArr);
 	}
 	
+	/**建议使用cn.hutool.core.convert.Convert.toChar*/ 
+	@Deprecated
 	public static <T> char getChar(final T obj) throws Exception
 	{
 		if (obj instanceof Character)

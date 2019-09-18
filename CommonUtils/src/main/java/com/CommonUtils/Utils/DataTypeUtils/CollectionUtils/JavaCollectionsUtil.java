@@ -26,7 +26,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.keyvalue.MultiKey;
 import org.apache.commons.collections4.map.MultiKeyMap;
 
-import com.CommonUtils.Utils.CommonUtils.CommonUtil;
 import com.CommonUtils.Utils.DBUtils.Bean.DBTable.Column;
 import com.CommonUtils.Utils.DBUtils.Bean.DBTable.Table;
 import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
@@ -35,6 +34,9 @@ import com.CommonUtils.Utils.DataTypeUtils.DateUtils.DateUtil;
 import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringContants;
 import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
 
+import cn.hutool.core.convert.Convert;
+import cn.hutool.core.lang.TypeReference;
+import cn.hutool.core.util.ObjectUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -258,7 +260,7 @@ public final class JavaCollectionsUtil
 						String value = null;
 						if (columnValue instanceof java.util.Date)
 						{
-							java.util.Date date = DateUtil.getDate(columnValue);
+							java.util.Date date = Convert.toDate(columnValue);
 							value = StringUtil.toString(date, dateFomat); 
 						}
 						else if (columnValue instanceof java.sql.Date)
@@ -574,28 +576,28 @@ public final class JavaCollectionsUtil
 			{
 				if (val instanceof HashSet)
 				{
-					HashSet<T> v = CommonUtil.cast(val);
-					result = CommonUtil.deepCopy(v);
+					HashSet<T> v = Convert.convert(new TypeReference<HashSet<T>>() {}, val);
+					result = ObjectUtil.cloneByStream(v);
 				}
 				else if (val instanceof TreeSet)
 				{
-					TreeSet<T> v = CommonUtil.cast(val);
-					result = CommonUtil.deepCopy(v);
+					TreeSet<T> v = Convert.convert(new TypeReference<TreeSet<T>>() {}, val);
+					result = ObjectUtil.cloneByStream(v);
 				}
 				else if (val instanceof LinkedHashSet)
 				{
-					LinkedHashSet<T> v = CommonUtil.cast(val);
-					result = CommonUtil.deepCopy(v);
+					LinkedHashSet<T> v = Convert.convert(new TypeReference<LinkedHashSet<T>>() {}, val);
+					result = ObjectUtil.cloneByStream(v);
 				}
 				else if (val instanceof ArrayList)
 				{
-					ArrayList<T> v = CommonUtil.cast(val);
-					result = CommonUtil.deepCopy(v);
+					ArrayList<T> v = Convert.convert(new TypeReference<ArrayList<T>>() {}, val);
+					result = ObjectUtil.cloneByStream(v);
 				}
 				else if (val instanceof LinkedList)
 				{
-					LinkedList<T> v = CommonUtil.cast(val);
-					result = CommonUtil.deepCopy(v);
+					LinkedList<T> v = Convert.convert(new TypeReference<LinkedList<T>>() {}, val);
+					result = ObjectUtil.cloneByStream(v);
 				}
 				else
 				{ throw new Exception("执行Collection的NVL函数出现问题，主要是无法生成Collection"); }
@@ -621,18 +623,18 @@ public final class JavaCollectionsUtil
 			{
 				if (val instanceof HashMap)
 				{
-					HashMap<K, V> v = CommonUtil.cast(val);
-					result = CommonUtil.deepCopy(v);
+					HashMap<K, V> v = Convert.convert(new TypeReference<HashMap<K, V>>() {}, val);
+					result = ObjectUtil.cloneByStream(v);
 				}
 				else if (val instanceof TreeMap)
 				{
-					TreeMap<K, V> v = CommonUtil.cast(val);
-					result = CommonUtil.deepCopy(v);
+					TreeMap<K, V> v = Convert.convert(new TypeReference<TreeMap<K, V>>() {}, val);
+					result = ObjectUtil.cloneByStream(v);
 				}
 				else if (val instanceof LinkedHashMap)
 				{
-					LinkedHashMap<K, V> v = CommonUtil.cast(val);
-					result = CommonUtil.deepCopy(v);
+					LinkedHashMap<K, V> v = Convert.convert(new TypeReference<LinkedHashMap<K, V>>() {}, val);
+					result = ObjectUtil.cloneByStream(v);
 				}
 				else
 				{ throw new Exception("执行Map的NVL函数出现问题，主要是无法生成Map"); }
