@@ -8,13 +8,13 @@ import java.util.Date;
 import org.json.JSONObject;
 
 import com.CommonUtils.Utils.DataTypeUtils.DateUtils.DateContants;
-import com.CommonUtils.Utils.DataTypeUtils.DateUtils.DateUtil;
 import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringContants;
 import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
 import com.CommonUtils.Utils.JsonUtils.JsonUtil;
 
 import com.alibaba.fastjson.JSON;
 
+import cn.hutool.core.date.DateUtil;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -245,8 +245,7 @@ public class VatInvoice
 		
 		public InvoiceDate transferInvoiceDate() throws Exception
 		{
-			this.actualInvoiceDate = DateUtil.formatStrToDate(this.invoiceDate, DateContants.DATE_FORMAT_7)
-											 .orElseThrow(() -> new Exception("获取回来的开票日期为空！！！"));
+			this.actualInvoiceDate = DateUtil.parse(this.invoiceDate, DateContants.DATE_FORMAT_7);
 			return this;
 		}
 	}

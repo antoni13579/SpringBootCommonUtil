@@ -4,6 +4,8 @@ import java.util.Map;
 
 import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.CustomCollections.HashMap;
 
+/**已废弃，请使用cn.hutool.core.util.IdcardUtil*/
+@Deprecated
 public final class IdCardContants 
 {
 	private IdCardContants() {}

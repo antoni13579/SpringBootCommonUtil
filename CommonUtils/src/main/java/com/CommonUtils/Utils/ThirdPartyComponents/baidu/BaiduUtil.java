@@ -1,8 +1,10 @@
 package com.CommonUtils.Utils.ThirdPartyComponents.baidu;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -19,12 +21,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
 
-import com.CommonUtils.Utils.IOUtils.FileUtil;
-import com.CommonUtils.Utils.IOUtils.IOUtil;
 import com.CommonUtils.Utils.NetworkUtils.HttpUtils.HttpUtil;
 import com.CommonUtils.Utils.ThirdPartyComponents.baidu.Bean.VatInvoice;
 import com.baidu.aip.util.Base64Util;
 
+import cn.hutool.core.io.IoUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -87,7 +88,11 @@ public final class BaiduUtil
 			token = "";
 		}
 		finally
-		{ IOUtil.closeQuietly(is, inputStreamReader, bufferedReader); }
+		{			
+			IoUtil.close(is);
+			IoUtil.close(inputStreamReader);
+			IoUtil.close(bufferedReader);
+		}
 		
 		return token;
 	}
@@ -105,9 +110,14 @@ public final class BaiduUtil
 		BufferedReader bufferedReader = null;
 		InputStreamReader inputStreamReader = null;
 		InputStream inputStream = null;
+		FileInputStream input = null;
+		BufferedInputStream bufferInput = null;
 		try
 		{
-			byte[] data = FileUtil.toBytes(file).orElseThrow(() -> new Exception("文件转换为字节数组，返回为空！！！"));
+			input = new FileInputStream(file);
+        	bufferInput = new BufferedInputStream(input);
+			//byte[] data = FileUtil.toBytes(file).orElseThrow(() -> new Exception("文件转换为字节数组，返回为空！！！"));
+        	byte[] data = IoUtil.readBytes(bufferInput);
 			String imgStr = Base64Util.encode(data);
 			
 			StringBuilder requestUrl = new StringBuilder()
@@ -156,7 +166,14 @@ public final class BaiduUtil
 		catch (Exception ex)
 		{ log.error("获取百度增值税发票识别结果出现异常，异常原因为：", ex); }
 		finally
-		{ IOUtil.closeQuietly(dataOutputStream, inputStream, inputStreamReader, bufferedReader); }
+		{
+			IoUtil.close(dataOutputStream);
+			IoUtil.close(inputStream);
+			IoUtil.close(inputStreamReader);
+			IoUtil.close(bufferedReader);
+			IoUtil.close(input);
+			IoUtil.close(bufferInput);
+		}
 		
 		return Optional.ofNullable(result);
 	}

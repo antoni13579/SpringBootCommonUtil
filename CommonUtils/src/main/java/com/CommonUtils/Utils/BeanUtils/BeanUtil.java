@@ -32,7 +32,7 @@ public final class BeanUtil
 	private BeanUtil() {}
 	
 	/**
-	 * bean转map
+	 * bean转map，请使用cn.hutool.core.bean.BeanUtil.beanToMap
 	 * */
 	@Deprecated
 	public static <T> Map<String, Object> beanToMap(final T bean, final boolean isGetAll) throws IllegalArgumentException, IllegalAccessException
@@ -50,7 +50,7 @@ public final class BeanUtil
 		return result;
 	}
 	
-	/**map转bean*/
+	/**map转bean，请使用cn.hutool.core.bean.BeanUtil.mapToBean*/
 	@Deprecated
 	public static <T> T mapToBean(final Map<String, Object> map, final T bean)
 	{
@@ -60,7 +60,7 @@ public final class BeanUtil
 	}
 	
 	/**
-	 * List<T>转换为List<Map<String, Object>> 
+	 * List<T>转换为List<Map<String, Object>> ，请使用cn.hutool.core.bean.BeanUtil.beanToMap
 	 * */
 	@Deprecated
 	public static <T> List<Map<String, Object>> beanListToMapList(final List<T> objectList, final boolean isGetAll) throws IllegalArgumentException, IllegalAccessException
@@ -77,7 +77,7 @@ public final class BeanUtil
 		return result;
 	}
 	
-	/**List<Map<String,Object>>转换为List<T> 
+	/**List<Map<String,Object>>转换为List<T> ，请使用cn.hutool.core.bean.BeanUtil.mapToBean
 	 * */
 	@Deprecated
 	public static <T> List<T> mapListToBeanList(final List<Map<String,Object>> mapList, final Class<T> clazz) throws InstantiationException, IllegalAccessException

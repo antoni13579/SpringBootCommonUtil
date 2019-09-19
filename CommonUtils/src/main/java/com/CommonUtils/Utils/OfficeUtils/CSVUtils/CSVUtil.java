@@ -11,9 +11,10 @@ import java.util.Collections;
 import java.util.List;
 
 import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
-import com.CommonUtils.Utils.IOUtils.IOUtil;
+
 import com.opencsv.CSVReader;
 
+import cn.hutool.core.io.IoUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -45,7 +46,13 @@ public final class CSVUtil
     	catch (Exception ex)
     	{ log.error("读取CSV文件出现异常，文件路径为{}，异常为：", file.getAbsolutePath(), ex); }
     	finally
-    	{ IOUtil.closeQuietly(csvReader, br, isr, bis, fos); }
+    	{
+    		IoUtil.close(csvReader);
+    		IoUtil.close(br);
+    		IoUtil.close(isr);
+    		IoUtil.close(bis);
+    		IoUtil.close(fos);
+    	}
     	
     	return result;
 	}

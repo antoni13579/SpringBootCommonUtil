@@ -30,7 +30,6 @@ import com.CommonUtils.Utils.DBUtils.Bean.DBTable.Column;
 import com.CommonUtils.Utils.DBUtils.Bean.DBTable.Table;
 import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
 import com.CommonUtils.Utils.DataTypeUtils.DateUtils.DateFormat;
-import com.CommonUtils.Utils.DataTypeUtils.DateUtils.DateUtil;
 import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringContants;
 import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
 
@@ -265,17 +264,17 @@ public final class JavaCollectionsUtil
 						}
 						else if (columnValue instanceof java.sql.Date)
 						{
-							java.sql.Date date = DateUtil.getSqlDate(columnValue);
+							java.sql.Date date = Convert.convert(java.sql.Date.class, columnValue);
 							value = StringUtil.toString(date, dateFomat); 
 						}
 						else if (columnValue instanceof java.sql.Timestamp)
 						{
-							java.sql.Timestamp date = DateUtil.getTimestamp(columnValue);
+							java.sql.Timestamp date = Convert.convert(java.sql.Timestamp.class, columnValue);
 							value = StringUtil.toString(date, dateFomat); 
 						}
 						else if (columnValue instanceof oracle.sql.TIMESTAMP)
 						{
-							oracle.sql.TIMESTAMP date = DateUtil.getOracleTimestamp(columnValue);
+							oracle.sql.TIMESTAMP date = Convert.convert(oracle.sql.TIMESTAMP.class, columnValue);
 							value = StringUtil.toString(date, dateFomat); 
 						}
 						else

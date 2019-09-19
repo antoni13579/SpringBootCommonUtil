@@ -6,19 +6,18 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.nio.ByteBuffer;
 
-import com.CommonUtils.Utils.IOUtils.IOUtil;
-
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.lang.TypeReference;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@Deprecated
 public final class BytesUtil 
 {
 	private BytesUtil() {}
 	
 	/**建议使用cn.hutool.core.convert.Convert.toByte*/ 
-	@Deprecated
 	public static <T> byte getByte(final T obj) throws Exception
 	{
 		if (obj instanceof Byte)
@@ -27,7 +26,7 @@ public final class BytesUtil
 		{ throw new Exception("无法转换为byte类型"); }
 	}
 	
-	/**字节数组转换为对象*/
+	/**字节数组转换为对象，请使用cn.hutool.core.util.ObjectUtil.deserialize或unserialize*/
 	public static <T> T fromBytes(byte[] bytes)
 	{
 		T obj = null;
@@ -44,15 +43,15 @@ public final class BytesUtil
         { log.error("字节数组转换为对象出现异常，异常原因为：{}", ex); } 
         finally 
         {            
-            IOUtil.closeQuietly(ois);
-            IOUtil.closeQuietly(bis);
+        	IoUtil.close(ois);
+        	IoUtil.close(bis);
         }
         
         return obj;
 	}
 	
 	/**
-	 * 对象转换为字节数组
+	 * 对象转换为字节数组，请使用cn.hutool.core.util.ObjectUtil.serialize
 	 * */
 	public static <T> byte[] toBytes(T obj)
 	{
@@ -72,30 +71,26 @@ public final class BytesUtil
         { log.error("对象转换为字节数组出现异常，异常原因为：{}", ex); }
         finally 
         {            
-            IOUtil.closeQuietly(oos);
-            IOUtil.closeQuietly(bos);
+        	IoUtil.close(oos);
+        	IoUtil.close(bos);
         }
 		
 		return bytes;
 	}
 	
 	/**byte[]与转换为int，建议使用cn.hutool.core.convert.Convert.bytesToInt*/ 
-	@Deprecated
 	public static int byteArrayToInt(byte[] b)
 	{ return b[3] & 0xFF | (b[2] & 0xFF) << 8 | (b[1] & 0xFF) << 16 | (b[0] & 0xFF) << 24; }  
 	
 	/**int转换为byte[]，建议使用cn.hutool.core.convert.Convert.intToBytes*/ 
-	@Deprecated
 	public static byte[] intToByteArray(int a) 
 	{ return new byte[] { (byte) ((a >> 24) & 0xFF), (byte) ((a >> 16) & 0xFF), (byte) ((a >> 8) & 0xFF), (byte) (a & 0xFF) }; }
 	
 	/**int转换为byte，建议使用cn.hutool.core.convert.Convert.intToByte*/ 
-	@Deprecated
 	public static byte intToByte(int x) 
 	{ return (byte) x; }  
 	
 	/**byte转换为int，建议使用cn.hutool.core.convert.Convert.byteToUnsignedInt*/
-	@Deprecated
 	public static int byteToInt(byte b) 
 	{  
 	    //Java 总是把 byte 当做有符处理；我们可以通过将其和 0xFF 进行二进制与得到它的无符值  
@@ -103,7 +98,6 @@ public final class BytesUtil
 	}
 
 	/**long转换为byte[]，建议使用cn.hutool.core.convert.Convert.longToBytes*/
-	@Deprecated
 	public static byte[] longToByteArray(long x)
 	{
 		ByteBuffer buffer = ByteBuffer.allocate(10);
@@ -112,7 +106,6 @@ public final class BytesUtil
 	}  
 	
 	/**byte[]转换为long，建议使用cn.hutool.core.convert.Convert.bytesToLong*/
-	@Deprecated
 	public static long byteArrayToLong(byte[] bytes)
 	{
 		ByteBuffer buffer = ByteBuffer.allocate(10);
@@ -122,7 +115,6 @@ public final class BytesUtil
 	}
 	
 	/**建议使用cn.hutool.core.convert.Convert.toHex*/
-	@Deprecated
 	public static String byteArrayToHex(final byte[] src)
 	{
 		char[] buf = new char[src.length * 2];

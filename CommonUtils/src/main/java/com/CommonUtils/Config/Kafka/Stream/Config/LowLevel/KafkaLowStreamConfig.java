@@ -15,12 +15,12 @@ import org.apache.kafka.streams.state.KeyValueStore;
 import org.apache.kafka.streams.state.Stores;
 
 import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
-import com.CommonUtils.Utils.DataTypeUtils.BytesUtils.BytesUtil;
 import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.CustomCollections.Properties;
 import com.CommonUtils.Utils.SystemUtils.KafkaUtils.KafkaUtil;
 
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.TypeReference;
+import cn.hutool.core.util.ObjectUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -204,7 +204,7 @@ public final class KafkaLowStreamConfig
 				
 				if (!ArrayUtil.isArrayEmpty(value))
 				{
-					Object tmpValue = BytesUtil.fromBytes(value);
+					Object tmpValue = ObjectUtil.deserialize(value);
 					if (null != tmpValue)
 					{
 						ArrayUtil.arrayProcessor

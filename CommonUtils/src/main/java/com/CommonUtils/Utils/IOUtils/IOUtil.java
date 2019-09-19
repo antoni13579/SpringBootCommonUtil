@@ -6,10 +6,12 @@ import java.io.File;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@Deprecated
 public final class IOUtil 
 {
 	private IOUtil() {}
 	
+	/**建议使用cn.hutool.core.io.IoUtil.close*/
 	public static void closeQuietly(final Closeable ... closeables)
 	{
 		if (null != closeables && closeables.length > 0)
@@ -27,6 +29,7 @@ public final class IOUtil
 		}
 	}
 	
+	/**建议使用cn.hutool.core.io.FileUtil.getTmpDirPath*/
 	public static String getTempFilePath()
 	{ return System.getProperty("java.io.tmpdir"); }
 	

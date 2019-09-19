@@ -31,11 +31,12 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringContants;
 import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
-import com.CommonUtils.Utils.IOUtils.FileUtil;
-import com.CommonUtils.Utils.IOUtils.IOUtil;
 import com.CommonUtils.Utils.OfficeUtils.ExcelUtils.Bean.ExcelData;
 import com.alibaba.fastjson.JSON;
 
+import cn.hutool.core.io.FileTypeUtil;
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.IoUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -71,7 +72,12 @@ public final class ExcelUtil
 		catch (Exception e)
 		{ log.error("输出文件信息内容给response出异常，异常原因为：", e); }
 		finally
-		{ IOUtil.closeQuietly(bos, os, fis, bis); }
+		{			
+			IoUtil.close(bos);
+			IoUtil.close(os);
+			IoUtil.close(bis);
+			IoUtil.close(fis);
+		}
 	}
 	
 	public static void exportExcel(final HttpServletRequest request, final HttpServletResponse response, final String outputFile)
@@ -334,7 +340,10 @@ public final class ExcelUtil
 		catch (Exception ex)
 		{ log.error("读取Excel文件失败，文件路径为{}，异常原因为", file.getAbsoluteFile(), ex); }
 		finally
-		{ IOUtil.closeQuietly(workBook, is); }
+		{
+			IoUtil.close(workBook);
+			IoUtil.close(is);
+		}
 		
 		return result;
 	}
@@ -344,7 +353,7 @@ public final class ExcelUtil
 		if (!FileUtil.isFile(file))
 		{ return false; }
 		
-		return FileUtil.getFileType(file).contains("xls");
+		return FileTypeUtil.getType(file).equalsIgnoreCase("xls");
 	}
 	
 	private static boolean isXlsx(final File file)
@@ -352,7 +361,7 @@ public final class ExcelUtil
 		if (!FileUtil.isFile(file))
 		{ return false; }
 		
-		return FileUtil.getFileType(file).contains("xlsx");
+		return FileTypeUtil.getType(file).equalsIgnoreCase("xlsx");
 	}
 	
 	private static ExcelData readExcelCommonHandler(final Sheet sheet, 

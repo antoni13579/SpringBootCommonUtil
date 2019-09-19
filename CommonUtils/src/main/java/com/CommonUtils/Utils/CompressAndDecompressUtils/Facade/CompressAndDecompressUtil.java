@@ -8,9 +8,12 @@ import java.util.Collection;
 import com.CommonUtils.Utils.CompressAndDecompressUtils.ECompressAndDecompress;
 import com.CommonUtils.Utils.CompressAndDecompressUtils.SubSystem.ZipUtil;
 import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
-import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
-import com.CommonUtils.Utils.IOUtils.FileUtil;
 
+import cn.hutool.core.io.FileTypeUtil;
+import cn.hutool.core.io.FileUtil;
+
+/**已废弃，请使用cn.hutool.core.util.ZipUtil*/
+@Deprecated
 public final class CompressAndDecompressUtil 
 {
 	private CompressAndDecompressUtil() {}
@@ -62,29 +65,21 @@ public final class CompressAndDecompressUtil
 		if (!FileUtil.isFile(srcFile))
 		{ throw new Exception("源文件有问题，可能是对象为空、文件不存在或不是文件类型"); }
 		
-		Collection<String> fileTypes = FileUtil.getFileType(srcFile);
-		if (!JavaCollectionsUtil.isCollectionEmpty(fileTypes))
+		String fileType = FileTypeUtil.getType(srcFile);
+		ECompressAndDecompress[] eCompressAndDecompresses = ECompressAndDecompress.values();
+		for (ECompressAndDecompress eCompressAndDecompress : eCompressAndDecompresses)
 		{
-			for (String fileType : fileTypes)
+			if (eCompressAndDecompress.name().equalsIgnoreCase(fileType))
 			{
-				ECompressAndDecompress[] eCompressAndDecompresses = ECompressAndDecompress.values();
-				for (ECompressAndDecompress eCompressAndDecompress : eCompressAndDecompresses)
+				switch (eCompressAndDecompress)
 				{
-					if (eCompressAndDecompress.name().equalsIgnoreCase(fileType))
-					{
-						switch (eCompressAndDecompress)
-						{
-							case ZIP:
-								ZipUtil.decompress(srcFile, saveFileDirectory, charsetName);
-								break;
-							default:
-								throw new Exception("需要解压缩压缩的文件类型不正确，无法处理");
-						}
-					}
+					case ZIP:
+						ZipUtil.decompress(srcFile, saveFileDirectory, charsetName);
+						break;
+					default:
+						throw new Exception("需要解压缩压缩的文件类型不正确，无法处理");
 				}
 			}
 		}
-		else
-		{ throw new Exception("无法获取其文件类型，无法进行后续处理"); }
 	}
 }

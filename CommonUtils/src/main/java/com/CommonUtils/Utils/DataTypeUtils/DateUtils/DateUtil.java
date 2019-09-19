@@ -11,14 +11,11 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
 import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
-import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.CustomCollections.ArrayList;
 import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.CustomCollections.HashMap;
-import com.CommonUtils.Utils.DataTypeUtils.DateUtils.Bean.RetailTimeIndicatorEntry;
 import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
 
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +25,8 @@ public final class DateUtil
 {
 	private DateUtil() {}
 	
+	/**建议使用cn.hutool.core.convert.Convert.convert(java.sql.Date.class, obj)*/ 
+	@Deprecated
 	public static <T> java.sql.Date getSqlDate(final T obj) throws Exception
 	{
 		if (obj instanceof java.sql.Date)
@@ -64,6 +63,8 @@ public final class DateUtil
 	public static Timestamp getTimestamp(final oracle.sql.TIMESTAMP timestamp) throws SQLException
 	{ return timestamp.timestampValue(); }
 	
+	/**建议使用cn.hutool.core.convert.Convert.convert(java.sql.Timestamp.class, obj)*/ 
+	@Deprecated
 	public static <T> java.sql.Timestamp getTimestamp(final T obj) throws Exception
 	{
 		if (obj instanceof java.sql.Timestamp)
@@ -72,6 +73,8 @@ public final class DateUtil
 		{ throw new Exception("无法转换为java.sql.Timestamp类型"); }
 	}
 	
+	/**建议使用cn.hutool.core.convert.Convert.convert(oracle.sql.TIMESTAMP.class, obj)*/ 
+	@Deprecated
 	public static <T> oracle.sql.TIMESTAMP getOracleTimestamp(final T obj) throws Exception
 	{
 		if (obj instanceof oracle.sql.TIMESTAMP)
@@ -90,8 +93,11 @@ public final class DateUtil
 	 * 2019-11-14为业务日
 	 * 2019-11-15为自然日
 	 * 
-	 * years参数是计算多少年后，或多少年前的业务日
+	 * years参数是计算多少年后，或多少年前的业务日，
+	 * 
+	 * 建议使用cn.hutool.core.date.DateUtil.offset相关方法
 	 * */
+	@Deprecated
 	public static Date getDate(final Date stlDate, final int cnt, final int type)
 	{
 		Calendar cal = Calendar.getInstance();
@@ -103,8 +109,9 @@ public final class DateUtil
 	
 	/**
 	 * 获取日期指定信息，如年，月等
-	 * @param type 如Calendar.DATE、Calendar.YEAR等
+	 * @param type 如Calendar.DATE、Calendar.YEAR等，建议使用cn.hutool.core.date.DateTime的getField方法
 	 * */
+	@Deprecated
 	public static int getField(final Date date, final int type)
 	{
 		Calendar cal = Calendar.getInstance();
@@ -112,6 +119,10 @@ public final class DateUtil
 		return cal.get(type);
 	}
 	
+	/**
+	 * 建议使用cn.hutool.core.date.DateUtil.range相关方法
+	 * */
+	@Deprecated
 	public static Collection<Date> getRangeCondition(final Date start, final Date end, final String timeType, final String ... params)
 	{
 		Collection<Date> dates = DateUtil.getRange(start, end);
@@ -152,8 +163,9 @@ public final class DateUtil
 	}
 	
 	/**
-	 * 根据开始日期与结束日期，获取其时间范围
+	 * 根据开始日期与结束日期，获取其时间范围，建议使用cn.hutool.core.date.DateUtil.range相关方法
 	 * */
+	@Deprecated
 	public static Collection<Date> getRange(final Date start, final Date end)
 	{
 		//开始日期为空，结束日期为空，开始时间大于结束时间都要返回空集合
@@ -173,6 +185,10 @@ public final class DateUtil
 		return result;
 	}
 	
+	/**
+	 * 建议使用cn.hutool.core.date.DateUtil.range相关方法
+	 * */
+	@Deprecated
 	public static Collection<String> getRangeForMonth(final Date start, final Date end)
 	{
 		Collection<Date> dateRange = getRange(start, end);
@@ -191,8 +207,9 @@ public final class DateUtil
 	}
 	
 	/**
-	 * 日期类型格式化输出为字符串
+	 * 日期类型格式化输出为字符串，建议使用cn.hutool.core.date.DateUtil.format相关方法
 	 * */
+	@Deprecated
 	public static String formatDateToStr(final Date date, final String format)
 	{
 		if (null == date || StringUtil.isStrEmpty(format))
@@ -204,8 +221,9 @@ public final class DateUtil
 	}
 	
 	/**
-	 * 字符串类型格式化输出为对应的日期
+	 * 字符串类型格式化输出为对应的日期，建议使用cn.hutool.core.date.DateUtil.parse相关方法
 	 * */
+	@Deprecated
 	public static Optional<Date> formatStrToDate(final String str, final String format)
 	{
 		if (StringUtil.isStrEmpty(str) || StringUtil.isStrEmpty(format))
@@ -220,7 +238,8 @@ public final class DateUtil
 		return Optional.ofNullable(date);
 	}
 	
-	/**模仿Oracle实现的MONTHS_BETWEEN函数*/
+	/**模仿Oracle实现的MONTHS_BETWEEN函数，建议使用cn.hutool.core.date.DateUtil.betweenMonth相关方法*/
+	@Deprecated
 	public static double monthsBetween(final Date startDate, final Date endDate)
 	{
 		if (null == startDate || null == endDate || startDate.compareTo(endDate) == 1)
@@ -262,8 +281,12 @@ public final class DateUtil
 	/**
 	 * 获取最后一天
 	 * type输入为Calendar.DAY_OF_MONTH，获取当月的最后一天
-	 * type输入为Calendar.DAY_OF_YEAR，获取当年的最后一天
+	 * type输入为Calendar.DAY_OF_YEAR，获取当年的最后一天，
+	 * 
+	 *  对于年，建议使用cn.hutool.core.date.DateUtil.endOfYear
+	 * 对于月，建议使用cn.hutool.core.date.DateUtil.endOfMonth
 	 * */
+	@Deprecated
 	public static Date getLastDate(final Date stlDate, final int type)
 	{
 		Calendar cal = Calendar.getInstance();
@@ -275,9 +298,12 @@ public final class DateUtil
 	/**
 	 * 获取第一天，
 	 * type输入为Calendar.DAY_OF_MONTH，获取当月的第一天
-	 * type输入为Calendar.DAY_OF_YEAR，获取当年的第一天
+	 * type输入为Calendar.DAY_OF_YEAR，获取当年的第一天，
 	 * 
+	 * 对于年，建议使用cn.hutool.core.date.DateUtil.beginOfYear
+	 * 对于月，建议使用cn.hutool.core.date.DateUtil.beginOfMonth
 	 * */
+	@Deprecated
 	public static Date getFirstDate(final Date stlDate, final int type)
 	{
 		Calendar cal = Calendar.getInstance();
@@ -286,6 +312,16 @@ public final class DateUtil
 		return cal.getTime();
 	}
 	
+	public static void main(String[] args)
+	{
+		Date startDate = formatStrToDate("20190225", "yyyyMMdd").get();
+		Date endDate = formatStrToDate("20190825", "yyyyMMdd").get();
+		System.out.println(monthsBetween(startDate, endDate));
+		System.out.println(cn.hutool.core.date.DateUtil.betweenMonth(startDate, endDate, true));
+	}
+	
+	/**建议使用cn.hutool.core.date.DateUtil.dayOfWeek相关方法*/
+	@Deprecated
 	public static DayOfWeekType getDateOfWeek(final Date stlDate)
 	{
 		Calendar cal = Calendar.getInstance();
@@ -302,102 +338,18 @@ public final class DateUtil
 		return null;
 	}
 	
-	public static RetailTimeIndicatorEntry getRetailTimeIndicatorEntry(final RetailTimeIndicator retailTimeIndicator, final Date stlDate)
-	{
-		switch (retailTimeIndicator)
-		{
-			case DTD:
-				Date dtdTyBussinessDate = stlDate;
-				Date dtdLyBussinessDate = getDate(dtdTyBussinessDate, 52 * 7 * -1, Calendar.DATE);
-				
-				Date dtdTyStartDate = dtdTyBussinessDate;
-				Date dtdTyEndDate = dtdTyBussinessDate;
-				
-				Date dtdLyStartDate = dtdLyBussinessDate;
-				Date dtdLyEndDate = dtdLyBussinessDate;
-				return new RetailTimeIndicatorEntry().setRetailTimeIndicator(RetailTimeIndicator.DTD)
-						  							 .setTyBussinessDate(dtdTyBussinessDate)
-						  							 .setLyBussinessDate(dtdLyBussinessDate)
-						  							 .setTyStartDate(dtdTyStartDate)
-						  							 .setTyEndDate(dtdTyEndDate)
-						  							 .setLyStartDate(dtdLyStartDate)
-						  							 .setLyEndDate(dtdLyEndDate);
-				
-			case WTD:
-				Date wtdTyBussinessDate = stlDate;
-				Date wtdLyBussinessDate = getDate(wtdTyBussinessDate, 52 * 7 * -1, Calendar.DATE);
-				
-				Date wtdTyStartDate = getDate(getFirstDate(wtdTyBussinessDate, Calendar.DAY_OF_WEEK), -1, Calendar.DATE);
-				Date wtdTyEndDate = wtdTyBussinessDate;
-				
-				Date wtdLyStartDate = getDate(getFirstDate(wtdLyBussinessDate, Calendar.DAY_OF_WEEK), -1, Calendar.DATE);
-				Date wtdLyEndDate = wtdLyBussinessDate;
-				return new RetailTimeIndicatorEntry().setRetailTimeIndicator(RetailTimeIndicator.WTD)
-						  							 .setTyBussinessDate(wtdTyBussinessDate)
-						  							 .setLyBussinessDate(wtdLyBussinessDate)
-						  							 .setTyStartDate(wtdTyStartDate)
-						  							 .setTyEndDate(wtdTyEndDate)
-						  							 .setLyStartDate(wtdLyStartDate)
-						  							 .setLyEndDate(wtdLyEndDate);
-				
-			//case MTD:
-				//break;
-				
-			//case QTD:
-				//break;
-				
-			case YTD:
-				Date ytdTyBussinessDate = stlDate;
-				Date ytdLyBussinessDate = getDate(ytdTyBussinessDate, -1, Calendar.YEAR);
-				
-				Date ytdTyStartDate = getFirstDate(ytdTyBussinessDate, Calendar.DAY_OF_YEAR);
-				Date ytdTyEndDate = ytdTyBussinessDate;
-				
-				Date ytdLyStartDate = getFirstDate(ytdLyBussinessDate, Calendar.DAY_OF_YEAR);
-				Date ytdLyEndDate = ytdLyBussinessDate;
-				return new RetailTimeIndicatorEntry().setRetailTimeIndicator(RetailTimeIndicator.YTD)
-													 .setTyBussinessDate(ytdTyBussinessDate)
-													 .setLyBussinessDate(ytdLyBussinessDate)
-													 .setTyStartDate(ytdTyStartDate)
-													 .setTyEndDate(ytdTyEndDate)
-													 .setLyStartDate(ytdLyStartDate)
-													 .setLyEndDate(ytdLyEndDate);
-				
-			default:
-				return new RetailTimeIndicatorEntry();
-		}
-	}
-	
-	/**
-	 * 此方法用于零售行业生成时间指标数据，目前是LOTUS用上
-	 * */
-	public static Map<Date, Collection<RetailTimeIndicatorEntry>> getRetailTimeIndicatorEntrys(final Date startDate, final Date endDate)
-	{
-		Map<Date, Collection<RetailTimeIndicatorEntry>> result = new TreeMap<>();
-		JavaCollectionsUtil.collectionProcessor
-		(
-				getRange(startDate, endDate), 
-				(final Date dateRecord, final int indx, final int length) -> 
-				{
-					result.put
-					(
-							dateRecord, 
-							new ArrayList<RetailTimeIndicatorEntry>().add(getRetailTimeIndicatorEntry(RetailTimeIndicator.DTD, dateRecord))
-																	 .add(getRetailTimeIndicatorEntry(RetailTimeIndicator.WTD, dateRecord))
-																	 .add(getRetailTimeIndicatorEntry(RetailTimeIndicator.YTD, dateRecord))
-																	 .getList()
-					);
-				}
-		);
-		return result;
-	}
-	
+	/**建议使用cn.hutool.core.date.DateUtil.year*/ 
+	@Deprecated
 	public static int getYear(final Date date)
 	{ return getField(date, Calendar.YEAR); }
 	
+	/**建议使用cn.hutool.core.date.DateUtil.month*/ 
+	@Deprecated
 	public static int getMonth(final Date date)
 	{ return getField(date, Calendar.MONTH) + 1; }
 	
+	/**建议使用cn.hutool.core.date.DateUtil.dayOfMonth*/ 
+	@Deprecated
 	public static int getDay(final Date date)
 	{ return getField(date, Calendar.DAY_OF_MONTH); }
 	

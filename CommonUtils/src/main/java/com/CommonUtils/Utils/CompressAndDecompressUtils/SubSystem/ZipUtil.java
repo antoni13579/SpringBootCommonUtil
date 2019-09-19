@@ -1,9 +1,12 @@
 package com.CommonUtils.Utils.CompressAndDecompressUtils.SubSystem;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -16,11 +19,12 @@ import org.apache.commons.compress.archivers.zip.ZipFile;
 
 import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
 import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
-import com.CommonUtils.Utils.IOUtils.FileUtil;
-import com.CommonUtils.Utils.IOUtils.IOUtil;
 
+import cn.hutool.core.io.IoUtil;
 import lombok.extern.slf4j.Slf4j;
 
+/**已废弃，请使用cn.hutool.core.util.ZipUtil*/
+@Deprecated
 @Slf4j
 public final class ZipUtil 
 {		
@@ -40,8 +44,9 @@ public final class ZipUtil
 		{ zaos.write(buffer, 0, len); }
 		zaos.flush();
 		
-		zaos.closeArchiveEntry();
-		IOUtil.closeQuietly(fis, bis);
+		zaos.closeArchiveEntry();		
+		IoUtil.close(bis);
+		IoUtil.close(fis);
 	}
 		
 	private static void writeDirectory(final ZipArchiveOutputStream zaos, 
@@ -116,7 +121,11 @@ public final class ZipUtil
 		catch (Exception ex)
 		{ log.error("压缩为zip文件出现异常，异常原因为：", ex); }
 		finally
-		{ IOUtil.closeQuietly(zaos, fis, bis); }
+		{
+			IoUtil.close(bis);
+			IoUtil.close(fis);
+			IoUtil.close(zaos);
+		}
 	}
 	
 	public static void decompress(final Path srcPath, final Path saveFileDirectoryPath, final String charsetName)
@@ -130,11 +139,8 @@ public final class ZipUtil
 		ZipFile zipFile = null;
 		try
 		{
-			if (!IOUtil.isFileEmpty(saveFileDirectory))
-			{
-				if (!(saveFileDirectory.mkdir()))
-				{ throw new Exception("解压zip文件失败，因无法创建目录，目录名称为：" + saveFileDirectory.getAbsolutePath()); }
-			}
+			if (!(saveFileDirectory.mkdir()))
+			{ throw new Exception("解压zip文件失败，因无法创建目录，目录名称为：" + saveFileDirectory.getAbsolutePath()); }
 			
 			zipFile = new ZipFile(srcFile, charsetName);
 			Enumeration<ZipArchiveEntry> files = zipFile.getEntries();
@@ -147,18 +153,33 @@ public final class ZipUtil
 				{
 					if (!(new File(entryFilePath).mkdir()))
 					{
-						IOUtil.closeQuietly(zipFile);
+						IoUtil.close(zipFile);
 						throw new Exception("解压zip文件失败，因无法创建目录，目录名称为：" + saveFileDirectory.getAbsolutePath());
 					}
 				}
 				else
-				{ FileUtil.copyFileBio(zipFile.getInputStream(zipArchiveEntry), new File(entryFilePath)); }
+				{
+					//FileUtil.copyFileBio(zipFile.getInputStream(zipArchiveEntry), new File(entryFilePath));
+					
+					InputStream is = zipFile.getInputStream(zipArchiveEntry);
+		            BufferedInputStream bis = IoUtil.toBuffered(is);
+		            
+		            FileOutputStream fos = new FileOutputStream(new File(entryFilePath));
+		            BufferedOutputStream bos = IoUtil.toBuffered(fos);
+		            
+		            IoUtil.copy(bis, bos);
+		            
+		            IoUtil.close(bis);
+		            IoUtil.close(is);
+		            IoUtil.close(bos);
+		            IoUtil.close(fos);
+				}
 			}
 		}
 		catch (Exception ex)
 		{ log.error("解压缩Zip文件异常，异常原因为：", ex); }
 		finally
-		{ IOUtil.closeQuietly(zipFile); }
+		{ IoUtil.close(zipFile); }
 	}
 	
 	public static boolean isEndsWithZip(final String fileName)
@@ -173,11 +194,7 @@ public final class ZipUtil
 	}
 	
 	public static boolean isEndsWithZip(final File file)
-	{
-		boolean result = false;
-		if (!IOUtil.isFileEmpty(file)) { result = isEndsWithZip(file.getAbsolutePath()); }
-		return result;
-	}
+	{ return isEndsWithZip(file.getAbsolutePath()); }
 	
 	public static boolean isEndsWithZip(final Path path)
 	{

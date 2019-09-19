@@ -9,6 +9,8 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import cn.hutool.core.date.DateField;
+import cn.hutool.core.date.DateTime;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -276,7 +278,8 @@ public class ChineseCalendar {
         
         //Antoni注释
         //this.firstWeek = sDObj.getDay();    //公历当月1日星期几
-        this.firstWeek = DateUtil.getField(sDObj, Calendar.DAY_OF_WEEK);    //公历当月1日星期几
+        
+        this.firstWeek = DateTime.of(sDObj).getField(DateField.DAY_OF_WEEK);    //公历当月1日星期几
 
         ////////年柱 1900年立春后为庚子年(60进制36)
         if (m < 2) cY = cyclical(y - 1900 + 36 - 1);
@@ -608,15 +611,17 @@ public class ChineseCalendar {
             
             //Antoni注释
             //Date dayEaster = new Date(l15.getTime() + 86400000 * ( 7 - l15.getDay() )); //求出下个周日
-            Date dayEaster = new Date(l15.getTime() + 86400000 * ( 7 - DateUtil.getField(l15, Calendar.DAY_OF_WEEK) )); //求出下个周日
+            
+            
+            Date dayEaster = new Date(l15.getTime() + 86400000 * ( 7 - DateTime.of(l15).getField(DateField.DAY_OF_WEEK) )); //求出下个周日
 
             //Antoni注释
             //this.m = dayEaster.getMonth();
-            this.m = DateUtil.getField(dayEaster, Calendar.MONTH);
+            this.m = DateTime.of(dayEaster).getField(DateField.MONTH);  
             
             //Antoni注释
             //this.d = dayEaster.getDate();
-            this.d = DateUtil.getField(dayEaster, Calendar.DAY_OF_MONTH);
+            this.d = DateTime.of(dayEaster).getField(DateField.DAY_OF_MONTH);  
         }
     }
     

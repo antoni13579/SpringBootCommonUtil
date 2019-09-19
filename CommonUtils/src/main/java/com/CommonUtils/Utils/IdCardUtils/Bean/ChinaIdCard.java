@@ -1,20 +1,21 @@
 package com.CommonUtils.Utils.IdCardUtils.Bean;
 
 import java.util.Date;
-import java.util.Optional;
 
 import com.CommonUtils.Utils.DataTypeUtils.DateUtils.DateContants;
-import com.CommonUtils.Utils.DataTypeUtils.DateUtils.DateUtil;
 import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
 import com.CommonUtils.Utils.IdCardUtils.EGender;
 import com.CommonUtils.Utils.IdCardUtils.IdCardContants;
 
+import cn.hutool.core.date.DateUtil;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
+/**已废弃，请使用cn.hutool.core.util.IdcardUtil*/
 /**中国身份证号码信息拆解*/
+@Deprecated
 @Getter
 @Setter
 @Accessors(chain = true)
@@ -27,7 +28,7 @@ public final class ChinaIdCard
 	private String idCard;
 	
 	//用于把birthYear、birthMonth、birthDay转换为实际的出生日期
-	private Optional<Date> birth;
+	private Date birth;
 	
 	//根据gender，判断出实际的性别
 	private EGender eGender;
@@ -42,7 +43,7 @@ public final class ChinaIdCard
 		this.idCard = idCard;
 		this.chinaIdCardExtract = new ChinaIdCardExtract(this.idCard);
 		
-		this.birth = DateUtil.formatStrToDate(StringUtil.substr(this.idCard, 6, 8), DateContants.DATE_FORMAT_1);
+		this.birth = DateUtil.parse(StringUtil.substr(this.idCard, 6, 8), DateContants.DATE_FORMAT_1);
 		this.eGender = Integer.parseInt(this.chinaIdCardExtract.getGender()) % 2 != 0 ? EGender.MALE : EGender.FEMALE;
 		this.administrativeAreaCode = this.idCard.substring(0, 6);
 		this.provinceName = IdCardContants.CITY_CODES.getOrDefault(Integer.parseInt(this.idCard.substring(0, 2)), "");

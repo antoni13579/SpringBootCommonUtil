@@ -35,17 +35,17 @@ import com.CommonUtils.Utils.DBUtils.Bean.DBBaseInfo.AbstractDBInfo;
 import com.CommonUtils.Utils.DBUtils.Bean.DBBaseInfo.DBInfo;
 import com.CommonUtils.Utils.DBUtils.Bean.DBBaseInfo.DBInfoForDataSource;
 import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
-import com.CommonUtils.Utils.DataTypeUtils.BytesUtils.BytesUtil;
 import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
 import com.CommonUtils.Utils.DataTypeUtils.DateUtils.DateFormat;
 import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
-import com.CommonUtils.Utils.IOUtils.IOUtil;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.opencsv.CSVReader;
 
+import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.ObjectUtil;
 import lombok.extern.slf4j.Slf4j;
 
@@ -114,7 +114,9 @@ public final class BatchUtil
 		}
 		finally
 		{
-			IOUtil.closeQuietly(fos, osw, bw);
+			IoUtil.close(bw);
+			IoUtil.close(osw);
+			IoUtil.close(fos);
 			DBHandleUtil.releaseRelatedResourcesNoDataSource(new Connection[] { sourceConnection }, new ResultSet[] { sourceResultSet }, new PreparedStatement[] { sourcePreparedStatement });
 		}
 		
@@ -199,7 +201,11 @@ public final class BatchUtil
 		}
 		finally
 		{
-			IOUtil.closeQuietly(csvReader, br, isr, bis, fos);
+			IoUtil.close(csvReader);
+			IoUtil.close(br);
+			IoUtil.close(isr);
+			IoUtil.close(bis);
+			IoUtil.close(fos);
 			DBHandleUtil.releaseRelatedResourcesNoDataSource(new Connection[] {targetConnection}, null, new PreparedStatement[] {targetPreparedStatement});
 		}
 		
@@ -278,8 +284,10 @@ public final class BatchUtil
 			result = false;
 		}
 		finally
-		{
-			IOUtil.closeQuietly(fis, isr, br);
+		{			
+			IoUtil.close(br);
+			IoUtil.close(isr);
+			IoUtil.close(fis);
 			DBHandleUtil.releaseRelatedResourcesNoDataSource(new Connection[] {targetConnection}, null, new PreparedStatement[] {targetPreparedStatement});
 		}
 		
@@ -443,7 +451,7 @@ public final class BatchUtil
 			   						   final String key)
 	{
 		Collection<Map<String, Object>> newRecords = batchProcess(records, itemProcessors);
-		kafkaTemplate.send(topic, key, BytesUtil.toBytes(newRecords));
+		kafkaTemplate.send(topic, key, ObjectUtil.serialize(newRecords));
 		records.clear();
 	}
 	

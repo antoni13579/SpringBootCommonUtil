@@ -4,7 +4,6 @@ import java.io.Closeable;
 
 import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
 import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.CustomCollections.Properties;
-import com.CommonUtils.Utils.IOUtils.IOUtil;
 import com.CommonUtils.Utils.SystemUtils.RemoteUtils.Bean.RemoteInfo;
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelExec;
@@ -13,6 +12,7 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 
+import cn.hutool.core.io.IoUtil;
 import lombok.Getter;
 
 public final class RemoteUtil 
@@ -24,7 +24,7 @@ public final class RemoteUtil
 	
 	public static void releaseResource(final Channel[] channels, final Session[] sessions, final Closeable ... closeables)
 	{
-		IOUtil.closeQuietly(closeables);
+		ArrayUtil.arrayProcessor(closeables, (final Closeable value, final int indx, final int length) -> { IoUtil.close(value); });
 		
 		ArrayUtil.arrayProcessor
 		(

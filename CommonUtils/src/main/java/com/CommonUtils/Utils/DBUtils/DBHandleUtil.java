@@ -34,11 +34,11 @@ import com.CommonUtils.Utils.DBUtils.Bean.DBTable.Table;
 import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
 import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
 import com.CommonUtils.Utils.DataTypeUtils.DateUtils.DateContants;
-import com.CommonUtils.Utils.DataTypeUtils.DateUtils.DateUtil;
 import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
-import com.CommonUtils.Utils.IOUtils.FileUtil;
-import com.CommonUtils.Utils.IOUtils.IOUtil;
 
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.IoUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -306,7 +306,7 @@ public final class DBHandleUtil
 	
 	public static String getPrimaryKeyForVarchar()
 	{
-		String prefix = DateUtil.formatDateToStr(new Date(), DateContants.DATE_FORMAT_4);
+		String prefix = DateUtil.format(new Date(), DateContants.DATE_FORMAT_4);
 		
 		//(数据类型)(最小值+Math.random()*(最大值-最小值+1))
 		int randomNum = (int)(1 + Math.random() * (99999999 - 1 + 1));
@@ -361,7 +361,11 @@ public final class DBHandleUtil
 		catch (Exception ex)
 		{ log.error("读取文件，获取查询SQL出现异常，异常原因为：", ex); }
 		finally
-		{ IOUtil.closeQuietly(fis, isr, br); }
+		{
+			IoUtil.close(br);
+			IoUtil.close(isr);
+			IoUtil.close(fis);
+		}
 		
 		return result;
 	}

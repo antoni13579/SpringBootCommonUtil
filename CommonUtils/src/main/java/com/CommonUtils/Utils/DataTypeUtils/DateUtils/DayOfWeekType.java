@@ -3,6 +3,7 @@ package com.CommonUtils.Utils.DataTypeUtils.DateUtils;
 import lombok.Getter;
 import lombok.ToString;
 
+@Deprecated
 @ToString
 @Getter
 public enum DayOfWeekType 

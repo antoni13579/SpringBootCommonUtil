@@ -1,17 +1,20 @@
 package com.CommonUtils.Utils.IdCardUtils;
 
-import java.util.Calendar;
 import java.util.Date;
 
 import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
 import com.CommonUtils.Utils.DataTypeUtils.CharacterUtils.CharacterUtil;
 import com.CommonUtils.Utils.DataTypeUtils.DateUtils.DateContants;
-import com.CommonUtils.Utils.DataTypeUtils.DateUtils.DateUtil;
 import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
 
+import cn.hutool.core.date.DateField;
+import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 
+/**已废弃，请使用cn.hutool.core.util.IdcardUtil*/
 @Slf4j
+@Deprecated
 public final class IdCardUtil 
 {
 	private IdCardUtil() {}
@@ -37,10 +40,9 @@ public final class IdCardUtil
 			{
 				// 获取出生年月日
 				String birthday = idCard.substring(6, 12);
-				Date birthDate = DateUtil.formatStrToDate(birthday, DateContants.DATE_FORMAT_1)
-										 .map(date -> date)
-										 .orElseThrow(() -> new Exception("将15位身份证号码转换为18位，获取15位身份证出生年月日出现异常！"));
-				idCard18 = idCard.substring(0, 6) + String.valueOf(DateUtil.getField(birthDate, Calendar.YEAR)) + idCard.substring(8);
+				Date birthDate = DateUtil.parse(birthday, DateContants.DATE_FORMAT_1);
+				
+				idCard18 = idCard.substring(0, 6) + String.valueOf(DateTime.of(birthDate).getField(DateField.YEAR)) + idCard.substring(8);
 				
 				// 转换字符数组
 				char[] cArr = idCard18.toCharArray();

@@ -195,6 +195,8 @@ public final class ArrayUtil
 		{ throw new Exception("无法转换为Integer[]类型"); }
 	}
 	
+	/**建议使用cn.hutool.core.convert.Convert.convert(int[].class, obj)*/ 
+	@Deprecated
 	public static <T> int[] getIntegerArray(final T obj) throws Exception
 	{
 		if (obj instanceof int[])
@@ -213,6 +215,8 @@ public final class ArrayUtil
 		{ throw new Exception("无法转换为Long[]类型"); }
 	}
 	
+	/**建议使用cn.hutool.core.convert.Convert.convert(long[].class, obj)*/ 
+	@Deprecated
 	public static <T> long[] getLongArray(final T obj) throws Exception
 	{
 		if (obj instanceof long[])

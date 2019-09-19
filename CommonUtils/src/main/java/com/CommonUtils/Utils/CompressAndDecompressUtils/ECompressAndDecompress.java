@@ -3,6 +3,8 @@ package com.CommonUtils.Utils.CompressAndDecompressUtils;
 import lombok.Getter;
 import lombok.ToString;
 
+/**已废弃，请使用cn.hutool.core.util.ZipUtil*/
+@Deprecated
 @ToString
 @Getter
 public enum ECompressAndDecompress 

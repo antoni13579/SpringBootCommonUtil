@@ -15,9 +15,9 @@ import org.springframework.data.redis.core.RedisTemplate;
 
 import com.CommonUtils.Utils.DBUtils.Bean.RedisEntry;
 import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
-import com.CommonUtils.Utils.DataTypeUtils.BytesUtils.BytesUtil;
 import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
 
+import cn.hutool.core.util.ObjectUtil;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 
@@ -210,8 +210,8 @@ public final class RedisUtil
 		try
 		{
 			result = reactiveRedisConnection.stringCommands()
-											.set(ByteBuffer.wrap(BytesUtil.toBytes(redisEntry.getKey())), 
-												 ByteBuffer.wrap(BytesUtil.toBytes(redisEntry.getValue())))
+											.set(ByteBuffer.wrap(ObjectUtil.serialize(redisEntry.getKey())), 
+												 ByteBuffer.wrap(ObjectUtil.serialize(redisEntry.getValue())))
 											.block();
 		}
 		catch (Exception ex)
@@ -303,9 +303,9 @@ public final class RedisUtil
 		try
 		{
 			ByteBuffer byteBuffer = reactiveRedisConnection.stringCommands()
-					   									   .get(ByteBuffer.wrap(BytesUtil.toBytes(key)))
+					   									   .get(ByteBuffer.wrap(ObjectUtil.serialize(key)))
 					   									   .block();
-			result = BytesUtil.fromBytes(byteBuffer.array());
+			result = ObjectUtil.deserialize(byteBuffer.array());
 		}
 		catch (Exception ex)
 		{ log.error("通过ReactiveRedisConnection获取值出现异常，异常原因为：", ex); }

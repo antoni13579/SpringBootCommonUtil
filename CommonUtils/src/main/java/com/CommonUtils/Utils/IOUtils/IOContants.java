@@ -3,10 +3,12 @@ package com.CommonUtils.Utils.IOUtils;
 import java.util.HashMap;
 import java.util.Map;
 
+@Deprecated
 public final class IOContants 
 {
 	private IOContants() {}
 
+	
 	public static final Map<String, String> fileType = new HashMap<String, String>()
 	{
 		private static final long serialVersionUID = 4829601666788448368L;

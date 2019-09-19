@@ -22,10 +22,10 @@ import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
 import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
 import com.CommonUtils.Utils.DataTypeUtils.DateUtils.DateContants;
 import com.CommonUtils.Utils.DataTypeUtils.DateUtils.DateFormat;
-import com.CommonUtils.Utils.DataTypeUtils.DateUtils.DateUtil;
 import com.CommonUtils.Utils.DataTypeUtils.StringUtils.Bean.Calculation;
 
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.date.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -186,9 +186,9 @@ public final class StringUtil
 		switch (dateFomat)
 		{
 			case DATE:
-				return DateUtil.formatDateToStr(date, DateContants.DATE_FORMAT_3);
+				return DateUtil.format(date, DateContants.DATE_FORMAT_3);
 			case TIMESTAMP:
-				return DateUtil.formatDateToStr(date, DateContants.DATE_FORMAT_6);
+				return DateUtil.format(date, DateContants.DATE_FORMAT_6);
 			default:
 				return "";
 		}

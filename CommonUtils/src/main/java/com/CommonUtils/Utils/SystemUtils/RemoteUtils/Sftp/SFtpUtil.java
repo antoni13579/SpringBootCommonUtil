@@ -10,9 +10,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
 import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
-import com.CommonUtils.Utils.IOUtils.DirectoryUtil;
-import com.CommonUtils.Utils.IOUtils.FileUtil;
-import com.CommonUtils.Utils.IOUtils.IOUtil;
 import com.CommonUtils.Utils.SystemUtils.RemoteUtils.RemoteUtil;
 import com.CommonUtils.Utils.SystemUtils.RemoteUtils.Bean.RemoteInfo;
 import com.CommonUtils.Utils.SystemUtils.RemoteUtils.Sftp.Impl.SftpProgressMonitorImpl;
@@ -20,6 +17,8 @@ import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.Session;
 
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.lang.TypeReference;
 import lombok.extern.slf4j.Slf4j;
 
@@ -60,7 +59,7 @@ public final class SFtpUtil
 	
 	public synchronized static boolean downloadFile(final File localDirectory, final String remoteDirectory, final RemoteInfo remoteInfo)
 	{
-		if (DirectoryUtil.isDirectory(localDirectory))
+		if (FileUtil.isDirectory(localDirectory))
 		{
 			File[] localFiles = localDirectory.listFiles();
 			if (!ArrayUtil.isArrayEmpty(localFiles))
@@ -117,7 +116,7 @@ public final class SFtpUtil
 											int mode = localFileMultipartFile.getSize() > 0 ? ChannelSftp.RESUME : ChannelSftp.OVERWRITE;
 											is = localFileMultipartFile.getInputStream();
 											channel.put(is, remoteFilePath, new SftpProgressMonitorImpl(), mode);
-											IOUtil.closeQuietly(is);
+											IoUtil.close(is);
 											is = null;
 										}
 								)
@@ -138,7 +137,7 @@ public final class SFtpUtil
 				remoteInfo, 
 				(ChannelSftp channel, InputStream is) -> 
 				{
-					int mode = FileUtil.getFileSize(localFilePath) > 0 ? ChannelSftp.RESUME : ChannelSftp.OVERWRITE;
+					int mode = FileUtil.size(new File(localFilePath)) > 0 ? ChannelSftp.RESUME : ChannelSftp.OVERWRITE;
 					channel.put(localFilePath, remoteFilePath, new SftpProgressMonitorImpl(), mode);
 				}
 		);
@@ -146,7 +145,7 @@ public final class SFtpUtil
 	
 	public synchronized static boolean uploadFile(final RemoteInfo remoteInfo, final File localDirectory, final String remoteDirectory)
 	{
-		if (DirectoryUtil.isDirectory(localDirectory))
+		if (FileUtil.isDirectory(localDirectory))
 		{
 			File[] localFiles = localDirectory.listFiles();
 			if (!ArrayUtil.isArrayEmpty(localFiles))

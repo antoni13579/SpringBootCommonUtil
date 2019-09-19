@@ -27,9 +27,9 @@ import org.springframework.web.util.UriUtils;
 
 import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
 
-import com.CommonUtils.Utils.IOUtils.IOUtil;
 import com.CommonUtils.Utils.NetworkUtils.HttpUtils.Bean.DownloadFileInfo;
 
+import cn.hutool.core.io.IoUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -127,7 +127,7 @@ public final class HttpUtil
 		catch (Exception ex)
 		{ log.error("返回字符串信息给页面出现异常，异常原因为：", ex); }
 		finally
-		{ IOUtil.closeQuietly(writer); }
+		{ IoUtil.close(writer); }
 	}
 	
 	/**
