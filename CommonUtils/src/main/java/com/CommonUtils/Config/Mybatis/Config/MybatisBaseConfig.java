@@ -5,11 +5,12 @@ import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.LocalCacheScope;
 
-import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.core.MybatisConfiguration;
 import com.baomidou.mybatisplus.core.config.GlobalConfig;
 import com.baomidou.mybatisplus.core.config.GlobalConfig.DbConfig;
+
+import cn.hutool.core.util.ArrayUtil;
 
 public final class MybatisBaseConfig 
 {	
@@ -31,7 +32,7 @@ public final class MybatisBaseConfig
 		instance.setDefaultExecutorType(ExecutorType.BATCH);
 		instance.setDefaultStatementTimeout(25000);
 		
-		if (!ArrayUtil.isArrayEmpty(logs))
+		if (!ArrayUtil.isEmpty(logs))
 		{
 			if (logs.length == 1)
 			{ instance.setLogImpl(logs[0]); }

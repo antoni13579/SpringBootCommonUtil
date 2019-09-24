@@ -32,10 +32,10 @@ import com.CommonUtils.Utils.DBUtils.Bean.DBBaseInfo.DBInfoForDataSource;
 import com.CommonUtils.Utils.DBUtils.Bean.DBTable.Column;
 import com.CommonUtils.Utils.DBUtils.Bean.DBTable.Table;
 import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
-import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
 import com.CommonUtils.Utils.DataTypeUtils.DateUtils.DateContants;
 import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IoUtil;
@@ -72,7 +72,7 @@ public final class DBHandleUtil
 	
 	public static void commit(final PreparedStatement[] preparedStatements, final Connection[] connections, final boolean useBatch) throws SQLException
 	{
-		if (!ArrayUtil.isArrayEmpty(preparedStatements))
+		if (!cn.hutool.core.util.ArrayUtil.isEmpty(preparedStatements))
 		{
 			for (PreparedStatement preparedStatement : preparedStatements)
 			{
@@ -83,7 +83,7 @@ public final class DBHandleUtil
 			}
 		}
 		
-		if (!ArrayUtil.isArrayEmpty(connections))
+		if (!cn.hutool.core.util.ArrayUtil.isEmpty(connections))
 		{
 			for (Connection connection : connections)
 			{ connection.commit(); }
@@ -91,7 +91,7 @@ public final class DBHandleUtil
 		
 		if (useBatch) 
 		{
-			if (!ArrayUtil.isArrayEmpty(preparedStatements))
+			if (!cn.hutool.core.util.ArrayUtil.isEmpty(preparedStatements))
 			{
 				for (PreparedStatement preparedStatement : preparedStatements)
 				{ preparedStatement.clearBatch(); }
@@ -178,7 +178,7 @@ public final class DBHandleUtil
 	
 	public static String generateInsertSqlWithBindingParams(final String tableName, final String ... columnNames) throws Exception
 	{
-		if (ArrayUtil.isArrayEmpty(columnNames))
+		if (cn.hutool.core.util.ArrayUtil.isEmpty(columnNames))
 		{ throw new Exception("生成INSERT语句，字段名称不能为空！！！"); }
 		
 		StringBuilder sb = new StringBuilder().append("INSERT INTO ")
@@ -257,11 +257,11 @@ public final class DBHandleUtil
 												final PreparedStatement preparedStatement, 
 												final Collection<T[]> params) throws SQLException
 	{
-		if (!JavaCollectionsUtil.isCollectionEmpty(params))
+		if (!CollUtil.isEmpty(params))
 		{
 			for (T[] param : params)
 			{
-				if (!ArrayUtil.isArrayEmpty(param))
+				if (!cn.hutool.core.util.ArrayUtil.isEmpty(param))
 				{
 					for (int i = 1; i <= param.length; i++)
 					{ preparedStatement.setObject(i, param[i - 1]); }
@@ -279,11 +279,11 @@ public final class DBHandleUtil
 											final Collection<Map<String, Object>> params,
 											final boolean useColumnName) throws SQLException
 	{
-		if (!JavaCollectionsUtil.isCollectionEmpty(params))
+		if (!CollUtil.isEmpty(params))
 		{
 			for (Map<String, Object> param : params)
 			{
-				if (!JavaCollectionsUtil.isMapEmpty(param))
+				if (!CollUtil.isEmpty(param))
 				{
 					for (int i = 1; i <= resultSetMetaData.getColumnCount(); i++) 
 					{
@@ -399,7 +399,7 @@ public final class DBHandleUtil
 			{
 				DBInfoForDataSource dbInfoForDataSource = (DBInfoForDataSource)abstractDBInfo;
 				usePool = true;
-				if (!JavaCollectionsUtil.isCollectionEmpty(dbInfoForDataSource.getBindingParams()))
+				if (!CollUtil.isEmpty(dbInfoForDataSource.getBindingParams()))
 				{
 					dbInfoForDataSource.getJdbcTemplate().batchUpdate
 					(
@@ -474,7 +474,7 @@ public final class DBHandleUtil
 			else if (abstractDBInfo instanceof DBInfoForDataSource)
 			{
 				DBInfoForDataSource dbInfoForDataSource = (DBInfoForDataSource)abstractDBInfo;
-				if (!JavaCollectionsUtil.isCollectionEmpty(dbInfoForDataSource.getBindingParams()))
+				if (!CollUtil.isEmpty(dbInfoForDataSource.getBindingParams()))
 				{ result = dbInfoForDataSource.getJdbcTemplate().queryForList(dbInfoForDataSource.getSql(), dbInfoForDataSource.getBindingParams().get(0)); }
 				else
 				{ result = dbInfoForDataSource.getJdbcTemplate().queryForList(dbInfoForDataSource.getSql()); }

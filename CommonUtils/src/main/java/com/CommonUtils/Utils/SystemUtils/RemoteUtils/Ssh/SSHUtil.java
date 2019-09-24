@@ -7,13 +7,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
 import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
 import com.CommonUtils.Utils.SystemUtils.RemoteUtils.RemoteUtil;
 import com.CommonUtils.Utils.SystemUtils.RemoteUtils.Bean.RemoteInfo;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.Session;
 
+import cn.hutool.core.collection.CollUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -47,7 +47,7 @@ public final class SSHUtil
             while (null != (stdoutLine = br.readLine())) 
             { tmpList.add(stdoutLine); }
             
-            if (JavaCollectionsUtil.isCollectionEmpty(tmpList)) { result = Collections.emptyList(); }
+            if (CollUtil.isEmpty(tmpList)) { result = Collections.emptyList(); }
             else { result = tmpList; }
 		}
 		catch (Exception ex)

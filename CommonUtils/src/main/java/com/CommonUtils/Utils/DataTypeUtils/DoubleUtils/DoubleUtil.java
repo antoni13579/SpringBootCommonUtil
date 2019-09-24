@@ -10,9 +10,10 @@ import java.util.function.Function;
 import java.util.function.ToDoubleFunction;
 import java.util.stream.Collectors;
 
-import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
-import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
 import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
+
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ArrayUtil;
 
 public final class DoubleUtil 
 {
@@ -29,7 +30,7 @@ public final class DoubleUtil
 	public static DoubleSummaryStatistics aggregation(final Double ... params)
 	{
 		Map<String, DoubleSummaryStatistics> map = groupBy((x) -> { return "ALL_AGGREGATION"; }, (x) -> { return x; }, params);
-		if (!JavaCollectionsUtil.isMapEmpty(map))
+		if (!CollUtil.isEmpty(map))
 		{ return map.get("ALL_AGGREGATION"); }
 		else
 		{ return new DoubleSummaryStatistics(); }
@@ -38,7 +39,7 @@ public final class DoubleUtil
 	public static DoubleSummaryStatistics aggregation(final Collection<Double> coll)
 	{
 		Map<String, DoubleSummaryStatistics> map = groupBy((x) -> { return "ALL_AGGREGATION"; }, (x) -> { return x; }, coll);
-		if (!JavaCollectionsUtil.isMapEmpty(map))
+		if (!CollUtil.isEmpty(map))
 		{ return map.get("ALL_AGGREGATION"); }
 		else
 		{ return new DoubleSummaryStatistics(); }
@@ -49,7 +50,7 @@ public final class DoubleUtil
 																   final ToDoubleFunction<? super T> mapper, 
 			   													   final T ... params)
 	{
-		if (!ArrayUtil.isArrayEmpty(params))
+		if (!ArrayUtil.isEmpty(params))
 		{ return groupBy(classifier, mapper, Arrays.asList(params)); }
 		else
 		{ return Collections.emptyMap(); }
@@ -59,7 +60,7 @@ public final class DoubleUtil
 																   final ToDoubleFunction<? super T> mapper, 
 																   final Collection<T> coll)
 	{
-		if (!JavaCollectionsUtil.isCollectionEmpty(coll))
+		if (!CollUtil.isEmpty(coll))
 		{ return coll.stream().collect(Collectors.groupingBy(classifier, Collectors.summarizingDouble(mapper))); }
 		else
 		{ return Collections.emptyMap(); }

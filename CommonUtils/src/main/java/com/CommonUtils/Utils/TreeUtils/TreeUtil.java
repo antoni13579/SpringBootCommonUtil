@@ -6,11 +6,12 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 
-import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
-import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
 import com.CommonUtils.Utils.OfficeUtils.ExcelUtils.Bean.ExcelData;
 import com.CommonUtils.Utils.TreeUtils.Bean.TreeNode;
 import com.alibaba.fastjson.JSON;
+
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ArrayUtil;
 
 public final class TreeUtil 
 {
@@ -24,7 +25,7 @@ public final class TreeUtil
 	
 	public static <K, V> Collection<TreeNode<Map<K, V>>> mapsToTreeNodes(final Collection<Map<K, V>> records)
 	{
-		if (!JavaCollectionsUtil.isCollectionEmpty(records))
+		if (!CollUtil.isEmpty(records))
 		{
 			Collection<TreeNode<Map<K, V>>> result = new ArrayList<>();
 			for (Map<K, V> record : records)
@@ -62,7 +63,7 @@ public final class TreeUtil
 				if (null != rootId && Objects.equals(rootId, leafId))
 				{
 					mark = true;
-					if (JavaCollectionsUtil.isCollectionEmpty(node2.getChildren()))
+					if (CollUtil.isEmpty(node2.getChildren()))
 					{ node2.setChildren(new ArrayList<TreeNode<Map<K, V>>>()); }
 					
 					if (!node2.getChildren().contains(node1))
@@ -88,7 +89,7 @@ public final class TreeUtil
 			Collection<TreeNode<Map<K, V>>> children = node.getChildren();
 			for (TreeNode<Map<K, V>> child : children)
 			{
-				if (!ArrayUtil.isArrayEmpty(itemProcesses))
+				if (!ArrayUtil.isEmpty(itemProcesses))
 				{
 					for (ItemProcess<Map<K, V>> itemProcess : itemProcesses)
 					{ itemProcess.process(child.getData(), level); }
@@ -112,7 +113,7 @@ public final class TreeUtil
 										 final int level, 
 										 final ItemProcess<Map<K, V>> ... itemProcesses)
 	{
-		if (!ArrayUtil.isArrayEmpty(itemProcesses))
+		if (!ArrayUtil.isEmpty(itemProcesses))
 		{
 			for (ItemProcess<Map<K, V>> itemProcess : itemProcesses)
 			{ itemProcess.process(root.getData(), level); }

@@ -1,7 +1,8 @@
 package com.CommonUtils.Utils.SystemUtils.RemoteUtils.Ssh;
 
-import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
 import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
+
+import cn.hutool.core.util.ArrayUtil;
 
 public final class SSHCommonCommand 
 {
@@ -33,7 +34,7 @@ public final class SSHCommonCommand
 	
 	public static String getPsEfCommand(final String ... pipes)
 	{
-		if (!ArrayUtil.isArrayEmpty(pipes))
+		if (!ArrayUtil.isEmpty(pipes))
 		{
 			StringBuilder result = new StringBuilder();
 			result.append(PS_EF_COMMAND);
@@ -60,7 +61,7 @@ public final class SSHCommonCommand
 		{
 			String result = PERL_COMMAND.replaceAll("filePath", filePath);
 			
-			if (!ArrayUtil.isArrayEmpty(args))
+			if (!ArrayUtil.isEmpty(args))
 			{
 				for (int i = 0; i < args.length; i++)
 				{

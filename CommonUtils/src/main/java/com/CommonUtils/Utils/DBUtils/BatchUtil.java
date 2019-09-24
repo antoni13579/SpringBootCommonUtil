@@ -45,6 +45,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.opencsv.CSVReader;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.ObjectUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -560,7 +561,7 @@ public final class BatchUtil
 	{
 		List<Map<String, Object>> newRecords = batchProcess(records, itemProcessors);
 		Collection<String> lines = JavaCollectionsUtil.getMapValues(newRecords, sourceResultSetMetaData, delimiter, dateFomat, useColumnName);
-		if (!JavaCollectionsUtil.isCollectionEmpty(lines))
+		if (!CollUtil.isEmpty(lines))
 		{
 			for (String line : lines)
 			{
@@ -578,7 +579,7 @@ public final class BatchUtil
 	@SafeVarargs
 	private static <T> List<T> batchProcess(final List<T> records, final ItemProcessor<T> ... itemProcessors)
 	{
-		if (!ArrayUtil.isArrayEmpty(itemProcessors))
+		if (!cn.hutool.core.util.ArrayUtil.isEmpty(itemProcessors))
 		{
 			List<T> newRecords = new ArrayList<T>();
 			

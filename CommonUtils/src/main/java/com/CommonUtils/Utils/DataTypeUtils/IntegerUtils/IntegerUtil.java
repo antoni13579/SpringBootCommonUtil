@@ -9,8 +9,8 @@ import java.util.function.Function;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 
-import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
-import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ArrayUtil;
 
 public final class IntegerUtil 
 {
@@ -19,7 +19,7 @@ public final class IntegerUtil
 	public static IntSummaryStatistics aggregation(final Integer ... params)
 	{
 		Map<String, IntSummaryStatistics> map = groupBy((x) -> { return "ALL_AGGREGATION"; }, (x) -> { return x; }, params);
-		if (!JavaCollectionsUtil.isMapEmpty(map))
+		if (!CollUtil.isEmpty(map))
 		{ return map.get("ALL_AGGREGATION"); }
 		else
 		{ return new IntSummaryStatistics(); }
@@ -28,7 +28,7 @@ public final class IntegerUtil
 	public static IntSummaryStatistics aggregation(final Collection<Integer> coll)
 	{
 		Map<String, IntSummaryStatistics> map = groupBy((x) -> { return "ALL_AGGREGATION"; }, (x) -> { return x; }, coll);
-		if (!JavaCollectionsUtil.isMapEmpty(map))
+		if (!CollUtil.isEmpty(map))
 		{ return map.get("ALL_AGGREGATION"); }
 		else
 		{ return new IntSummaryStatistics(); }
@@ -39,7 +39,7 @@ public final class IntegerUtil
 																final ToIntFunction<? super T> mapper, 
 			   													final T ... params)
 	{
-		if (!ArrayUtil.isArrayEmpty(params))
+		if (!ArrayUtil.isEmpty(params))
 		{ return groupBy(classifier, mapper, Arrays.asList(params)); }
 		else
 		{ return Collections.emptyMap(); }
@@ -49,7 +49,7 @@ public final class IntegerUtil
 																final ToIntFunction<? super T> mapper, 
 																final Collection<T> coll)
 	{
-		if (!JavaCollectionsUtil.isCollectionEmpty(coll))
+		if (!CollUtil.isEmpty(coll))
 		{ return coll.stream().collect(Collectors.groupingBy(classifier, Collectors.summarizingInt(mapper))); }
 		else
 		{ return Collections.emptyMap(); }

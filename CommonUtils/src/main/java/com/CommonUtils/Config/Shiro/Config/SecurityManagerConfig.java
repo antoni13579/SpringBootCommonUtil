@@ -17,7 +17,7 @@ public final class SecurityManagerConfig
 	
 	public static DefaultWebSecurityManager getInstance(final boolean closeSession, final RealmAndCredentialsMatcherDefinition ... realmAndCredentialsMatcherDefinitions) throws Exception
 	{
-		if (ArrayUtil.isArrayEmpty(realmAndCredentialsMatcherDefinitions))
+		if (cn.hutool.core.util.ArrayUtil.isEmpty(realmAndCredentialsMatcherDefinitions))
 		{ throw new Exception("必须设置用户鉴权逻辑！！"); }
 		
 		Collection<Realm> realms = new ArrayList<>();

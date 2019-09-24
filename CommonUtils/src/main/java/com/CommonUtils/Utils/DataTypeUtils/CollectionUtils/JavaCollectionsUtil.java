@@ -29,6 +29,7 @@ import org.apache.commons.collections4.map.MultiKeyMap;
 import com.CommonUtils.Utils.DBUtils.Bean.DBTable.Column;
 import com.CommonUtils.Utils.DBUtils.Bean.DBTable.Table;
 import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
+import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil.ItemProcessor;
 import com.CommonUtils.Utils.DataTypeUtils.DateUtils.DateFormat;
 import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringContants;
 import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
@@ -53,7 +54,7 @@ public final class JavaCollectionsUtil
 	
 	public static Map<String, Long> wordCount(final String ... strings)
 	{
-		if (!ArrayUtil.isArrayEmpty(strings))
+		if (!cn.hutool.core.util.ArrayUtil.isEmpty(strings))
 		{
 			return Arrays.asList(strings)
 						 .stream()
@@ -86,7 +87,7 @@ public final class JavaCollectionsUtil
 	{
 		V result = null;
 		
-		if (!ArrayUtil.isArrayEmpty(keys))
+		if (!cn.hutool.core.util.ArrayUtil.isEmpty(keys))
 		{
 			if (keys.length == 1)
 			{ log.warn("使用getOrElseUpdate，key的数量必须2个以上"); }
@@ -140,6 +141,8 @@ public final class JavaCollectionsUtil
 	/**
 	 * 检测Map是否为空，true为空，false为非空
 	 * */
+	/**建议使用cn.hutool.core.map.MapUtil.isEmpty或isNotEmpty*/ 
+	@Deprecated
 	public static <K, V> boolean isMapEmpty(final Map<K, V> map)
 	{
 		if (null == map || map.isEmpty())
@@ -159,6 +162,8 @@ public final class JavaCollectionsUtil
 	/**
 	 * 检测实现了Collection接口，如List，Set等是否为空，true为空，false为非空
 	 * */
+	/**建议使用cn.hutool.core.collection.CollUtil.isEmpty或isNotEmpty*/ 
+	@Deprecated
 	public static <T> boolean isCollectionEmpty(final Collection<T> collection)
 	{
 		if (null == collection || collection.isEmpty())
@@ -201,6 +206,8 @@ public final class JavaCollectionsUtil
     	}
     }
 	
+	/**建议使用cn.hutool.core.collection.CollUtil.get相关函数*/ 
+	@Deprecated
 	public static <T> T getItem(final Collection<T> items, final int dstIndx)
 	{
 		List<T> result = new ArrayList<T>();
@@ -323,7 +330,7 @@ public final class JavaCollectionsUtil
 			while (entries.hasNext())
 			{
 				Map.Entry<K, V> entry = entries.next();
-				if (!ArrayUtil.isArrayEmpty(itemProcessorForMaps)) { for (ItemProcessorForMap<K, V> itemProcessorForMap : itemProcessorForMaps) { itemProcessorForMap.process(entry.getKey(), entry.getValue(), indx); } }
+				if (!cn.hutool.core.util.ArrayUtil.isEmpty(itemProcessorForMaps)) { for (ItemProcessorForMap<K, V> itemProcessorForMap : itemProcessorForMaps) { itemProcessorForMap.process(entry.getKey(), entry.getValue(), indx); } }
 				indx++;
 			}
 			
@@ -343,7 +350,7 @@ public final class JavaCollectionsUtil
 			while (entries.hasNext())
 			{
 				Entry<MultiKey<? extends K>, V> entry = entries.next();
-				if (!ArrayUtil.isArrayEmpty(itemProcessorForMultiKeyMaps)) 
+				if (!cn.hutool.core.util.ArrayUtil.isEmpty(itemProcessorForMultiKeyMaps)) 
 				{
 					for (ItemProcessorForMultiKeyMap<K, V> itemProcessorForMultiKeyMap : itemProcessorForMultiKeyMaps) 
 					{ itemProcessorForMultiKeyMap.process(entry.getKey(), entry.getValue(), indx); }
@@ -369,7 +376,7 @@ public final class JavaCollectionsUtil
 			int length = values.size();
 			for (T value : values)
 			{
-				if (!ArrayUtil.isArrayEmpty(itemProcessorForCollections)) 
+				if (!cn.hutool.core.util.ArrayUtil.isEmpty(itemProcessorForCollections)) 
 				{
 					for (ItemProcessorForCollection<T> itemProcessorForCollection : itemProcessorForCollections) 
 					{ itemProcessorForCollection.process(value, indx, length); }
@@ -404,6 +411,10 @@ public final class JavaCollectionsUtil
 				{ mapProcessor(record, itemProcessorForMultiKeyMaps); }
 		);
 	}
+	
+	@SafeVarargs
+	public static <T> boolean collectionProcessor(final Collection<T[]> records, final ItemProcessor<T> ... itemProcessors)
+	{ return collectionProcessor(records, (final T[] values, final int indx, final int length) -> { ArrayUtil.arrayProcessor(values, itemProcessors); }); }
 	
 	public static <T> Collection<T> collectionOperation(final Collection<T> a, final Collection<T> b, final OperationType operationType)
 	{

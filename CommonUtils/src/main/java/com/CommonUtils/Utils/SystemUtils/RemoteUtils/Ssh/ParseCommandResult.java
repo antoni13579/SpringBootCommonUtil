@@ -5,9 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
-import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
 import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
+
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ArrayUtil;
 
 public final class ParseCommandResult
 {	
@@ -17,7 +18,7 @@ public final class ParseCommandResult
 	public static List<Map<String, String>> getDFHCommandResult(final List<String> executeRecords)
 	{
 		List<Map<String, String>> records = new ArrayList<Map<String, String>>();
-		if (!JavaCollectionsUtil.isCollectionEmpty(executeRecords))
+		if (!CollUtil.isEmpty(executeRecords))
 		{
 			int skipRow = 1;
 			for (String executeRecord : executeRecords)
@@ -71,7 +72,7 @@ public final class ParseCommandResult
     public static List<Map<String, String>> getLSLHCommandResult(final List<String> executeRecords)
     {
     	List<Map<String, String>> records = new ArrayList<Map<String, String>>();
-    	if (!JavaCollectionsUtil.isCollectionEmpty(executeRecords))
+    	if (!CollUtil.isEmpty(executeRecords))
     	{
     		int firstRow = 1;
     		for (String executeRecord : executeRecords)
@@ -81,7 +82,7 @@ public final class ParseCommandResult
 				{
     				String addSeparatorStr = executeRecord.replaceAll(" ", "，");
         			String addSeparatorStrArray[] = addSeparatorStr.split("，");
-        			if (!ArrayUtil.isArrayEmpty(addSeparatorStrArray))
+        			if (!ArrayUtil.isEmpty(addSeparatorStrArray))
         			{
         				records.add
             			(

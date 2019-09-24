@@ -5,6 +5,8 @@ import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
 import lombok.Getter;
 import lombok.ToString;
 
+/**请使用cn.hutool.system.OsInfo*/
+@Deprecated
 public final class SystemInfo 
 {
 	private static String OS = null;  

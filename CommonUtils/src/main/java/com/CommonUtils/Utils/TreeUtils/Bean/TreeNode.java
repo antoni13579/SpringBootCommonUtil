@@ -2,8 +2,7 @@ package com.CommonUtils.Utils.TreeUtils.Bean;
 
 import java.util.Collection;
 
-import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
-
+import cn.hutool.core.collection.CollUtil;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -20,5 +19,5 @@ public final class TreeNode<T>
 	{ this.data = data; }
 	
 	public boolean haveChildren()
-	{ return !JavaCollectionsUtil.isCollectionEmpty(this.children); }
+	{ return !CollUtil.isEmpty(this.children); }
 }

@@ -17,11 +17,11 @@ import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
 import org.quartz.Trigger.TriggerState;
 
-import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
-import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
 import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
 import com.CommonUtils.Utils.FrameworkUtils.QuartzUtils.Bean.QuartzJobsInfo;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ArrayUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -56,7 +56,7 @@ public final class QuartzUtil //implements ApplicationListener<ContextClosedEven
         								.build();
         
         //设置任务传递参数
-        if (!JavaCollectionsUtil.isMapEmpty(quartzJobsInfo.getParams()))
+        if (!CollUtil.isEmpty(quartzJobsInfo.getParams()))
         { jobDetail.getJobDataMap().putAll(quartzJobsInfo.getParams()); }
         
         //创建任务触发器
@@ -89,7 +89,7 @@ public final class QuartzUtil //implements ApplicationListener<ContextClosedEven
 	
 	public static void deleteJobs(final List<JobKey> jobKeys, final Scheduler scheduler)
 	{
-		if (!JavaCollectionsUtil.isCollectionEmpty(jobKeys))
+		if (!CollUtil.isEmpty(jobKeys))
 		{
 			try { scheduler.deleteJobs(jobKeys); }
 			catch (Exception ex) { log.error("删除job出现异常，异常原因为：", ex); }
@@ -98,13 +98,13 @@ public final class QuartzUtil //implements ApplicationListener<ContextClosedEven
 	
 	public static void deleteJobs(final Scheduler scheduler, final JobKey ... jobKeys)
 	{
-		if (!ArrayUtil.isArrayEmpty(jobKeys))
+		if (!ArrayUtil.isEmpty(jobKeys))
 		{ deleteJobs(Arrays.asList(jobKeys), scheduler); }
 	}
 	
 	public static void deleteJobs(final Scheduler scheduler, final QuartzJobsInfo ... quartzJobsInfos)
 	{
-		if (!ArrayUtil.isArrayEmpty(quartzJobsInfos))
+		if (!ArrayUtil.isEmpty(quartzJobsInfos))
 		{
 			List<JobKey> jobKeys = new ArrayList<JobKey>();
 			for (QuartzJobsInfo quartzJobsInfo : quartzJobsInfos)

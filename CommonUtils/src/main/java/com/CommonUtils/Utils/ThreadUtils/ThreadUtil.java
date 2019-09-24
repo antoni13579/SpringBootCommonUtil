@@ -18,9 +18,8 @@ import java.util.function.Supplier;
 
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
-import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
-import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
-
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ArrayUtil;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,7 +30,7 @@ public final class ThreadUtil
 	
 	public static void submit(final ThreadPoolTaskExecutor threadPool, final Collection<Future<?>> futures, final Runnable ... tasks)
 	{
-		if (!ArrayUtil.isArrayEmpty(tasks) && (null != futures) && (null != threadPool))
+		if (!ArrayUtil.isEmpty(tasks) && (null != futures) && (null != threadPool))
 		{
 			for (Runnable task : tasks)
 			{ futures.add(threadPool.submit(task)); }
@@ -41,7 +40,7 @@ public final class ThreadUtil
 	@SafeVarargs
 	public static <T> void submit(final ThreadPoolTaskExecutor threadPool, final Collection<Future<T>> futures, final Callable<T> ... tasks)
 	{
-		if (!ArrayUtil.isArrayEmpty(tasks) && (null != futures) && (null != threadPool))
+		if (!ArrayUtil.isEmpty(tasks) && (null != futures) && (null != threadPool))
 		{
 			for (Callable<T> task : tasks)
 			{ futures.add(threadPool.submit(task)); }
@@ -51,7 +50,7 @@ public final class ThreadUtil
 	public static List<Future<?>> submit(final ThreadPoolTaskExecutor threadPool, final Runnable ... tasks)
 	{
 		List<Future<?>> result = new ArrayList<Future<?>>();
-		if (!ArrayUtil.isArrayEmpty(tasks))
+		if (!ArrayUtil.isEmpty(tasks))
 		{
 			for (Runnable task : tasks)
 			{ result.add(threadPool.submit(task)); }
@@ -63,7 +62,7 @@ public final class ThreadUtil
 	public static <T> List<Future<T>> submit(final ThreadPoolTaskExecutor threadPool, final Callable<T> ... tasks)
 	{
 		List<Future<T>> result = new ArrayList<Future<T>>();
-		if (!ArrayUtil.isArrayEmpty(tasks))
+		if (!ArrayUtil.isEmpty(tasks))
 		{
 			for (Callable<T> task : tasks)
 			{ result.add(threadPool.submit(task)); }
@@ -77,7 +76,7 @@ public final class ThreadUtil
 	@SneakyThrows(InterruptedException.class)
 	public static void waitForFinished(final long sleepTime, final boolean remove, final Collection<Future<?>> futures)
 	{
-		if (!JavaCollectionsUtil.isCollectionEmpty(futures))
+		if (!CollUtil.isEmpty(futures))
 		{
 			Collection<Future<?>> removeFutures = null;
 			if (remove) { removeFutures = new ArrayList<>(); }
@@ -174,7 +173,7 @@ public final class ThreadUtil
 	 * */
 	public static boolean countDownAll(final CountDownLatch ... countDownLatchs)
 	{
-		return ArrayUtil.arrayProcessor
+		return com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil.arrayProcessor
 		(
 				countDownLatchs, 
 				(countDownLatch, indx, length) -> 

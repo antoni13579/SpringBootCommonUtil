@@ -6,7 +6,7 @@ import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.interceptor.TransactionInterceptor;
 
-import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
+import cn.hutool.core.util.ArrayUtil;
 
 public final class TxAdviceAdvisorConfig 
 {
@@ -23,7 +23,7 @@ public final class TxAdviceAdvisorConfig
 	public static String getAopPointcutExpression(final String ... paths)
 	{
 		StringBuilder sb = new StringBuilder();
-		if (!ArrayUtil.isArrayEmpty(paths))
+		if (!ArrayUtil.isEmpty(paths))
 		{
 			for (int i = 0; i < paths.length; i++)
 			{

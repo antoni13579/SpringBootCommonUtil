@@ -86,6 +86,8 @@ public final class ExcelUtil
 	public static void exportExcel(final HttpServletRequest request, final HttpServletResponse response, final Path outputFile)
 	{ exportExcel(request, response, outputFile.toFile()); }
 	
+	/**请使用cn.hutool.poi包里面相关Excel工具类*/
+	@Deprecated
 	public static String getCellValueStr(final Cell cell)
 	{
 		String cellValue = "";
@@ -129,6 +131,8 @@ public final class ExcelUtil
 	/**
 	 * 获取单元格数据，可兼容xls与xlsx版本
 	 * */
+	/**请使用cn.hutool.poi包里面相关Excel工具类*/
+	@Deprecated
 	public static Object getCellValue(final Cell cell) 
 	{
 		Object cellValue = new Object();
@@ -168,6 +172,8 @@ public final class ExcelUtil
 	/**
 	 * 设置单元格数据，可兼容xls与xlsx版本，此重载版用于Cell重新设置值
 	 * */
+	/**请使用cn.hutool.poi包里面相关Excel工具类*/
+	@Deprecated
 	public static void setCellValue(final Cell cell)
 	{
 		switch (cell.getCellTypeEnum())
@@ -199,6 +205,8 @@ public final class ExcelUtil
 	/**
 	 * 设置单元格数据，可兼容xls与xlsx版本，此重载版用于在Map获取值并赋值到Cell中
 	 * */
+	/**请使用cn.hutool.poi包里面相关Excel工具类*/
+	@Deprecated
 	public static void setCellValue(final Cell cell, 
 									final Map<String, Object> dataValue, 
 									final String key) 
@@ -247,18 +255,28 @@ public final class ExcelUtil
 		}
 	}
 	
+	/**请使用cn.hutool.poi包里面相关Excel工具类*/
+	@Deprecated
 	public static String toJson(final Collection<ExcelData> records)
 	{ return JSON.toJSONString(records); }
 	
+	/**请使用cn.hutool.poi包里面相关Excel工具类*/
+	@Deprecated
 	public static Collection<ExcelData> read(final File file)
 	{ return read(file, null, 0, 0, 0, 0, 0, 0); }
 	
+	/**请使用cn.hutool.poi包里面相关Excel工具类*/
+	@Deprecated
 	public static Collection<ExcelData> read(final URL url)
 	{ return read(url, null, 0, 0, 0, 0, 0, 0); }
 	
+	/**请使用cn.hutool.poi包里面相关Excel工具类*/
+	@Deprecated
 	public static Collection<ExcelData> read(final URL url, final String sheetName)
 	{ return read(url, sheetName, 0, 0, 0, 0, 0, 0); }
 	
+	/**请使用cn.hutool.poi包里面相关Excel工具类*/
+	@Deprecated
 	private static Collection<ExcelData> read(final URL url, 
 			  								  final String sheetName,
 			  								  final int startSheet,
@@ -283,6 +301,8 @@ public final class ExcelUtil
 		return result;
 	}
 	
+	/**请使用cn.hutool.poi包里面相关Excel工具类*/
+	@Deprecated
 	private static Collection<ExcelData> read(final File file, 
 			  								  final String sheetName,
 			  								  final int startSheet,
@@ -348,6 +368,8 @@ public final class ExcelUtil
 		return result;
 	}
 	
+	/**请使用cn.hutool.poi包里面相关Excel工具类*/
+	@Deprecated
 	private static boolean isXls(final File file)
 	{
 		if (!FileUtil.isFile(file))
@@ -356,6 +378,8 @@ public final class ExcelUtil
 		return FileTypeUtil.getType(file).equalsIgnoreCase("xls");
 	}
 	
+	/**请使用cn.hutool.poi包里面相关Excel工具类*/
+	@Deprecated
 	private static boolean isXlsx(final File file)
 	{
 		if (!FileUtil.isFile(file))
@@ -364,6 +388,8 @@ public final class ExcelUtil
 		return FileTypeUtil.getType(file).equalsIgnoreCase("xlsx");
 	}
 	
+	/**请使用cn.hutool.poi包里面相关Excel工具类*/
+	@Deprecated
 	private static ExcelData readExcelCommonHandler(final Sheet sheet, 
 			    								   final int startRow, 
 			    								   final int endRow,

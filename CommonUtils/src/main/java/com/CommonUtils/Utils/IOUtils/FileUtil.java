@@ -481,7 +481,7 @@ public final class FileUtil
 	
 	public static boolean uploadFilesLocal(final File directory, final MultipartFile ... multipartFiles)
 	{
-		if (!ArrayUtil.isArrayEmpty(multipartFiles))
+		if (!cn.hutool.core.util.ArrayUtil.isEmpty(multipartFiles))
 		{
 			Set<Boolean> executeRecords = new HashSet<>();
 			ArrayUtil.arrayProcessor

@@ -14,9 +14,9 @@ import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import com.CommonUtils.Utils.DBUtils.Bean.RedisEntry;
-import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
-import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +41,7 @@ public final class RedisUtil
 	public synchronized static <K, V> boolean setExpireForValues(final RedisTemplate<K, V> redisTemplate, final long timeout, final TimeUnit unit, final RedisEntry<K, V> ... redisEntrys)
 	{
 		Set<Boolean> records = new HashSet<>();
-		if (!ArrayUtil.isArrayEmpty(redisEntrys))
+		if (!ArrayUtil.isEmpty(redisEntrys))
 		{
 			for (RedisEntry<K, V> redisEntry : redisEntrys)
 			{
@@ -53,7 +53,7 @@ public final class RedisUtil
 		if (records.size() > 1)
 		{ return false; }
 		else
-		{ return JavaCollectionsUtil.getItem(records, 0); }
+		{ return CollUtil.get(records, 0); }
 	}
 	
 	public synchronized static <K, V> boolean setExpireForValue(final ReactiveRedisTemplate<K, V> reactiveRedisTemplate, final RedisEntry<K, V> redisEntry, final Duration timeout)
@@ -71,7 +71,7 @@ public final class RedisUtil
 	public synchronized static <K, V> boolean setExpireForValues(final ReactiveRedisTemplate<K, V> reactiveRedisTemplate, final Duration timeout, final RedisEntry<K, V> ... redisEntrys)
 	{
 		Set<Boolean> records = new HashSet<>();
-		if (!ArrayUtil.isArrayEmpty(redisEntrys))
+		if (!ArrayUtil.isEmpty(redisEntrys))
 		{
 			for (RedisEntry<K, V> redisEntry : redisEntrys)
 			{
@@ -83,7 +83,7 @@ public final class RedisUtil
 		if (records.size() > 1)
 		{ return false; }
 		else
-		{ return JavaCollectionsUtil.getItem(records, 0); }
+		{ return CollUtil.get(records, 0); }
 	}
 	
 	@Synchronized
@@ -101,7 +101,7 @@ public final class RedisUtil
 	@SafeVarargs
 	public synchronized static <K, V> void setForValues(final RedisTemplate<K, V> redisTemplate, final long timeout, final TimeUnit unit, final RedisEntry<K, V> ... redisEntrys)
 	{
-		if (!ArrayUtil.isArrayEmpty(redisEntrys))
+		if (!ArrayUtil.isEmpty(redisEntrys))
 		{
 			for (RedisEntry<K, V> redisEntry : redisEntrys)
 			{ setForValue(redisTemplate, redisEntry, timeout, unit); }
@@ -122,7 +122,7 @@ public final class RedisUtil
 	@SafeVarargs
 	public synchronized static <K, V> void setForValues(final RedisTemplate<K, V> redisTemplate, final RedisEntry<K, V> ... redisEntrys)
 	{
-		if (!ArrayUtil.isArrayEmpty(redisEntrys))
+		if (!ArrayUtil.isEmpty(redisEntrys))
 		{
 			for (RedisEntry<K, V> redisEntry : redisEntrys)
 			{ setForValue(redisTemplate, redisEntry); }
@@ -149,16 +149,16 @@ public final class RedisUtil
 	public synchronized static <K, V> boolean setForValues(final ReactiveRedisTemplate<K, V> reactiveRedisTemplate, final Duration timeout, final RedisEntry<K, V> ... redisEntrys)
 	{
 		Set<Boolean> result = new HashSet<Boolean>();
-		if (!ArrayUtil.isArrayEmpty(redisEntrys))
+		if (!ArrayUtil.isEmpty(redisEntrys))
 		{
 			for (RedisEntry<K, V> redisEntry : redisEntrys)
 			{ result.add(setForValue(reactiveRedisTemplate, redisEntry, timeout)); }
 		}
 		
-		if (!JavaCollectionsUtil.isCollectionEmpty(result))
+		if (!CollUtil.isEmpty(result))
 		{
 			if (result.size() == 1)
-			{ return JavaCollectionsUtil.getItem(result, 0); }
+			{ return CollUtil.get(result, 0); }
 			else
 			{ return false; }
 		}
@@ -186,16 +186,16 @@ public final class RedisUtil
 	public synchronized static <K, V> boolean setForValues(final ReactiveRedisTemplate<K, V> reactiveRedisTemplate, final RedisEntry<K, V> ... redisEntrys)
 	{
 		Set<Boolean> result = new HashSet<Boolean>();
-		if (!ArrayUtil.isArrayEmpty(redisEntrys))
+		if (!ArrayUtil.isEmpty(redisEntrys))
 		{
 			for (RedisEntry<K, V> redisEntry : redisEntrys)
 			{ result.add(setForValue(reactiveRedisTemplate, redisEntry)); }
 		}
 		
-		if (!JavaCollectionsUtil.isCollectionEmpty(result))
+		if (!CollUtil.isEmpty(result))
 		{
 			if (result.size() == 1)
-			{ return JavaCollectionsUtil.getItem(result, 0); }
+			{ return CollUtil.get(result, 0); }
 			else
 			{ return false; }
 		}
@@ -224,16 +224,16 @@ public final class RedisUtil
 	public synchronized static <K, V> boolean setForValues(final ReactiveRedisConnection reactiveRedisConnection, final RedisEntry<K, V> ... redisEntrys)
 	{
 		Set<Boolean> result = new HashSet<Boolean>();
-		if (!ArrayUtil.isArrayEmpty(redisEntrys))
+		if (!ArrayUtil.isEmpty(redisEntrys))
 		{
 			for (RedisEntry<K, V> redisEntry : redisEntrys)
 			{ result.add(setForValue(reactiveRedisConnection, redisEntry)); }
 		}
 		
-		if (!JavaCollectionsUtil.isCollectionEmpty(result))
+		if (!CollUtil.isEmpty(result))
 		{
 			if (result.size() == 1)
-			{ return JavaCollectionsUtil.getItem(result, 0); }
+			{ return CollUtil.get(result, 0); }
 			else
 			{ return false; }
 		}
@@ -260,7 +260,7 @@ public final class RedisUtil
 	public static <K, V> Collection<V> getForValues(final RedisTemplate<K, V> redisTemplate, final K ... keys)
 	{
 		Collection<V> result = new ArrayList<>();
-		if (!ArrayUtil.isArrayEmpty(keys))
+		if (!ArrayUtil.isEmpty(keys))
 		{
 			for (K key : keys)
 			{ result.add(getForValue(redisTemplate, key)); }
@@ -288,7 +288,7 @@ public final class RedisUtil
 	public static <K, V> Collection<V> getForValues(final ReactiveRedisTemplate<K, V> reactiveRedisTemplate, final K ... keys)
 	{
 		Collection<V> result = new ArrayList<>();
-		if (!ArrayUtil.isArrayEmpty(keys))
+		if (!ArrayUtil.isEmpty(keys))
 		{
 			for (K key : keys)
 			{ result.add(getForValue(reactiveRedisTemplate, key)); }
@@ -317,7 +317,7 @@ public final class RedisUtil
 	public static <K, V> Collection<V> getForValues(final ReactiveRedisConnection reactiveRedisConnection, final K ... keys)
 	{
 		Collection<V> result = new ArrayList<>();
-		if (!ArrayUtil.isArrayEmpty(keys))
+		if (!ArrayUtil.isEmpty(keys))
 		{
 			for (K key : keys)
 			{ result.add(getForValue(reactiveRedisConnection, key)); }

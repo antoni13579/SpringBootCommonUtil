@@ -28,6 +28,8 @@ public final class ArrayUtil
 	/**
 	 * 检测Array是否为空，true为空，false为非空
 	 * */
+	/**建议使用cn.hutool.core.util.ArrayUtil.isEmpty或isNotEmpty*/ 
+	@Deprecated
 	public static <T> boolean isArrayEmpty(final T[] array)
 	{
 		if (null == array || array.length == 0)
@@ -39,6 +41,8 @@ public final class ArrayUtil
 	/**
 	 * 检测Array是否为空，true为空，false为非空
 	 * */
+	/**建议使用cn.hutool.core.util.ArrayUtil.isEmpty或isNotEmpty*/ 
+	@Deprecated
 	public static boolean isArrayEmpty(final int[] array)
 	{
 		if (null == array || array.length == 0)
@@ -50,6 +54,8 @@ public final class ArrayUtil
 	/**
 	 * 检测Array是否为空，true为空，false为非空
 	 * */
+	/**建议使用cn.hutool.core.util.ArrayUtil.isEmpty或isNotEmpty*/ 
+	@Deprecated
 	public static boolean isArrayEmpty(final boolean[] array)
 	{
 		if (null == array || array.length == 0)
@@ -61,6 +67,8 @@ public final class ArrayUtil
 	/**
 	 * 检测Array是否为空，true为空，false为非空
 	 * */
+	/**建议使用cn.hutool.core.util.ArrayUtil.isEmpty或isNotEmpty*/ 
+	@Deprecated
 	public static boolean isArrayEmpty(final byte[] array)
 	{
 		if (null == array || array.length == 0)
@@ -72,6 +80,8 @@ public final class ArrayUtil
 	/**
 	 * 检测Array是否为空，true为空，false为非空
 	 * */
+	/**建议使用cn.hutool.core.util.ArrayUtil.isEmpty或isNotEmpty*/ 
+	@Deprecated
 	public static boolean isArrayEmpty(final char[] array)
 	{
 		if (null == array || array.length == 0)
@@ -83,6 +93,8 @@ public final class ArrayUtil
 	/**
 	 * 检测Array是否为空，true为空，false为非空
 	 * */
+	/**建议使用cn.hutool.core.util.ArrayUtil.isEmpty或isNotEmpty*/ 
+	@Deprecated
 	public static boolean isArrayEmpty(final long[] array)
 	{
 		if (null == array || array.length == 0)
@@ -91,6 +103,8 @@ public final class ArrayUtil
 		return false;
 	}
 	
+	/**建议使用cn.hutool.core.util.ArrayUtil.isEmpty或isNotEmpty*/ 
+	@Deprecated
 	public static boolean isArrayEmpty(final double[] array)
 	{
 		if (null == array || array.length == 0)

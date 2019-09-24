@@ -28,7 +28,6 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.CommonUtils.ConfigTemplate.Bean.ExcelBean;
 import com.CommonUtils.ConfigTemplate.Config.SpringIntegrationConfig.MainGateWay;
-import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
 import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringContants;
 import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
 import com.CommonUtils.Utils.FrameworkUtils.SecurityUtils.SpringSecurityUtil;
@@ -38,6 +37,7 @@ import com.CommonUtils.Utils.OfficeUtils.ExcelUtils.ExcelUtil;
 import com.CommonUtils.Utils.OfficeUtils.ExcelUtils.Bean.ExcelData;
 import com.CommonUtils.Utils.TreeUtils.Bean.TreeNode;
 
+import cn.hutool.core.collection.CollUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -138,7 +138,7 @@ public class HomeRestController
 					
 					ExcelBean excelBean = new ExcelBean()
 							.setExcelDatas(excelDatas)
-							.setEmpty(JavaCollectionsUtil.isCollectionEmpty(excelDatas))
+							.setEmpty(CollUtil.isEmpty(excelDatas))
 							.setDeferredResult(result);
 					this.mainGateWay.startToHandleExcelData(excelBean);
 				}

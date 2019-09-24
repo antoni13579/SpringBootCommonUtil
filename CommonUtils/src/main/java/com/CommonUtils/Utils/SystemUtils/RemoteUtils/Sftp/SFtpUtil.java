@@ -38,7 +38,7 @@ public final class SFtpUtil
 			session = RemoteUtil.getSession(remoteInfo);
 			channel = RemoteUtil.getChannelSftp(session);
 			
-			if (!ArrayUtil.isArrayEmpty(processors))
+			if (!cn.hutool.core.util.ArrayUtil.isEmpty(processors))
 			{
 				for (Processor processor : processors)
 				{ processor.process(channel, is); }
@@ -62,7 +62,7 @@ public final class SFtpUtil
 		if (FileUtil.isDirectory(localDirectory))
 		{
 			File[] localFiles = localDirectory.listFiles();
-			if (!ArrayUtil.isArrayEmpty(localFiles))
+			if (!cn.hutool.core.util.ArrayUtil.isEmpty(localFiles))
 			{
 				Set<Boolean> executeResult = new HashSet<>();
 				ArrayUtil.arrayProcessor
@@ -96,7 +96,7 @@ public final class SFtpUtil
 	
 	public synchronized static boolean uploadFile(final RemoteInfo remoteInfo, final String remoteFileDirectory, final MultipartFile ... localFileMultipartFiles)
 	{
-		if (!ArrayUtil.isArrayEmpty(localFileMultipartFiles))
+		if (!cn.hutool.core.util.ArrayUtil.isEmpty(localFileMultipartFiles))
 		{
 			Set<Boolean> executeResult = new HashSet<>();
 			
@@ -148,7 +148,7 @@ public final class SFtpUtil
 		if (FileUtil.isDirectory(localDirectory))
 		{
 			File[] localFiles = localDirectory.listFiles();
-			if (!ArrayUtil.isArrayEmpty(localFiles))
+			if (!cn.hutool.core.util.ArrayUtil.isEmpty(localFiles))
 			{
 				Set<Boolean> executeResult = new HashSet<>();
 				ArrayUtil.arrayProcessor

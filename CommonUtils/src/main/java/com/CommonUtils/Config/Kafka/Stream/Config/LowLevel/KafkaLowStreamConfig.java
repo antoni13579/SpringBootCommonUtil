@@ -202,7 +202,7 @@ public final class KafkaLowStreamConfig
 					JobProcessorSupplier.this.firstRun = false;
 				}
 				
-				if (!ArrayUtil.isArrayEmpty(value))
+				if (!cn.hutool.core.util.ArrayUtil.isEmpty(value))
 				{
 					Object tmpValue = ObjectUtil.deserialize(value);
 					if (null != tmpValue)

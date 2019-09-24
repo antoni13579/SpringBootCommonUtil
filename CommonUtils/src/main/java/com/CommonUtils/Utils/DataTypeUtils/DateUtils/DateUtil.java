@@ -18,6 +18,7 @@ import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
 import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.CustomCollections.HashMap;
 import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
 
+import cn.hutool.core.collection.CollUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -376,7 +377,7 @@ public final class DateUtil
 	
 	public static Map<String, Date> getMaxAndMin(final Collection<Date> dates)
 	{
-		if (!JavaCollectionsUtil.isCollectionEmpty(dates))
+		if (!CollUtil.isEmpty(dates))
 		{ return getMaxAndMin(dates.toArray(new Date[dates.size()])); }
 		else
 		{ return Collections.emptyMap(); }
@@ -384,7 +385,7 @@ public final class DateUtil
 	
 	public static Map<String, Date> getMaxAndMin(final Date ... dates)
 	{
-		if (!ArrayUtil.isArrayEmpty(dates))
+		if (!cn.hutool.core.util.ArrayUtil.isEmpty(dates))
 		{
 			Date min = dates[0];
 			Date max = min;			

@@ -2,8 +2,7 @@ package com.CommonUtils.Utils.DataTypeUtils.CharacterUtils;
 
 import java.util.Optional;
 
-import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
-
+import cn.hutool.core.util.ArrayUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -29,7 +28,7 @@ public final class CharacterUtil
 	
 	public static Optional<int[]> converCharToInt(final char[] ca) 
 	{
-		if (ArrayUtil.isArrayEmpty(ca))
+		if (ArrayUtil.isEmpty(ca))
 		{ return Optional.ofNullable(null); }
 		
 		int len = ca.length;

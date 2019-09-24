@@ -6,8 +6,7 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 
-import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
-
+import cn.hutool.core.util.ArrayUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -29,7 +28,7 @@ public final class EmailUtil
 		catch (Exception ex)
 		{
 			StringBuilder sb = new StringBuilder();
-			if (!ArrayUtil.isArrayEmpty(sendTo))
+			if (!ArrayUtil.isEmpty(sendTo))
 			{
 				for (int i = 0; i < sendTo.length; i++)
 				{
@@ -57,7 +56,7 @@ public final class EmailUtil
 		catch (Exception ex)
 		{
 			StringBuilder sb = new StringBuilder();
-			if (!ArrayUtil.isArrayEmpty(sendTo))
+			if (!ArrayUtil.isEmpty(sendTo))
 			{
 				for (int i = 0; i < sendTo.length; i++)
 				{
@@ -82,7 +81,7 @@ public final class EmailUtil
 		catch (Exception ex)
 		{
 			StringBuilder sb = new StringBuilder();
-			if (!ArrayUtil.isArrayEmpty(sendTo))
+			if (!ArrayUtil.isEmpty(sendTo))
 			{
 				for (int i = 0; i < sendTo.length; i++)
 				{

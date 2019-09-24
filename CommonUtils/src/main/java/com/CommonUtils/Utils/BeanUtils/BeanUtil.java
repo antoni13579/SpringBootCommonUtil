@@ -13,8 +13,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.BeanUtils;
 import org.springframework.cglib.beans.BeanMap;
 
-import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
-import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
+
 import com.CommonUtils.Utils.ReflectUtils.ReflectUtil;
 import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -22,6 +21,8 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ArrayUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -97,7 +98,7 @@ public final class BeanUtil
 	
 	public static <T, R> List<R> getFields(final Function<? super T, ? extends R> mapper, final Collection<T> beans)
 	{
-		if (!JavaCollectionsUtil.isCollectionEmpty(beans))
+		if (!CollUtil.isEmpty(beans))
 		{ return beans.stream().map(mapper).collect(Collectors.toList()); }
 		else
 		{ return Collections.emptyList(); }
@@ -106,7 +107,7 @@ public final class BeanUtil
 	@SafeVarargs
 	public static <T, R> List<R> getFields(final Function<? super T, ? extends R> mapper, final T ... beans)
 	{
-		if (!ArrayUtil.isArrayEmpty(beans))
+		if (!ArrayUtil.isEmpty(beans))
 		{ return getFields(mapper, Arrays.asList(beans)); }
 		else
 		{ return Collections.emptyList(); }

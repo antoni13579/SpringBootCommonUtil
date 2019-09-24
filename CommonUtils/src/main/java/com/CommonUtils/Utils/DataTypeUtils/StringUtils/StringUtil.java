@@ -17,15 +17,14 @@ import java.util.regex.Pattern;
 import org.wltea.analyzer.core.IKSegmenter;
 import org.wltea.analyzer.core.Lexeme;
 
-import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
-
-import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
 import com.CommonUtils.Utils.DataTypeUtils.DateUtils.DateContants;
 import com.CommonUtils.Utils.DataTypeUtils.DateUtils.DateFormat;
 import com.CommonUtils.Utils.DataTypeUtils.StringUtils.Bean.Calculation;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.ArrayUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -354,7 +353,7 @@ public final class StringUtil
      */
     private static void statistics(Map<String,int[]> map,List<String> words ,int direction)
     {
-        if(JavaCollectionsUtil.isCollectionEmpty(words))
+        if(CollUtil.isEmpty(words))
         { return; }
         
         int[] in = null;
@@ -363,7 +362,7 @@ public final class StringUtil
         {
             int[] wordD = map.get(word);
             
-            if(ArrayUtil.isArrayEmpty(wordD))
+            if(ArrayUtil.isEmpty(wordD))
             {
                 if(flag) { in = new int[]{1, 0}; }
                 else { in = new int[]{0, 1}; }

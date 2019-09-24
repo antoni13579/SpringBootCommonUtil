@@ -12,8 +12,7 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
-import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
-
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.TypeReference;
 import lombok.extern.slf4j.Slf4j;
@@ -120,7 +119,7 @@ public final class ReflectUtil
 			}
 		};
 		
-		if (results.size() == 1) { return JavaCollectionsUtil.getItem(results, 0); }
+		if (results.size() == 1) { return CollUtil.get(results, 0); }
 		else { return true; }
 	}
 	

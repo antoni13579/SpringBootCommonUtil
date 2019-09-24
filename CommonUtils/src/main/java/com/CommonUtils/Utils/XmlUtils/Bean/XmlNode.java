@@ -7,10 +7,10 @@ import java.util.Iterator;
 import org.dom4j.Attribute;
 import org.dom4j.Element;
 
-import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
 import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
 import com.alibaba.fastjson.JSON;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.TypeReference;
 import lombok.Getter;
@@ -51,13 +51,13 @@ public class XmlNode
 		while (iter.hasNext())
 		{
 			Attribute attribute = iter.next();
-			if (JavaCollectionsUtil.isCollectionEmpty(this.xmlAttributes)) { this.xmlAttributes = new ArrayList<>(); }
+			if (CollUtil.isEmpty(this.xmlAttributes)) { this.xmlAttributes = new ArrayList<>(); }
 			this.xmlAttributes.add(new XmlAttribute(attribute));
 		}
 	}
 	
 	public boolean haveChildren()
-	{ return !JavaCollectionsUtil.isCollectionEmpty(this.children); }
+	{ return !CollUtil.isEmpty(this.children); }
 	
 	public String toJson()
 	{ return JSON.toJSONString(this); }

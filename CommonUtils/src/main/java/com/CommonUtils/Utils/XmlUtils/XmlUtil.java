@@ -14,11 +14,11 @@ import java.util.Iterator;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 
-import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
 import com.CommonUtils.Utils.XmlUtils.Bean.XmlNode;
 import com.alibaba.fastjson.JSON;
 import com.thoughtworks.xstream.XStream;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.TypeReference;
 import lombok.extern.slf4j.Slf4j;
@@ -107,7 +107,7 @@ public final class XmlUtil
 		
 		while (externalIter.hasNext())
 		{
-			if (JavaCollectionsUtil.isCollectionEmpty(xmlNode.getChildren()))
+			if (CollUtil.isEmpty(xmlNode.getChildren()))
 			{ xmlNode.setChildren(new ArrayList<>()); }
 			
 			Element element = externalIter.next();
