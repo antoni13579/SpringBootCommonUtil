@@ -22,6 +22,8 @@ public final class ReflectUtil
 {
 	private ReflectUtil() {}
 	
+	/**建议使用cn.hutool.core.util.ClassLoaderUtil.loadClass*/ 
+	@Deprecated
 	public static Class<?> getClass(final String classPath)
 	{
 		Class<?> clazz = null;
@@ -33,6 +35,8 @@ public final class ReflectUtil
 	/**
 	 * 利用反射，获取BEAN中指定字段的值
 	 * */
+	/**建议使用cn.hutool.core.util.ReflectUtil.getFieldValue*/ 
+	@Deprecated
 	public static Object getBeanFieldValue(final Object obj, final String fieldName)
 	{
 		Object result = null;
@@ -68,6 +72,8 @@ public final class ReflectUtil
 	/**
 	 * 利用反射，获取BEAN中所有字段的值
 	 * */
+	/**建议使用cn.hutool.core.util.ReflectUtil.getFieldValue*/ 
+	@Deprecated
 	public static Map<String, Object> getBeanFieldValue(final Object obj)
 	{
 		Map<String, Object> result = new HashMap<String, Object>();

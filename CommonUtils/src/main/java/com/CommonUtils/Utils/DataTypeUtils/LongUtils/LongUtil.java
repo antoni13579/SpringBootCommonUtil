@@ -9,6 +9,10 @@ import java.util.function.Function;
 import java.util.function.ToLongFunction;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
+
+import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
+
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ArrayUtil;
 
@@ -55,6 +59,24 @@ public final class LongUtil
 		{ return Collections.emptyMap(); }
 	}
 	
+	public static boolean processGroupByResult(final Map<String, LongSummaryStatistics> map, final String delimiter, final ItemProcessorForProcessGroupByResult ... processors)
+	{
+		return JavaCollectionsUtil.mapProcessor
+		(
+				map, 
+				(final String groupByKey, final LongSummaryStatistics groupByResult, final int indx) -> 
+				{
+					String[] groupByFields = StringUtils.splitPreserveAllTokens(groupByKey, delimiter);
+					com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil.arrayProcessor
+					(
+							processors, 
+							(final ItemProcessorForProcessGroupByResult val, final int inx, final int length) -> 
+							{ val.process(groupByResult, groupByFields); }
+					);
+				}
+		);
+	}
+	
 	/**建议使用cn.hutool.core.convert.Convert.toLong*/ 
 	@Deprecated
 	public static <T> long getLong(final T obj) throws Exception
@@ -64,4 +86,8 @@ public final class LongUtil
 		else
 		{ throw new Exception("无法转换为long类型"); }
 	}
+	
+	@FunctionalInterface
+	public interface ItemProcessorForProcessGroupByResult
+	{ void process(final LongSummaryStatistics groupByResult, final String[] groupByFields); }
 }

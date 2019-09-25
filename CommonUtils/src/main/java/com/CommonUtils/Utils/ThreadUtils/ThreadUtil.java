@@ -28,6 +28,8 @@ public final class ThreadUtil
 {
 	private ThreadUtil() {}
 	
+	/**建议使用cn.hutool.core.thread.ThreadUtil.execAsync*/ 
+	@Deprecated
 	public static void submit(final ThreadPoolTaskExecutor threadPool, final Collection<Future<?>> futures, final Runnable ... tasks)
 	{
 		if (!ArrayUtil.isEmpty(tasks) && (null != futures) && (null != threadPool))
@@ -38,6 +40,8 @@ public final class ThreadUtil
 	}
 	
 	@SafeVarargs
+	/**建议使用cn.hutool.core.thread.ThreadUtil.execAsync*/ 
+	@Deprecated
 	public static <T> void submit(final ThreadPoolTaskExecutor threadPool, final Collection<Future<T>> futures, final Callable<T> ... tasks)
 	{
 		if (!ArrayUtil.isEmpty(tasks) && (null != futures) && (null != threadPool))
@@ -47,6 +51,8 @@ public final class ThreadUtil
 		}
 	}
 	
+	/**建议使用cn.hutool.core.thread.ThreadUtil.execAsync*/ 
+	@Deprecated
 	public static List<Future<?>> submit(final ThreadPoolTaskExecutor threadPool, final Runnable ... tasks)
 	{
 		List<Future<?>> result = new ArrayList<Future<?>>();
@@ -59,6 +65,8 @@ public final class ThreadUtil
 	}
 	
 	@SafeVarargs
+	/**建议使用cn.hutool.core.thread.ThreadUtil.execAsync*/ 
+	@Deprecated
 	public static <T> List<Future<T>> submit(final ThreadPoolTaskExecutor threadPool, final Callable<T> ... tasks)
 	{
 		List<Future<T>> result = new ArrayList<Future<T>>();
@@ -96,6 +104,8 @@ public final class ThreadUtil
 		}
 	}
 	
+	/**建议使用cn.hutool.core.thread.ThreadUtil.sleep相关函数*/ 
+	@Deprecated
 	public static void sleep(final long millis)
 	{
 		try

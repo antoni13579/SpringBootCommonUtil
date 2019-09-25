@@ -46,6 +46,13 @@ public final class DateUtil
 		{ throw new Exception("无法转换为java.util.Date类型"); }
 	}
 	
+	public static Date getDate(final int year, final int month, final int day)
+	{
+		String monthStr = month < 10 ? "0" + month : String.valueOf(month);
+		String dayStr = day < 10 ? "0" + day : String.valueOf(day);
+		return cn.hutool.core.date.DateUtil.parse(String.valueOf(year) + monthStr + dayStr, DateContants.DATE_FORMAT_1);
+	}
+	
 	/**java.util.Date转换为java.sql.Date*/
 	public static java.sql.Date getDate(final Date date)
 	{ return new java.sql.Date(date.getTime()); }
@@ -311,14 +318,6 @@ public final class DateUtil
 		cal.setTime(stlDate);
 		cal.set(type, 1);
 		return cal.getTime();
-	}
-	
-	public static void main(String[] args)
-	{
-		Date startDate = formatStrToDate("20190225", "yyyyMMdd").get();
-		Date endDate = formatStrToDate("20190825", "yyyyMMdd").get();
-		System.out.println(monthsBetween(startDate, endDate));
-		System.out.println(cn.hutool.core.date.DateUtil.betweenMonth(startDate, endDate, true));
 	}
 	
 	/**建议使用cn.hutool.core.date.DateUtil.dayOfWeek相关方法*/

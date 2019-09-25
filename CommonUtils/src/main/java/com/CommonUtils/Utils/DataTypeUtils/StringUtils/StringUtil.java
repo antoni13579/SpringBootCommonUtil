@@ -25,6 +25,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ArrayUtil;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -273,6 +274,32 @@ public final class StringUtil
 	/**
 	 * 分词工具
 	 * */
+	/**建议使用cn.hutool.extra.tokenizer.TokenizerUtil相关工具类
+	 * 
+	 * 解析文本并分词
+	 //自动根据用户引入的分词库的jar来自动选择使用的引擎
+	 TokenizerEngine engine = TokenizerUtil.createEngine();
+
+	 //解析文本
+	 String text = "这两个方法的区别在于返回值";
+	 Result result = engine.parse(text);
+	 //输出：这 两个 方法 的 区别 在于 返回 值
+	 String resultStr = CollUtil.join((Iterator<Word>)result, " ");
+	 
+	 
+	 
+	 自定义模板引擎
+	此处以HanLP为例：
+
+	TokenizerEngine engine = new HanLPEngine();
+
+	//解析文本
+	String text = "这两个方法的区别在于返回值";
+	Result result = engine.parse(text);
+	//输出：这 两个 方法 的 区别 在于 返回 值
+	String resultStr = CollUtil.join((Iterator<Word>)result, " ");
+	 * */ 
+	@Deprecated
 	public static List<String> divideText(final String text)
 	{
 		if (isStrEmpty(text))

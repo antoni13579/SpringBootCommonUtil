@@ -9,6 +9,10 @@ import java.util.function.Function;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
+
+import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
+
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ArrayUtil;
 
@@ -55,6 +59,24 @@ public final class IntegerUtil
 		{ return Collections.emptyMap(); }
 	}
 	
+	public static boolean processGroupByResult(final Map<String, IntSummaryStatistics> map, final String delimiter, final ItemProcessorForProcessGroupByResult ... processors)
+	{
+		return JavaCollectionsUtil.mapProcessor
+		(
+				map, 
+				(final String groupByKey, final IntSummaryStatistics groupByResult, final int indx) -> 
+				{
+					String[] groupByFields = StringUtils.splitPreserveAllTokens(groupByKey, delimiter);
+					com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil.arrayProcessor
+					(
+							processors, 
+							(final ItemProcessorForProcessGroupByResult val, final int inx, final int length) -> 
+							{ val.process(groupByResult, groupByFields); }
+					);
+				}
+		);
+	}
+	
 	/**建议使用cn.hutool.core.convert.Convert.toInt*/ 
 	@Deprecated
 	public static <T> int getInteger(final T obj) throws Exception
@@ -64,4 +86,8 @@ public final class IntegerUtil
 		else
 		{ throw new Exception("无法转换为int类型"); }
 	}
+	
+	@FunctionalInterface
+	public interface ItemProcessorForProcessGroupByResult
+	{ void process(final IntSummaryStatistics groupByResult, final String[] groupByFields); }
 }

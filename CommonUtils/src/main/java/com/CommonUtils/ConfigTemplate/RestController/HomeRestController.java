@@ -38,6 +38,7 @@ import com.CommonUtils.Utils.OfficeUtils.ExcelUtils.Bean.ExcelData;
 import com.CommonUtils.Utils.TreeUtils.Bean.TreeNode;
 
 import cn.hutool.core.collection.CollUtil;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -87,7 +88,7 @@ public class HomeRestController
 	@RequestMapping("/getUserModule")
 	public WebAsyncTask<Collection<ExcelData>> getUserModule()
 	{
-		URL url = Thread.currentThread().getContextClassLoader().getResource(this.userModulePath);
+		URL url = Thread.currentThread().getContextClassLoader().getResource(this.userModulePath);		
 		WebAsyncTask<Collection<ExcelData>> result = new WebAsyncTask<Collection<ExcelData>>(4000L, this.commonThreadPool, () -> { return ExcelUtil.read(url); });
 		result.onError
 		(

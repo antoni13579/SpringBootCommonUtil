@@ -9,8 +9,11 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.function.Function;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.collections.impl.collector.BigDecimalSummaryStatistics;
 import org.eclipse.collections.impl.collector.Collectors2;
+
+import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ArrayUtil;
@@ -59,6 +62,24 @@ public final class BigDecimalUtil
 		{ return coll.stream().collect(java.util.stream.Collectors.groupingBy(classifier, Collectors2.summarizingBigDecimal(mapper))); }
 		else
 		{ return Collections.emptyMap(); }
+	}
+	
+	public static boolean processGroupByResult(final Map<String, BigDecimalSummaryStatistics> map, final String delimiter, final ItemProcessorForProcessGroupByResult ... processors)
+	{
+		return JavaCollectionsUtil.mapProcessor
+		(
+				map, 
+				(final String groupByKey, final BigDecimalSummaryStatistics groupByResult, final int indx) -> 
+				{
+					String[] groupByFields = StringUtils.splitPreserveAllTokens(groupByKey, delimiter);
+					com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil.arrayProcessor
+					(
+							processors, 
+							(final ItemProcessorForProcessGroupByResult val, final int inx, final int length) -> 
+							{ val.process(groupByResult, groupByFields); }
+					);
+				}
+		);
 	}
 	
 	public static <T> BigDecimal ifNull(final T t)
@@ -118,4 +139,8 @@ public final class BigDecimalUtil
 		else
 		{ throw new Exception("无法转换为BigDecimal类型"); }
 	}
+	
+	@FunctionalInterface
+	public interface ItemProcessorForProcessGroupByResult
+	{ void process(final BigDecimalSummaryStatistics groupByResult, final String[] groupByFields); }
 }
