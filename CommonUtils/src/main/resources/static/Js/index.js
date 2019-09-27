@@ -183,15 +183,10 @@ function getUserModule()
 			
 			//Ajax成功的处理步骤
 			function(data)
-			{
-				if (data.length == 1)
-				{
-					var userModuleData = data[0];
-					for (var i = 1; i < userModuleData.rows.length; i++)
-					{ userModuleList[i - 1] = userModuleData.rows[i]; }
-				}
-				else
-				{ alert("用户菜单模组存在多个，请及时找管理员协查"); }
+			{				
+				var userModuleData = data;
+				for (var i = 0; i < userModuleData.length; i++)
+				{ userModuleList[i] = userModuleData[i]; }
 			},
 			
 			//Ajax失败的处理步骤

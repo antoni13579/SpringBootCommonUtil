@@ -10,6 +10,7 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
+@Deprecated
 @Accessors(chain = true)
 @Getter
 @Setter

@@ -303,6 +303,8 @@ public final class JavaCollectionsUtil
 		{ return Collections.emptyList(); }
 	}
 	
+	/**建议使用cn.hutool.core.collection.CollUtil.values*/ 
+	@Deprecated
 	public static <K, V> Collection<V> getMapValues(final Map<K, V> map)
 	{
 		Collection<V> records = new ArrayList<V>();

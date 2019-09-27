@@ -1,11 +1,8 @@
 package com.CommonUtils.Utils.DataTypeUtils.StringUtils;
 
-import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -13,9 +10,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.wltea.analyzer.core.IKSegmenter;
-import org.wltea.analyzer.core.Lexeme;
+import java.util.stream.Collectors;
 
 import com.CommonUtils.Utils.DataTypeUtils.DateUtils.DateContants;
 import com.CommonUtils.Utils.DataTypeUtils.DateUtils.DateFormat;
@@ -25,7 +20,8 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ArrayUtil;
-
+import cn.hutool.extra.tokenizer.TokenizerUtil;
+import cn.hutool.extra.tokenizer.Word;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -299,6 +295,7 @@ public final class StringUtil
 	//输出：这 两个 方法 的 区别 在于 返回 值
 	String resultStr = CollUtil.join((Iterator<Word>)result, " ");
 	 * */ 
+	/*
 	@Deprecated
 	public static List<String> divideText(final String text)
 	{
@@ -320,6 +317,7 @@ public final class StringUtil
         
         return resultList;
 	}
+	*/
 	
 	public static String substr(final String str, final int startPosition, final int length)
 	{
@@ -348,9 +346,12 @@ public final class StringUtil
 		
 		Map<String,int[]> resultMap = new HashMap<>();
 		
-		//统计
-        statistics(resultMap, StringUtil.divideText(text1),1);
-        statistics(resultMap, StringUtil.divideText(text2),0);
+		//统计				
+        //statistics(resultMap, StringUtil.divideText(text1), 1);
+        //statistics(resultMap, StringUtil.divideText(text2), 0);
+        
+        statistics(resultMap, CollUtil.list(false, (Iterable<Word>)TokenizerUtil.createEngine().parse(text1)).stream().map((word) -> { return word.getText(); }).collect(Collectors.toList()), 1);
+        statistics(resultMap, CollUtil.list(false, (Iterable<Word>)TokenizerUtil.createEngine().parse(text2)).stream().map((word) -> { return word.getText(); }).collect(Collectors.toList()), 0);
         
         calculation = new Calculation();
         Iterator<Map.Entry<String, int[]>> entries = resultMap.entrySet().iterator();

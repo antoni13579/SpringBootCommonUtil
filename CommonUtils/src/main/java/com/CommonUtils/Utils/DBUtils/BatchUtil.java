@@ -22,7 +22,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -43,10 +42,12 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.opencsv.CSVReader;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.text.StrSpliter;
+import cn.hutool.core.text.csv.CsvRow;
+import cn.hutool.core.text.csv.CsvUtil;
 import cn.hutool.core.util.ObjectUtil;
 import lombok.extern.slf4j.Slf4j;
 
@@ -135,7 +136,6 @@ public final class BatchUtil
     	BufferedInputStream bis = null;
     	InputStreamReader isr = null;
     	BufferedReader br = null;
-    	CSVReader csvReader = null;
     	
     	Connection targetConnection = null;
 		PreparedStatement targetPreparedStatement = null;
@@ -149,7 +149,6 @@ public final class BatchUtil
     		bis = new BufferedInputStream(fos);
     		isr = new InputStreamReader(bis, encode);
     		br = new BufferedReader(isr);
-    		csvReader = new CSVReader(br);
     		
     		if (targetDBInfo instanceof DBInfo)
 			{
@@ -166,7 +165,7 @@ public final class BatchUtil
 			{ throw new Exception("出现了新的AbstractDBInfo继承子类，请及时处理"); }
     		
     		List<String[]> records = new ArrayList<>();
-    		Iterator<String[]> iter = csvReader.iterator();
+    		Iterator<CsvRow> iter = CsvUtil.getReader().read(br).iterator();
     		long rows = 0;
     		while (iter.hasNext())
     		{
@@ -174,7 +173,8 @@ public final class BatchUtil
     			if (rows == skipRow)
     			{ continue; }
     			
-    			String[] record = iter.next();
+    			CsvRow tmp = iter.next();
+    			String[] record = tmp.toArray(new String[tmp.size()]);
     			records.add(record);
     			if (records.size() % DBContants.fetchSize == 0)
     			{
@@ -202,7 +202,6 @@ public final class BatchUtil
 		}
 		finally
 		{
-			IoUtil.close(csvReader);
 			IoUtil.close(br);
 			IoUtil.close(isr);
 			IoUtil.close(bis);
@@ -258,8 +257,9 @@ public final class BatchUtil
 				if (rows == skipRow)
 				{ continue; }
 				
-				String[] record = StringUtils.splitPreserveAllTokens(line, delimiter);
-				records.add(record);
+				//String[] record = StringUtils.splitPreserveAllTokens(line, delimiter);
+				List<String> record = StrSpliter.split(line, delimiter, false, false);
+				records.add(record.toArray(new String[record.size()]));
 				if (records.size() % DBContants.fetchSize == 0)
 				{
 					if (usePool)

@@ -6,16 +6,17 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.collections.impl.collector.BigDecimalSummaryStatistics;
 import org.eclipse.collections.impl.collector.Collectors2;
 
 import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.text.StrSpliter;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -71,7 +72,9 @@ public final class BigDecimalUtil
 				map, 
 				(final String groupByKey, final BigDecimalSummaryStatistics groupByResult, final int indx) -> 
 				{
-					String[] groupByFields = StringUtils.splitPreserveAllTokens(groupByKey, delimiter);
+					List<String> tmp = StrSpliter.split(groupByKey, delimiter, false, false);
+					//String[] groupByFields = StringUtils.splitPreserveAllTokens(groupByKey, groupByKey);
+					String[] groupByFields = tmp.toArray(new String[tmp.size()]);
 					com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil.arrayProcessor
 					(
 							processors, 

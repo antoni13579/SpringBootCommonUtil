@@ -20,6 +20,8 @@ import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.CustomCollections.Has
  * PersistenceUnitManager请用@Autowired(required = false)引用
  * 
  * */
+/**建议使用mybatis plus*/ 
+@Deprecated
 public final class LocalContainerEntityManagerFactoryBeanConfig 
 {
 	private LocalContainerEntityManagerFactoryBeanConfig() {}

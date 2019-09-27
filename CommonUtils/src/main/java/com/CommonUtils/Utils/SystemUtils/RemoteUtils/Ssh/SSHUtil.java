@@ -14,9 +14,12 @@ import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.Session;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.extra.ssh.JschUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+/**建议使用cn.hutool.extra.ssh.JschUtil.exec*/
+@Deprecated
 public final class SSHUtil 
 {	
 	private SSHUtil() {}
@@ -35,7 +38,7 @@ public final class SSHUtil
 		
 		try
 		{
-			session = RemoteUtil.getSession(sshInfo);
+			session = JschUtil.getSession(sshInfo.getHost(), sshInfo.getPort(), sshInfo.getUsername(), sshInfo.getPassword());
 			channelExec = RemoteUtil.getChannelExec(session, command);
 			
             is = channelExec.getInputStream();

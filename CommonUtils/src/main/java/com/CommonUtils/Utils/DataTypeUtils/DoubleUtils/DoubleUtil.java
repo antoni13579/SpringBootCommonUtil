@@ -5,17 +5,17 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.DoubleSummaryStatistics;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.ToDoubleFunction;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
-
 import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
 import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.text.StrSpliter;
 import cn.hutool.core.util.ArrayUtil;
 
 public final class DoubleUtil 
@@ -76,7 +76,9 @@ public final class DoubleUtil
 				map, 
 				(final String groupByKey, final DoubleSummaryStatistics groupByResult, final int indx) -> 
 				{
-					String[] groupByFields = StringUtils.splitPreserveAllTokens(groupByKey, delimiter);
+					List<String> tmp = StrSpliter.split(groupByKey, delimiter, false, false);
+					//String[] groupByFields = StringUtils.splitPreserveAllTokens(groupByKey, delimiter);
+					String[] groupByFields = tmp.toArray(new String[tmp.size()]);
 					com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil.arrayProcessor
 					(
 							processors, 

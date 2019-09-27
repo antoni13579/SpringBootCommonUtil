@@ -25,8 +25,7 @@ public class TransactionalJtaAnnotationAspect
 		Object result = null;
 		try
 		{
-			JtaTransactionManager jtaTransactionManager = BeanUtilServiceImpl.getBean(transactionManagerName, JtaTransactionManager.class)
-																			 .orElseThrow(() -> { return new Exception("找不到指定的分布式事务管理器！！需查找的分布式事务管理器名字为：" + transactionManagerName); });
+			JtaTransactionManager jtaTransactionManager = BeanUtilServiceImpl.getBean(transactionManagerName, JtaTransactionManager.class).orElseThrow(() -> { return new Exception("找不到指定的分布式事务管理器！！需查找的分布式事务管理器名字为：" + transactionManagerName); });
 			jtaTransactionManager.getUserTransaction().begin();
 			result = pjp.proceed();
 			jtaTransactionManager.getUserTransaction().commit();

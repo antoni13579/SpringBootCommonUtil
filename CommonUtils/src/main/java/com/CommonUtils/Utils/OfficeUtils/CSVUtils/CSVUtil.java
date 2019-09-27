@@ -1,30 +1,11 @@
 package com.CommonUtils.Utils.OfficeUtils.CSVUtils;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
-import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
-
-import com.opencsv.CSVReader;
-
-import cn.hutool.core.io.IoUtil;
-
-import lombok.extern.slf4j.Slf4j;
-
 /**建议使用cn.hutool.core.text.csv.CsvUtil*/
-@Slf4j
 @Deprecated
 public final class CSVUtil
 {
 	private CSVUtil() {}
-	
+	/*
 	public static Collection<String[]> read(final File file, final String encode)
 	{
 		if (null == file || StringUtil.isStrEmpty(encode))
@@ -59,4 +40,5 @@ public final class CSVUtil
     	
     	return result;
 	}
+	*/
 }

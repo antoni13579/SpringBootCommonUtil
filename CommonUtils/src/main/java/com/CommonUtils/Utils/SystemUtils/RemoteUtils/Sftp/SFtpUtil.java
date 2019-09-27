@@ -10,7 +10,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
 import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
-import com.CommonUtils.Utils.SystemUtils.RemoteUtils.RemoteUtil;
 import com.CommonUtils.Utils.SystemUtils.RemoteUtils.Bean.RemoteInfo;
 import com.CommonUtils.Utils.SystemUtils.RemoteUtils.Sftp.Impl.SftpProgressMonitorImpl;
 import com.jcraft.jsch.ChannelSftp;
@@ -20,9 +19,11 @@ import cn.hutool.core.convert.Convert;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.lang.TypeReference;
+import cn.hutool.extra.ssh.JschUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@Deprecated
 public final class SFtpUtil 
 {
 	private SFtpUtil() {}
@@ -35,8 +36,8 @@ public final class SFtpUtil
 		boolean result = false;
 		try
 		{
-			session = RemoteUtil.getSession(remoteInfo);
-			channel = RemoteUtil.getChannelSftp(session);
+			session = JschUtil.getSession(remoteInfo.getHost(), remoteInfo.getPort(), remoteInfo.getUsername(), remoteInfo.getPassword());
+			channel = JschUtil.openSftp(session);
 			
 			if (!cn.hutool.core.util.ArrayUtil.isEmpty(processors))
 			{
@@ -52,11 +53,17 @@ public final class SFtpUtil
 			result = false;
 		}
 		finally
-		{ RemoteUtil.releaseResource(new ChannelSftp[] { channel }, new Session[] { session }, is); }
+		{
+			JschUtil.close(channel);
+			JschUtil.close(session);
+			JschUtil.closeAll();
+			IoUtil.close(is);
+		}
 		
 		return result;
 	}
 	
+	/**请使用cn.hutool.extra.ssh.Sftp.download或get相关方法*/
 	public synchronized static boolean downloadFile(final File localDirectory, final String remoteDirectory, final RemoteInfo remoteInfo)
 	{
 		if (FileUtil.isDirectory(localDirectory))
@@ -84,6 +91,7 @@ public final class SFtpUtil
 		{ return false; }
 	}
 	
+	/**请使用cn.hutool.extra.ssh.Sftp.download或get相关方法*/
 	public synchronized static boolean downloadFile(final String localFilePath, final String remoteFilePath, final RemoteInfo remoteInfo)
 	{
 		return execute
@@ -94,6 +102,7 @@ public final class SFtpUtil
 		);
 	}
 	
+	/**请使用cn.hutool.extra.ssh.Sftp.upload或put相关方法*/
 	public synchronized static boolean uploadFile(final RemoteInfo remoteInfo, final String remoteFileDirectory, final MultipartFile ... localFileMultipartFiles)
 	{
 		if (!cn.hutool.core.util.ArrayUtil.isEmpty(localFileMultipartFiles))
@@ -130,6 +139,7 @@ public final class SFtpUtil
 		{ return false; }
 	}
 	
+	/**请使用cn.hutool.extra.ssh.Sftp.upload或put相关方法*/
 	public synchronized static boolean uploadFile(final RemoteInfo remoteInfo, final String localFilePath, final String remoteFilePath)
 	{
 		return execute
@@ -143,6 +153,7 @@ public final class SFtpUtil
 		);
 	}
 	
+	/**请使用cn.hutool.extra.ssh.Sftp.upload或put相关方法*/
 	public synchronized static boolean uploadFile(final RemoteInfo remoteInfo, final File localDirectory, final String remoteDirectory)
 	{
 		if (FileUtil.isDirectory(localDirectory))
@@ -170,6 +181,7 @@ public final class SFtpUtil
 		{ return false; }
 	}
 	
+	/**请使用cn.hutool.extra.ssh.Sftp.ls相关方法*/
 	public synchronized static Collection<ChannelSftp.LsEntry> getFiles(final RemoteInfo remoteInfo, final String remotePath)
 	{
 		Collection<ChannelSftp.LsEntry> result = new HashSet<>();
@@ -183,6 +195,7 @@ public final class SFtpUtil
 		return result;
 	}
 	
+	/**请使用cn.hutool.extra.ssh.Sftp.del相关方法*/
 	public synchronized static void deleteFile(final RemoteInfo remoteInfo, final String directory, final String fileName)
 	{
 		execute

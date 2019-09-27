@@ -1,10 +1,12 @@
 package com.CommonUtils.ConfigTemplate.RestController;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -38,7 +40,8 @@ import com.CommonUtils.Utils.OfficeUtils.ExcelUtils.Bean.ExcelData;
 import com.CommonUtils.Utils.TreeUtils.Bean.TreeNode;
 
 import cn.hutool.core.collection.CollUtil;
-
+import cn.hutool.core.io.IoUtil;
+import cn.hutool.poi.excel.ExcelReader;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -86,10 +89,30 @@ public class HomeRestController
 	 * WebAsyncTask是作为返回值，同时可以直接把执行任务嵌套其中，异步执行
 	 * */
 	@RequestMapping("/getUserModule")
-	public WebAsyncTask<Collection<ExcelData>> getUserModule()
+	public WebAsyncTask<List<Map<String, Object>>> getUserModule()
 	{
 		URL url = Thread.currentThread().getContextClassLoader().getResource(this.userModulePath);		
-		WebAsyncTask<Collection<ExcelData>> result = new WebAsyncTask<Collection<ExcelData>>(4000L, this.commonThreadPool, () -> { return ExcelUtil.read(url); });
+		WebAsyncTask<List<Map<String, Object>>> result = new WebAsyncTask<List<Map<String, Object>>>
+		(
+				4000L, 
+				this.commonThreadPool, 
+				() -> 
+				{
+					ExcelReader reader = null;
+					List<Map<String, Object>> excelResult = null;
+					try
+					{
+						reader = cn.hutool.poi.excel.ExcelUtil.getReader(new File(url.toURI()));
+						excelResult = reader.readAll();
+					}
+					catch (Exception ex)
+					{ excelResult = Collections.emptyList(); }
+					finally
+					{ IoUtil.close(reader); }
+					
+					return excelResult;
+				}
+		);
 		result.onError
 		(
 				() -> 
@@ -106,6 +129,7 @@ public class HomeRestController
 					return Collections.emptyList();
 				}
 		);
+		
 		return result;
 	}
 	

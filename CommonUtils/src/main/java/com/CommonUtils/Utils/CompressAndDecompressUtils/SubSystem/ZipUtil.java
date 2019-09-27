@@ -153,7 +153,8 @@ public final class ZipUtil
 				{
 					if (!(new File(entryFilePath).mkdir()))
 					{
-						IoUtil.close(zipFile);
+						//IoUtil.close(zipFile);
+						zipFile.close();
 						throw new Exception("解压zip文件失败，因无法创建目录，目录名称为：" + saveFileDirectory.getAbsolutePath());
 					}
 				}
@@ -179,7 +180,15 @@ public final class ZipUtil
 		catch (Exception ex)
 		{ log.error("解压缩Zip文件异常，异常原因为：", ex); }
 		finally
-		{ IoUtil.close(zipFile); }
+		{
+			if (null != zipFile)
+			{
+				try 
+				{ zipFile.close(); } 
+				catch (IOException e) 
+				{ e.printStackTrace(); }
+			}
+		}
 	}
 	
 	public static boolean isEndsWithZip(final String fileName)
