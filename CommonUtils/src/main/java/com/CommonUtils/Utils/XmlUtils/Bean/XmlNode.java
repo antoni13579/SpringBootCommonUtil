@@ -8,7 +8,6 @@ import org.dom4j.Attribute;
 import org.dom4j.Element;
 
 import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
-import com.alibaba.fastjson.JSON;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
@@ -58,9 +57,6 @@ public class XmlNode
 	
 	public boolean haveChildren()
 	{ return !CollUtil.isEmpty(this.children); }
-	
-	public String toJson()
-	{ return JSON.toJSONString(this); }
 	
 	public Element toElement()
 	{ return this.element; }

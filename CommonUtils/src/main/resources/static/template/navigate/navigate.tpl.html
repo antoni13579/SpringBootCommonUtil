@@ -2,14 +2,14 @@
 	<li ng-repeat="firstLevel in menusOfModule | orderBy:'-CELL8'">
     	<a href="javascript:void(0);" class="first-level list-group-item" ng-click="toggleExpandNextLevel($event)">
             <i class="icon-th-list" style="color: gray"></i>
-          	{{firstLevel.data.CELL2}}
+          	{{firstLevel.data.PERMISSION_NAME}}
           	<i class="icon-angle-left icon-large pull-right"></i>
         </a>
         <ul class="second" id="secondMenu" class="list-group">
             <li ng-repeat="subMenu in firstLevel.children | orderBy:'-CELL8' track by $index" class="list-group-item" on-repeat-finished-render>
-                <a href="javascript:void(0);" ng-click="createWorkTab(subMenu.CELL1,subMenu.CELL2,subMenu.CELL4)">
+                <a href="javascript:void(0);" ng-click="createWorkTab(subMenu.PERMISSION_ID,subMenu.PERMISSION_NAME,subMenu.PERMISSION_MARK)">
                     <i class="icon-arrow-right"></i>
-                    {{subMenu.data.CELL2}}
+                    {{subMenu.data.PERMISSION_NAME}}
                 </a>
             </li>
         </ul>

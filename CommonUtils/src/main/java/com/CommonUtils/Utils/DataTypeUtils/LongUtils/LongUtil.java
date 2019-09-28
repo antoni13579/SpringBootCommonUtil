@@ -10,8 +10,6 @@ import java.util.function.Function;
 import java.util.function.ToLongFunction;
 import java.util.stream.Collectors;
 
-import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
-
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.text.StrSpliter;
 import cn.hutool.core.util.ArrayUtil;
@@ -59,9 +57,9 @@ public final class LongUtil
 		{ return Collections.emptyMap(); }
 	}
 	
-	public static boolean processGroupByResult(final Map<String, LongSummaryStatistics> map, final String delimiter, final ItemProcessorForProcessGroupByResult ... processors)
+	public static void processGroupByResult(final Map<String, LongSummaryStatistics> map, final String delimiter, final ItemProcessorForProcessGroupByResult ... processors)
 	{
-		return JavaCollectionsUtil.mapProcessor
+		CollUtil.forEach//return JavaCollectionsUtil.mapProcessor
 		(
 				map, 
 				(final String groupByKey, final LongSummaryStatistics groupByResult, final int indx) -> 

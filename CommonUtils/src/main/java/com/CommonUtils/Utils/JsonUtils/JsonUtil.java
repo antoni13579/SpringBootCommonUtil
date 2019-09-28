@@ -4,12 +4,29 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public final class JsonUtil 
 {
 	private JsonUtil() {}
 	
-	public static String toJsonByFastjson(final Object obj)
-	{ return com.alibaba.fastjson.JSON.toJSONString(obj); }
+	private static ObjectMapper OBJECT_MAPPER = null;
+	
+	public static String toJson(final Object obj)
+	{
+		String result = null;
+		try
+		{ result = getInstanceForObjectMapper().writeValueAsString(obj); }
+		catch (Exception ex)
+		{
+			log.error("转换json出现异常，异常原因为：", ex);
+			result = "";
+		}
+		return result;
+	}
 	
 	public static <T> Collection<T> jsonArrayToCollection(final org.json.JSONArray jsonArray, final HandlerForJsonArrayTransferToCollection<T> handlerForJsonArrayTransferToCollection)
 	{
@@ -23,6 +40,20 @@ public final class JsonUtil
 				{ collection.add(handlerForJsonArrayTransferToCollection.process((org.json.JSONObject)obj)); }
 		);
 		return collection;
+	}
+	
+	private static ObjectMapper getInstanceForObjectMapper()
+	{
+		if (null == OBJECT_MAPPER)
+		{
+			synchronized (JsonUtil.class)
+			{
+				if (null == OBJECT_MAPPER)
+				{ OBJECT_MAPPER = new ObjectMapper(); }
+			}
+		}
+		
+		return OBJECT_MAPPER;
 	}
 	
 	@FunctionalInterface

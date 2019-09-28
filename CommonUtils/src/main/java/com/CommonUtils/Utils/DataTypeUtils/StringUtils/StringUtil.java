@@ -3,14 +3,19 @@ package com.CommonUtils.Utils.DataTypeUtils.StringUtils;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.CommonUtils.Utils.DataTypeUtils.DateUtils.DateContants;
 import com.CommonUtils.Utils.DataTypeUtils.DateUtils.DateFormat;
@@ -28,6 +33,30 @@ import lombok.extern.slf4j.Slf4j;
 public final class StringUtil 
 {
 	private StringUtil() {}
+	
+	public static Map<String, Long> wordCount(final Collection<String> strings)
+	{
+		if (!CollUtil.isEmpty(strings))
+		{ return wordCount(strings.toArray(new String[strings.size()])); }
+		else
+		{ return Collections.emptyMap(); }
+	}
+	
+	public static Map<String, Long> wordCount(final String ... strings)
+	{
+		if (!cn.hutool.core.util.ArrayUtil.isEmpty(strings))
+		{			
+			return Arrays.asList(strings)
+						 .stream()
+						 .map(String::trim)
+						 .filter(value -> !StringUtil.isStrEmpty(value))
+						 .map(value -> value.split(StringContants.PATTERN_5))
+						 .flatMap(x -> Stream.of(x))
+						 .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+		}
+		else
+		{ return Collections.emptyMap(); }
+	}
 	
 	/**建议使用cn.hutool.core.convert.Convert.toStr*/ 
 	@Deprecated

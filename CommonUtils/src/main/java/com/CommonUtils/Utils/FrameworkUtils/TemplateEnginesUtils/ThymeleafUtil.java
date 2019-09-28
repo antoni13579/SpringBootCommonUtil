@@ -5,7 +5,7 @@ import java.util.Map;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
-import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
+import cn.hutool.core.collection.CollUtil;
 
 public final class ThymeleafUtil 
 {
@@ -14,7 +14,7 @@ public final class ThymeleafUtil
 	public static String process(final String template, final Map<String, Object> attributes, final TemplateEngine templateEngine)
 	{
 		Context context = new Context();
-		JavaCollectionsUtil.mapProcessor
+		CollUtil.forEach//JavaCollectionsUtil.mapProcessor
 		(
 				attributes, 
 				(String key, Object value, int indx) -> 

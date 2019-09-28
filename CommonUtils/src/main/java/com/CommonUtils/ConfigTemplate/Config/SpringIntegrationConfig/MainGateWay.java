@@ -11,5 +11,5 @@ import com.CommonUtils.ConfigTemplate.Bean.ExcelBean;
 public interface MainGateWay 
 {
 	@Gateway(requestChannel = "startToHandleExcelData.input")
-	void startToHandleExcelData(final ExcelBean excelDatas);
+	void startToHandleExcelData(final ExcelBean excelBean);
 }

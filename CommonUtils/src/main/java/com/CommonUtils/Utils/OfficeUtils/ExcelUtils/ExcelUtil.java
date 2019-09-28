@@ -6,42 +6,22 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URI;
-import java.net.URL;
+
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.collections4.MapUtils;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-
-import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringContants;
 import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
-import com.CommonUtils.Utils.OfficeUtils.ExcelUtils.Bean.ExcelData;
-import com.alibaba.fastjson.JSON;
 
-import cn.hutool.core.io.FileTypeUtil;
-import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IoUtil;
+import cn.hutool.http.Header;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public final class ExcelUtil 
-{
+{	
 	public static void exportExcel(final HttpServletRequest request, final HttpServletResponse response, final File outputFile)
 	{
 		OutputStream bos = null;
@@ -57,7 +37,7 @@ public final class ExcelUtil
             bos = new BufferedOutputStream(os);		//缓冲输出流
             response.reset();						// 清空输出流
             
-            response.setHeader("Content-disposition", "attachment; filename=" + StringUtil.toUtf8String(outputFile.getName()));		// 设定输出文件头
+            response.setHeader(Header.CONTENT_DISPOSITION.toString(), "attachment; filename=" + StringUtil.toUtf8String(outputFile.getName()));		// 设定输出文件头
             response.setContentType("application/msexcel");																			// 定义输出类型
             
             fis = new FileInputStream(outputFile);
@@ -87,6 +67,7 @@ public final class ExcelUtil
 	{ exportExcel(request, response, outputFile.toFile()); }
 	
 	/**请使用cn.hutool.poi包里面相关Excel工具类*/
+	/*
 	@Deprecated
 	public static String getCellValueStr(final Cell cell)
 	{
@@ -127,11 +108,13 @@ public final class ExcelUtil
 		}
 		return cellValue;
 	}
+	*/
 	
 	/**
 	 * 获取单元格数据，可兼容xls与xlsx版本
 	 * */
 	/**请使用cn.hutool.poi包里面相关Excel工具类*/
+	/*
 	@Deprecated
 	public static Object getCellValue(final Cell cell) 
 	{
@@ -168,11 +151,13 @@ public final class ExcelUtil
 		}
 		return cellValue;
 	}
+	*/
 	
 	/**
 	 * 设置单元格数据，可兼容xls与xlsx版本，此重载版用于Cell重新设置值
 	 * */
 	/**请使用cn.hutool.poi包里面相关Excel工具类*/
+	/*
 	@Deprecated
 	public static void setCellValue(final Cell cell)
 	{
@@ -201,11 +186,13 @@ public final class ExcelUtil
     			break;
     	}
 	}
+	*/
 	
 	/**
 	 * 设置单元格数据，可兼容xls与xlsx版本，此重载版用于在Map获取值并赋值到Cell中
 	 * */
 	/**请使用cn.hutool.poi包里面相关Excel工具类*/
+	/*
 	@Deprecated
 	public static void setCellValue(final Cell cell, 
 									final Map<String, Object> dataValue, 
@@ -254,28 +241,44 @@ public final class ExcelUtil
 				break;
 		}
 	}
+	*/
 	
 	/**请使用cn.hutool.poi包里面相关Excel工具类*/
+	/*
 	@Deprecated
 	public static String toJson(final Collection<ExcelData> records)
 	{ return JSON.toJSONString(records); }
+	*/
 	
 	/**请使用cn.hutool.poi包里面相关Excel工具类*/
+	/*
 	@Deprecated
 	public static Collection<ExcelData> read(final File file)
 	{ return read(file, null, 0, 0, 0, 0, 0, 0); }
+	*/
+	
+	/*
+	@Deprecated
+	public static Collection<ExcelData> read(final File file, final String sheetName)
+	{ return read(file, sheetName, 0, 0, 0, 0, 0, 0); }
+	*/
 	
 	/**请使用cn.hutool.poi包里面相关Excel工具类*/
+	/*
 	@Deprecated
 	public static Collection<ExcelData> read(final URL url)
 	{ return read(url, null, 0, 0, 0, 0, 0, 0); }
+	*/
 	
 	/**请使用cn.hutool.poi包里面相关Excel工具类*/
+	/*
 	@Deprecated
 	public static Collection<ExcelData> read(final URL url, final String sheetName)
 	{ return read(url, sheetName, 0, 0, 0, 0, 0, 0); }
+	*/
 	
 	/**请使用cn.hutool.poi包里面相关Excel工具类*/
+	/*
 	@Deprecated
 	private static Collection<ExcelData> read(final URL url, 
 			  								  final String sheetName,
@@ -300,8 +303,10 @@ public final class ExcelUtil
 		}
 		return result;
 	}
+	*/
 	
 	/**请使用cn.hutool.poi包里面相关Excel工具类*/
+	/*
 	@Deprecated
 	private static Collection<ExcelData> read(final File file, 
 			  								  final String sheetName,
@@ -367,8 +372,10 @@ public final class ExcelUtil
 		
 		return result;
 	}
+	*/
 	
 	/**请使用cn.hutool.poi包里面相关Excel工具类*/
+	/*
 	@Deprecated
 	private static boolean isXls(final File file)
 	{
@@ -377,8 +384,10 @@ public final class ExcelUtil
 		
 		return FileTypeUtil.getType(file).equalsIgnoreCase("xls");
 	}
+	*/
 	
 	/**请使用cn.hutool.poi包里面相关Excel工具类*/
+	/*
 	@Deprecated
 	private static boolean isXlsx(final File file)
 	{
@@ -387,8 +396,10 @@ public final class ExcelUtil
 		
 		return FileTypeUtil.getType(file).equalsIgnoreCase("xlsx");
 	}
+	*/
 	
 	/**请使用cn.hutool.poi包里面相关Excel工具类*/
+	/*
 	@Deprecated
 	private static ExcelData readExcelCommonHandler(final Sheet sheet, 
 			    								   final int startRow, 
@@ -430,4 +441,5 @@ public final class ExcelUtil
 
 		return null;
 	}
+	*/
 }

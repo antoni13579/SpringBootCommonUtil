@@ -2,7 +2,6 @@ package com.CommonUtils.Utils.DataTypeUtils.CollectionUtils;
 
 import java.sql.ResultSetMetaData;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -18,9 +17,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.keyvalue.MultiKey;
@@ -31,9 +27,9 @@ import com.CommonUtils.Utils.DBUtils.Bean.DBTable.Table;
 import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
 import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil.ItemProcessor;
 import com.CommonUtils.Utils.DataTypeUtils.DateUtils.DateFormat;
-import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringContants;
 import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.util.ObjectUtil;
@@ -43,30 +39,6 @@ import lombok.extern.slf4j.Slf4j;
 public final class JavaCollectionsUtil 
 {
 	private JavaCollectionsUtil() {}
-	
-	public static Map<String, Long> wordCount(final Collection<String> strings)
-	{
-		if (!isCollectionEmpty(strings))
-		{ return wordCount(strings.toArray(new String[strings.size()])); }
-		else
-		{ return Collections.emptyMap(); }
-	}
-	
-	public static Map<String, Long> wordCount(final String ... strings)
-	{
-		if (!cn.hutool.core.util.ArrayUtil.isEmpty(strings))
-		{
-			return Arrays.asList(strings)
-						 .stream()
-						 .map(String::trim)
-						 .filter(value -> !StringUtil.isStrEmpty(value))
-						 .map(value -> value.split(StringContants.PATTERN_5))
-						 .flatMap(x -> Stream.of(x))
-						 .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
-		}
-		else
-		{ return Collections.emptyMap(); }
-	}
 	
 	/**
 	 * 如果map中存在键key,则返回键key的值。否则向map中新增映射关系key -> value并返回value
@@ -320,8 +292,9 @@ public final class JavaCollectionsUtil
 	}
 	
 	/**
-	 * 针对Map做的通用型迭代处理
+	 * 针对Map做的通用型迭代处理，建议使用cn.hutool.core.collection.CollUtil.forEach
 	 * */
+	@Deprecated
 	@SafeVarargs
 	public static <K, V> boolean mapProcessor(final Map<K, V> map, final ItemProcessorForMap<K, V> ... itemProcessorForMaps)
 	{		
@@ -426,16 +399,19 @@ public final class JavaCollectionsUtil
 		switch (operationType)
 		{
 			case INTER_SECTION:
-				return CollectionUtils.intersection(a, b);
+				return CollUtil.intersection(a, b);
 				
 			case LEFT_SUBTRACT:
 				return CollectionUtils.subtract(a, b);
 				
 			case RIGHT_SUBTRACT:
 				return CollectionUtils.subtract(b, a);
-				
+			
 			case UNION:
-				return CollectionUtils.union(a, b);
+				return CollUtil.union(a, b);
+				
+			case DISJUNCTION:
+				return CollUtil.disjunction(a, b);
 				
 			default:
 				return Collections.emptyList();
@@ -552,30 +528,6 @@ public final class JavaCollectionsUtil
 		return result;
 	}
 	
-	public static <V> Map<String, V> mapKeyToUpperCase(final Map<String, V> map)
-	{
-		Map<String, V> result = new HashMap<>();
-		mapProcessor
-		(
-				map, 
-				(final String key, final V value, final int indx) -> 
-				{ result.put(key.toUpperCase(), value); }
-		);
-		return result;
-	}
-	
-	public static <V> Map<String, V> mapKeyToLowerCase(final Map<String, V> map)
-	{
-		Map<String, V> result = new HashMap<>();
-		mapProcessor
-		(
-				map, 
-				(final String key, final V value, final int indx) -> 
-				{ result.put(key.toLowerCase(), value); }
-		);
-		return result;
-	}
-	
 	public static <T> Collection<T> ifNullForCollection(final T val)
 	{ return nvlForCollection(val); }
 	
@@ -680,9 +632,11 @@ public final class JavaCollectionsUtil
 		INTER_SECTION, 		//交集
 	    LEFT_SUBTRACT, 		//以左边集合为准的差集
 	    RIGHT_SUBTRACT,		//以右边集合为准的差集
-	    UNION;
+	    UNION,
+	    DISJUNCTION;
 	}
 	
+	@Deprecated
 	@FunctionalInterface
 	public interface ItemProcessorForMap<K, V>
 	{ void process(final K key, final V value, final int indx); }

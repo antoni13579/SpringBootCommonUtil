@@ -39,12 +39,18 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IoUtil;
+import cn.hutool.db.meta.JdbcType;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public final class DBHandleUtil 
 {
 	private DBHandleUtil() {}
+	
+	public static void main(String[] args)
+	{
+		System.out.println(JdbcType.valueOf(123));
+	}
 	
 	/**数据库连接还原AutoCommit配置与提交事务*/
 	public static void resetConnectionsSetting(final boolean commit, final Connection ... connections)
@@ -143,7 +149,7 @@ public final class DBHandleUtil
 						new Column().setColumnLabel(columnLabels[i - 1])
 						  			.setColumnName(columnNames[i - 1])
 						  			.setIndx(i - 1)
-						  			.setColumnTypeForJdbc(resultSetMetaData.getColumnType(i))
+						  			.setColumnTypeForJdbc(JdbcType.valueOf(resultSetMetaData.getColumnType(i)))
 						  			.setColumnTypeNameForJdbc(resultSetMetaData.getColumnTypeName(i))
 						  			.setColumnTypeNameForJava(resultSetMetaData.getColumnClassName(i))
 				);

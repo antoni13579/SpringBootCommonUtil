@@ -9,8 +9,7 @@ import javax.servlet.Filter;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 
-import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
-
+import cn.hutool.core.collection.CollUtil;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -42,7 +41,7 @@ public final class ShiroFilterFactoryBeanConfig
 		// 拦截器
 		Map<String, String> filterChainDefinitionMap = new LinkedHashMap<String, String>();
 		// 配置链接需注意这个是顺序判断
-		JavaCollectionsUtil.mapProcessor
+		CollUtil.forEach//JavaCollectionsUtil.mapProcessor
 		(
 				paramFilterChainDefinitionMap, 
 				(final String key, final InterceptorChain value, final int indx) -> 

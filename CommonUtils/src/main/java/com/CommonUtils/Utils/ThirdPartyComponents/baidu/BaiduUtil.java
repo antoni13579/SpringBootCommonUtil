@@ -7,7 +7,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
@@ -16,16 +16,16 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.json.JSONObject;
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
-
-import com.CommonUtils.Utils.NetworkUtils.HttpUtils.HttpUtil;
 import com.CommonUtils.Utils.ThirdPartyComponents.baidu.Bean.VatInvoice;
 import com.baidu.aip.util.Base64Util;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.IoUtil;
+import cn.hutool.http.ContentType;
+import cn.hutool.http.Header;
+import cn.hutool.http.HttpConnection;
+import cn.hutool.http.Method;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -39,6 +39,7 @@ public final class BaiduUtil
 		BufferedReader bufferedReader = null;
 		InputStreamReader inputStreamReader = null;
 		InputStream is = null;
+		HttpConnection connection = null;
 		try
 		{
 			StringBuilder authTockenUrl = new StringBuilder()
@@ -55,14 +56,14 @@ public final class BaiduUtil
 					//3. 官网获取的 Secret Key
 					.append("&client_secret=")
 					.append(secretKey);
-			
+
 			// 打开和URL之间的连接
-			HttpURLConnection connection = HttpUtil.getHttpURLConnection(authTockenUrl.toString(), RequestMethod.POST, null, false, true, false, true);
-            connection.connect();
-            
+			//HttpURLConnection connection = HttpUtil.getHttpURLConnection(authTockenUrl.toString(), RequestMethod.POST, null, false, true, false, true);
+			connection = HttpConnection.create(new URL(authTockenUrl.toString()), null).setMethod(Method.POST).connect();
+			
             // 获取所有响应头字段
-            Map<String, List<String>> map = connection.getHeaderFields();
-            JavaCollectionsUtil.mapProcessor
+            Map<String, List<String>> map = connection.headers();
+            CollUtil.forEach//JavaCollectionsUtil.mapProcessor
             (
             		map, 
             		(final String key, final List<String> value, final int indx) -> 
@@ -92,6 +93,9 @@ public final class BaiduUtil
 			IoUtil.close(is);
 			IoUtil.close(inputStreamReader);
 			IoUtil.close(bufferedReader);
+			
+			if (null != connection)
+			{ connection.disconnectQuietly(); }
 		}
 		
 		return token;
@@ -112,6 +116,7 @@ public final class BaiduUtil
 		InputStream inputStream = null;
 		FileInputStream input = null;
 		BufferedInputStream bufferInput = null;
+		HttpConnection connection = null;
 		try
 		{
 			input = new FileInputStream(file);
@@ -125,7 +130,8 @@ public final class BaiduUtil
 					.append("?access_token=")
 					.append(accessToken);
 			
-			HttpURLConnection connection = HttpUtil.getHttpURLConnection(requestUrl.toString(), RequestMethod.POST, MediaType.APPLICATION_FORM_URLENCODED_VALUE, true, false, true, true);
+			//HttpURLConnection connection = HttpUtil.getHttpURLConnection(requestUrl.toString(), RequestMethod.POST, MediaType.APPLICATION_FORM_URLENCODED_VALUE, true, false, true, true);
+			connection = HttpConnection.create(new URL(requestUrl.toString()), null).setMethod(Method.POST).header(Header.CONTENT_TYPE, ContentType.FORM_URLENCODED.toString(), true).header(Header.CONNECTION, "Keep-Alive", true).connect();
 			
 			StringBuilder params = new StringBuilder()
 					.append(URLEncoder.encode("image", "UTF-8"))
@@ -140,11 +146,10 @@ public final class BaiduUtil
 			dataOutputStream.flush();
 			
 			// 建立实际的连接
-	        connection.connect();
 	        
 	        // 获取所有响应头字段
-            Map<String, List<String>> map = connection.getHeaderFields();
-            JavaCollectionsUtil.mapProcessor
+            Map<String, List<String>> map = connection.headers();
+            CollUtil.forEach//JavaCollectionsUtil.mapProcessor
             (
             		map, 
             		(final String key, final List<String> value, final int indx) -> 
@@ -173,6 +178,9 @@ public final class BaiduUtil
 			IoUtil.close(bufferedReader);
 			IoUtil.close(input);
 			IoUtil.close(bufferInput);
+			
+			if (null != connection)
+			{ connection.disconnectQuietly(); }
 		}
 		
 		return Optional.ofNullable(result);

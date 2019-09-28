@@ -2,6 +2,7 @@ package com.CommonUtils.Utils.DBUtils.Bean.DBTable;
 
 import java.io.Serializable;
 
+import cn.hutool.db.meta.JdbcType;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -20,7 +21,7 @@ public class Column implements Serializable
 	private String columnLabel;
 	
 	/**对应于java.sql.Types*/
-	private int columnTypeForJdbc;
+	private JdbcType columnTypeForJdbc;
 	private String columnTypeNameForJdbc;
 	
 	private String columnTypeNameForJava;

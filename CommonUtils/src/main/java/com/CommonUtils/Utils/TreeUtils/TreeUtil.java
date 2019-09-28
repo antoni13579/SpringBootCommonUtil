@@ -6,9 +6,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 
-import com.CommonUtils.Utils.OfficeUtils.ExcelUtils.Bean.ExcelData;
 import com.CommonUtils.Utils.TreeUtils.Bean.TreeNode;
-import com.alibaba.fastjson.JSON;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ArrayUtil;
@@ -16,12 +14,6 @@ import cn.hutool.core.util.ArrayUtil;
 public final class TreeUtil 
 {
 	private TreeUtil() {}
-	
-	public static <K, V> String getTreeJson(final Collection<TreeNode<Map<K, V>>> tree)
-	{ return JSON.toJSONString(tree); }
-	
-	public static <K, V> String getTreeJson(final Collection<TreeNode<Map<K, V>>> originNodeList, final K rootKey, final K leafKey)
-	{ return JSON.toJSONString(getTree(originNodeList, rootKey, leafKey)); }
 	
 	public static <K, V> Collection<TreeNode<Map<K, V>>> mapsToTreeNodes(final Collection<Map<K, V>> records)
 	{
@@ -36,6 +28,8 @@ public final class TreeUtil
 		{ return Collections.emptyList(); }
 	}
 	
+	/*
+	@Deprecated
 	public static Collection<TreeNode<Map<String, Object>>> excelDataToTreeNodes(final ExcelData excelData)
 	{
 		if (null != excelData)
@@ -46,6 +40,7 @@ public final class TreeUtil
 		else
 		{ return Collections.emptyList(); }
 	}
+	*/
 	
 	/**
 	 * 生成基于Map的树形结构

@@ -5,7 +5,6 @@ import java.util.Map;
 
 import org.springframework.web.context.request.async.DeferredResult;
 
-import com.CommonUtils.Utils.OfficeUtils.ExcelUtils.Bean.ExcelData;
 import com.CommonUtils.Utils.TreeUtils.Bean.TreeNode;
 
 import lombok.Getter;
@@ -19,7 +18,7 @@ import lombok.experimental.Accessors;
 @ToString
 public class ExcelBean
 {
-	private Collection<ExcelData> excelDatas;
+	private Collection<Map<String, Object>> excelDatas;
 	private boolean empty;
 	private DeferredResult<Collection<TreeNode<Map<String, Object>>>> deferredResult;
 }

@@ -1,6 +1,6 @@
 package com.CommonUtils.Utils.NetworkUtils.HttpUtils.Bean;
 
-import com.alibaba.fastjson.JSON;
+import com.CommonUtils.Utils.JsonUtils.JsonUtil;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -18,5 +18,5 @@ public class SimpleResponse
 	private Object object;
 	
 	public String toJson()
-	{ return JSON.toJSONString(this); }
+	{ return JsonUtil.toJson(this); }
 }

@@ -15,7 +15,7 @@ import org.springframework.cglib.beans.BeanMap;
 
 
 import com.CommonUtils.Utils.ReflectUtils.ReflectUtil;
-import com.alibaba.fastjson.JSON;
+
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -141,8 +141,8 @@ public final class BeanUtil
 			ObjectReader objectReader = getInstanceForObjectMapper(Include.NON_DEFAULT).readerForUpdating(dst);
 			
 			//此代码把实体转换为json，但根据Include进行过滤
-			//String srcJson = getInstanceForObjectMapper(JsonInclude.Include.NON_DEFAULT).writeValueAsString(src)
-			String srcJson = JSON.toJSONString(src);
+			String srcJson = getInstanceForObjectMapper(Include.NON_DEFAULT).writeValueAsString(src);
+			//String srcJson = JSON.toJSONString(src);
 			
 			//将源实体的值赋值到目标实体
 			objectReader.readValue(srcJson);

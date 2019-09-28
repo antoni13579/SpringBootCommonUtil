@@ -154,8 +154,8 @@ function getMenusOfModule (menuType)
 			//Ajax成功的处理步骤
 			function(data)
 			{
-				for (var i = 1; i < data.length; i++)
-				{ menusOfModule[i - 1] = data[i]; }
+				for (var i = 0; i < data.length; i++)
+				{ menusOfModule[i] = data[i]; }
 			},
 			
 			//Ajax失败的处理步骤

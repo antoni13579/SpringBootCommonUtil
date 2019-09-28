@@ -18,9 +18,9 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Service;
 
-import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
 import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
 
+import cn.hutool.core.collection.CollUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @Service("beanUtilService")
@@ -93,7 +93,7 @@ public final class BeanUtilServiceImpl implements ApplicationContextAware
 			BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(beanClazz);
 			
 			//设置bean字段信息
-			JavaCollectionsUtil.mapProcessor
+			CollUtil.forEach//JavaCollectionsUtil.mapProcessor
 			(
 					fieldInfo, 
 					(final String key, final Object value, final int indx) -> 

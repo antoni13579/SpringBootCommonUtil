@@ -35,8 +35,6 @@ import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
 import com.CommonUtils.Utils.FrameworkUtils.SecurityUtils.SpringSecurityUtil;
 import com.CommonUtils.Utils.NetworkUtils.HttpUtils.Bean.RegisterInfo;
 import com.CommonUtils.Utils.NetworkUtils.HttpUtils.Bean.SimpleResponse;
-import com.CommonUtils.Utils.OfficeUtils.ExcelUtils.ExcelUtil;
-import com.CommonUtils.Utils.OfficeUtils.ExcelUtils.Bean.ExcelData;
 import com.CommonUtils.Utils.TreeUtils.Bean.TreeNode;
 
 import cn.hutool.core.collection.CollUtil;
@@ -159,11 +157,22 @@ public class HomeRestController
 				() -> 
 				{
 					URL url = Thread.currentThread().getContextClassLoader().getResource(this.menusOfModulePath);
-					Collection<ExcelData> excelDatas =  ExcelUtil.read(url, menuType);
+					ExcelReader reader = null;
+					List<Map<String, Object>> excelResult = null;
+					try
+					{
+						reader = cn.hutool.poi.excel.ExcelUtil.getReader(new File(url.toURI()));
+						reader.setSheet(menuType);
+						excelResult = reader.readAll();
+					}
+					catch (Exception ex)
+					{ excelResult = Collections.emptyList(); }
+					finally
+					{ IoUtil.close(reader); }
 					
 					ExcelBean excelBean = new ExcelBean()
-							.setExcelDatas(excelDatas)
-							.setEmpty(CollUtil.isEmpty(excelDatas))
+							.setExcelDatas(excelResult)
+							.setEmpty(CollUtil.isEmpty(excelResult))
 							.setDeferredResult(result);
 					this.mainGateWay.startToHandleExcelData(excelBean);
 				}

@@ -12,8 +12,6 @@ import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringContants;
 import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
 import com.CommonUtils.Utils.JsonUtils.JsonUtil;
 
-import com.alibaba.fastjson.JSON;
-
 import cn.hutool.core.date.DateUtil;
 import lombok.Getter;
 import lombok.Setter;
@@ -139,9 +137,6 @@ public class VatInvoice
 	
 	/**校验码*/
 	private String checkCode;
-	
-	public String toJson()
-	{ return JSON.toJSONString(this); }
 	
 	public static VatInvoice getInstance(final String json) throws Exception
 	{

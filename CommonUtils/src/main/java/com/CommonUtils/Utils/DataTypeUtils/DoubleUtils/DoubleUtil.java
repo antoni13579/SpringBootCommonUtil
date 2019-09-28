@@ -11,7 +11,6 @@ import java.util.function.Function;
 import java.util.function.ToDoubleFunction;
 import java.util.stream.Collectors;
 
-import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
 import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
 
 import cn.hutool.core.collection.CollUtil;
@@ -69,9 +68,9 @@ public final class DoubleUtil
 		{ return Collections.emptyMap(); }
 	}
 	
-	public static boolean processGroupByResult(final Map<String, DoubleSummaryStatistics> map, final String delimiter, final ItemProcessorForProcessGroupByResult ... processors)
+	public static void processGroupByResult(final Map<String, DoubleSummaryStatistics> map, final String delimiter, final ItemProcessorForProcessGroupByResult ... processors)
 	{
-		return JavaCollectionsUtil.mapProcessor
+		CollUtil.forEach//return JavaCollectionsUtil.mapProcessor
 		(
 				map, 
 				(final String groupByKey, final DoubleSummaryStatistics groupByResult, final int indx) -> 

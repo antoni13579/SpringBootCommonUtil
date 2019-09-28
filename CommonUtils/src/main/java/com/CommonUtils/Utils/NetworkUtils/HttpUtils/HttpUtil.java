@@ -8,7 +8,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.Optional;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -25,11 +25,15 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.util.UriUtils;
 
+import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.CustomCollections.HashMap;
 import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
 
 import com.CommonUtils.Utils.NetworkUtils.HttpUtils.Bean.DownloadFileInfo;
 
 import cn.hutool.core.io.IoUtil;
+import cn.hutool.http.ContentType;
+import cn.hutool.http.Header;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -37,50 +41,10 @@ public final class HttpUtil
 {
 	private HttpUtil() {}
 	
-	/**
-	 * 生成下载响应信息
-	 * 
-	 * 由于一个奇葩的浏览器————IE的存在，响应的时候需要对它单独处理，同时响应给用户的文件名中有可能包含一些不是英文和数字的字符，如汉语，也需要进行处理
-	 * */
-	public static ResponseEntity<Resource> downloadResponse(final DownloadFileInfo fileInfo) throws UnsupportedEncodingException, MalformedURLException
+	private static Map<String, Object> downloadResponse(final long contentLength, final String paramFileName)
 	{
-		File file = fileInfo.getFile();
-        String fileName = fileInfo.getFileName();
-        //Resource body = new FileSystemResource(file);
-        Resource body = new UrlResource(file.toURI());
-        
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-        String header = request.getHeader("User-Agent").toUpperCase();
-        HttpStatus status = HttpStatus.CREATED;
-        
-        if (header.contains("MSIE") || header.contains("TRIDENT") || header.contains("EDGE")) 
-        {
-            //fileName = URLEncoder.encode(fileName, "UTF-8");
-            //fileName = fileName.replace("+", "%20");    // IE下载文件名空格变+号问题
-        	fileName = UriUtils.encode(fileName, StandardCharsets.UTF_8);
-            status = HttpStatus.OK;
-        } 
-        else 
-        {
-        	//fileName = new String(fileName.getBytes("UTF-8"), "ISO8859-1");
-        	fileName = new String(fileName.getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1);
-        	
-        	//这句不确定要不要加
-        	//status = HttpStatus.CREATED;
-        }
-        
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-        headers.setContentDispositionFormData("attachment", fileName);
-        headers.setContentLength(file.length());
-
-        return new ResponseEntity<Resource>(body, headers, status);
-	}
-	
-	public static ResponseEntity<byte[]> downloadResponse(final byte[] datas, final String paramFileName)
-	{        
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-        String header = request.getHeader("User-Agent").toUpperCase();
+		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        String header = request.getHeader(Header.USER_AGENT.toString()).toUpperCase();
         HttpStatus status = HttpStatus.CREATED;
         
         String fileName = paramFileName;
@@ -94,19 +58,36 @@ public final class HttpUtil
         } 
         else 
         {
-        	//fileName = new String(fileName.getBytes("UTF-8"), "ISO8859-1");
         	fileName = new String(fileName.getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1);
-        	
-        	//这句不确定要不要加
-        	//status = HttpStatus.CREATED;
+        	status = HttpStatus.CREATED;
         }
         
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
         headers.setContentDispositionFormData("attachment", fileName);
-        headers.setContentLength(datas.length);
-
-        return new ResponseEntity<byte[]>(datas, headers, status);
+        headers.setContentLength(contentLength);
+        
+        return new HashMap<String, Object>().put("HEADERS", headers).put("STATUS", status).getMap();
+	}
+	
+	/**
+	 * 生成下载响应信息
+	 * 
+	 * 由于一个奇葩的浏览器————IE的存在，响应的时候需要对它单独处理，同时响应给用户的文件名中有可能包含一些不是英文和数字的字符，如汉语，也需要进行处理
+	 * */
+	public static ResponseEntity<Resource> downloadResponse(final DownloadFileInfo fileInfo) throws UnsupportedEncodingException, MalformedURLException
+	{
+		File file = fileInfo.getFile();
+        //Resource body = new FileSystemResource(file);
+        Resource body = new UrlResource(file.toURI());        
+        Map<String, Object> configResult = downloadResponse(file.length(), fileInfo.getFileName());
+        return new ResponseEntity<Resource>(body, (HttpHeaders)configResult.get("HEADERS"), (HttpStatus)configResult.get("STATUS"));
+	}
+	
+	public static ResponseEntity<byte[]> downloadResponse(final byte[] datas, final String paramFileName)
+	{        
+        Map<String, Object> configResult = downloadResponse(datas.length, paramFileName);
+        return new ResponseEntity<byte[]>(datas, (HttpHeaders)configResult.get("HEADERS"), (HttpStatus)configResult.get("STATUS"));
 	}
 	
 	/**
@@ -133,13 +114,15 @@ public final class HttpUtil
 	/**
 	 * 当前的HTTP Session也可以通过原始Servlet API以编程方式获得：
 	 * */
-	public static Optional<HttpSession> getHttpSession(final boolean allowCreateSession)
+	public static HttpSession getHttpSession(final boolean allowCreateSession)
 	{
 		ServletRequestAttributes attr = (ServletRequestAttributes)RequestContextHolder.currentRequestAttributes();
 		HttpSession session= attr.getRequest().getSession(allowCreateSession); // true == allow create
-		return Optional.ofNullable(session);
+		return session;
 	}
 	
+	/**建议使用cn.hutool.http.HttpConnection*/
+	@Deprecated
 	public static HttpURLConnection getHttpURLConnection(final String urlPath, 
 														 final RequestMethod requestMethod,
 														 final String contentType,
@@ -153,10 +136,10 @@ public final class HttpUtil
 		httpURLConnection.setRequestMethod(requestMethod.name().toUpperCase());
 		
 		if (!StringUtil.isStrEmpty(contentType))
-		{ httpURLConnection.setRequestProperty("Content-Type", contentType); }
+		{ httpURLConnection.setRequestProperty(Header.CONTENT_TYPE.toString(), contentType); }
 		
 		if (keepAlive)
-		{ httpURLConnection.setRequestProperty("Connection", "Keep-Alive"); }
+		{ httpURLConnection.setRequestProperty(Header.CONNECTION.toString(), "Keep-Alive"); }
 		
 		httpURLConnection.setUseCaches(useCaches);
 		httpURLConnection.setDoOutput(doOutput);
@@ -167,8 +150,8 @@ public final class HttpUtil
 	/**
 	 * 获取@Scope("session")的bean
 	 * */
-	public static Optional<Object> getBean(final HttpSession httpSession, final String beanName)
-	{ return Optional.ofNullable(httpSession.getAttribute(beanName)); }
+	public static Object getBean(final HttpSession httpSession, final String beanName)
+	{ return httpSession.getAttribute(beanName); }
 	
 	/**
 	 * 注入@Scope("session")的bean
@@ -213,9 +196,9 @@ public final class HttpUtil
 	public static boolean isAjaxRequest(HttpServletRequest request)
 	{
 		String accept = request.getHeader(HttpHeaders.ACCEPT.toLowerCase());
-		if (accept != null && accept.indexOf("application/json") != -1) { return true; }
+		if (accept != null && accept.indexOf(ContentType.JSON.toString()) != -1) { return true; }
 
-		String xRequestedWith = request.getHeader(com.CommonUtils.Utils.NetworkUtils.HttpUtils.HttpHeaders.X_REQUESTED_WITH);
+		String xRequestedWith = request.getHeader("X-Requested-With");
 		if (xRequestedWith != null && xRequestedWith.indexOf("XMLHttpRequest") != -1) { return true; }
 		
 		return false;
