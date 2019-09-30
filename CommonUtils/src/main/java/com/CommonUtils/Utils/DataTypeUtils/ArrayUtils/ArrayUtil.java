@@ -2,6 +2,9 @@ package com.CommonUtils.Utils.DataTypeUtils.ArrayUtils;
 
 import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
 
+import cn.hutool.core.util.StrUtil;
+
+@Deprecated
 public final class ArrayUtil 
 {
 	private ArrayUtil() {}
@@ -29,7 +32,6 @@ public final class ArrayUtil
 	 * 检测Array是否为空，true为空，false为非空
 	 * */
 	/**建议使用cn.hutool.core.util.ArrayUtil.isEmpty或isNotEmpty*/ 
-	@Deprecated
 	public static <T> boolean isArrayEmpty(final T[] array)
 	{
 		if (null == array || array.length == 0)
@@ -42,7 +44,6 @@ public final class ArrayUtil
 	 * 检测Array是否为空，true为空，false为非空
 	 * */
 	/**建议使用cn.hutool.core.util.ArrayUtil.isEmpty或isNotEmpty*/ 
-	@Deprecated
 	public static boolean isArrayEmpty(final int[] array)
 	{
 		if (null == array || array.length == 0)
@@ -55,7 +56,6 @@ public final class ArrayUtil
 	 * 检测Array是否为空，true为空，false为非空
 	 * */
 	/**建议使用cn.hutool.core.util.ArrayUtil.isEmpty或isNotEmpty*/ 
-	@Deprecated
 	public static boolean isArrayEmpty(final boolean[] array)
 	{
 		if (null == array || array.length == 0)
@@ -68,7 +68,6 @@ public final class ArrayUtil
 	 * 检测Array是否为空，true为空，false为非空
 	 * */
 	/**建议使用cn.hutool.core.util.ArrayUtil.isEmpty或isNotEmpty*/ 
-	@Deprecated
 	public static boolean isArrayEmpty(final byte[] array)
 	{
 		if (null == array || array.length == 0)
@@ -81,7 +80,6 @@ public final class ArrayUtil
 	 * 检测Array是否为空，true为空，false为非空
 	 * */
 	/**建议使用cn.hutool.core.util.ArrayUtil.isEmpty或isNotEmpty*/ 
-	@Deprecated
 	public static boolean isArrayEmpty(final char[] array)
 	{
 		if (null == array || array.length == 0)
@@ -94,7 +92,6 @@ public final class ArrayUtil
 	 * 检测Array是否为空，true为空，false为非空
 	 * */
 	/**建议使用cn.hutool.core.util.ArrayUtil.isEmpty或isNotEmpty*/ 
-	@Deprecated
 	public static boolean isArrayEmpty(final long[] array)
 	{
 		if (null == array || array.length == 0)
@@ -104,7 +101,6 @@ public final class ArrayUtil
 	}
 	
 	/**建议使用cn.hutool.core.util.ArrayUtil.isEmpty或isNotEmpty*/ 
-	@Deprecated
 	public static boolean isArrayEmpty(final double[] array)
 	{
 		if (null == array || array.length == 0)
@@ -135,7 +131,7 @@ public final class ArrayUtil
     		{
     			for (String val2 : array2)
     			{
-    				if (StringUtil.strEquals(val1, val2, false))
+    				if (StrUtil.equals(val1, val2, false))
     				{ matched++; }
     			}
     		}
@@ -147,6 +143,7 @@ public final class ArrayUtil
     	}
     }
 	
+	/**建议用CollUtil.newArrayList转换为集合，再使用JavaCollectionsUtil.collectionProcessor*/
 	@SafeVarargs
 	public static <T> boolean arrayProcessor(final T[] array, final ItemProcessor<T> ... itemProcessors)
 	{
@@ -168,6 +165,7 @@ public final class ArrayUtil
 		{ return false; }
 	}
 	
+	/**建议用CollUtil.newArrayList转换为集合，再使用JavaCollectionsUtil.collectionProcessor*/
 	@SafeVarargs
 	public static boolean arrayProcessor(final byte[] array, final ItemProcessor<Byte> ... itemProcessors)
 	{
@@ -190,7 +188,6 @@ public final class ArrayUtil
 	}
 	
 	/**建议使用cn.hutool.core.convert.Convert.toStrArray*/ 
-	@Deprecated
 	public static <T> String[] getStringArray(final T obj) throws Exception
 	{
 		if (obj instanceof String[])
@@ -200,7 +197,6 @@ public final class ArrayUtil
 	}
 	
 	/**建议使用cn.hutool.core.convert.Convert.toIntArray*/ 
-	@Deprecated
 	public static <T> Integer[] getIntegerArrayForWrapperClass(final T obj) throws Exception
 	{
 		if (obj instanceof Integer[])
@@ -210,7 +206,6 @@ public final class ArrayUtil
 	}
 	
 	/**建议使用cn.hutool.core.convert.Convert.convert(int[].class, obj)*/ 
-	@Deprecated
 	public static <T> int[] getIntegerArray(final T obj) throws Exception
 	{
 		if (obj instanceof int[])
@@ -220,7 +215,6 @@ public final class ArrayUtil
 	}
 	
 	/**建议使用cn.hutool.core.convert.Convert.toLongArray*/ 
-	@Deprecated
 	public static <T> Long[] getLongArrayForWrapperClass(final T obj) throws Exception
 	{
 		if (obj instanceof Long[])
@@ -230,7 +224,6 @@ public final class ArrayUtil
 	}
 	
 	/**建议使用cn.hutool.core.convert.Convert.convert(long[].class, obj)*/ 
-	@Deprecated
 	public static <T> long[] getLongArray(final T obj) throws Exception
 	{
 		if (obj instanceof long[])

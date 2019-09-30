@@ -13,12 +13,12 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 
-import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
 import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
 import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.CustomCollections.HashMap;
 import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.date.DatePattern;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -50,24 +50,31 @@ public final class DateUtil
 	{
 		String monthStr = month < 10 ? "0" + month : String.valueOf(month);
 		String dayStr = day < 10 ? "0" + day : String.valueOf(day);
-		return cn.hutool.core.date.DateUtil.parse(String.valueOf(year) + monthStr + dayStr, DateContants.DATE_FORMAT_1);
+		return cn.hutool.core.date.DateUtil.parse(String.valueOf(year) + monthStr + dayStr, DatePattern.PURE_DATE_PATTERN);
 	}
 	
-	/**java.util.Date转换为java.sql.Date*/
+	/**java.util.Date转换为java.sql.Date，建议使用cn.hutool.core.date.DateTime.toSqlDate*/
+	@Deprecated
 	public static java.sql.Date getDate(final Date date)
 	{ return new java.sql.Date(date.getTime()); }
 	
-	/**java.sql.Date转换为java.util.Date*/
+	/**java.sql.Date转换为java.util.Date，建议使用cn.hutool.core.date.DateTime.toJdkDate*/
+	@Deprecated
 	public static Date getDate(final java.sql.Date date)
 	{ return new Date(date.getTime()); }
 	
-	/**java.sql.Timestamp转换为java.util.Date*/
+	/**java.sql.Timestamp转换为java.util.Date，建议使用cn.hutool.core.date.DateTime.toJdkDate*/
+	@Deprecated
 	public static Date getDate(final Timestamp timestamp)
 	{ return new Date(timestamp.getTime()); }
 	
+	/**建议使用cn.hutool.core.date.DateTime.toJdkDate*/
+	@Deprecated
 	public static Date getDate(final oracle.sql.TIMESTAMP timestamp) throws SQLException
 	{ return getDate(timestamp.timestampValue()); }
 	
+	/**建议使用cn.hutool.core.date.DateTime.toTimestamp*/
+	@Deprecated
 	public static Timestamp getTimestamp(final oracle.sql.TIMESTAMP timestamp) throws SQLException
 	{ return timestamp.timestampValue(); }
 	
@@ -130,6 +137,7 @@ public final class DateUtil
 	/**
 	 * 建议使用cn.hutool.core.date.DateUtil.range相关方法
 	 * */
+	/*
 	@Deprecated
 	public static Collection<Date> getRangeCondition(final Date start, final Date end, final String timeType, final String ... params)
 	{
@@ -169,6 +177,7 @@ public final class DateUtil
 			return result;
 		}
 	}
+	*/
 	
 	/**
 	 * 根据开始日期与结束日期，获取其时间范围，建议使用cn.hutool.core.date.DateUtil.range相关方法
@@ -364,12 +373,7 @@ public final class DateUtil
 	}
 	
 	public static int getTotalDayForYear(final int year)
-	{
-		if (year % 4 == 0)
-		{ return 366; }
-		
-		return 365;
-	}
+	{ return year % 4 == 0 ? 366 : 365; }
 	
 	public static int getTotalDayForYear(final Date date)
 	{ return getTotalDayForYear(getYear(date)); }

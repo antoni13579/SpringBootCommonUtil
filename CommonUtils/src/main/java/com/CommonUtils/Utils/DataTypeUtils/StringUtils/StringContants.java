@@ -32,13 +32,16 @@ public final class StringContants
 	 * */
 	public static final String PATTERN_5 = "\\s+";
 	
-	/**验证邮箱格式的正则表达式*/
+	/**验证邮箱格式的正则表达式，建议使用cn.hutool.core.lang.PatternPool.EMAIL*/
+	@Deprecated
 	public static final String PATTERN_6 = "\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*";
 	
-	/**验证数字的正则表达式*/
+	/**验证数字的正则表达式，建议使用cn.hutool.core.lang.PatternPool.NUMBERS*/
+	@Deprecated
 	public static final String PATTERN_7 = "^[0-9]*$";
 	
-	/**提取数字的正则表达式*/
+	/**提取数字的正则表达式，建议使用cn.hutool.core.lang.PatternPool.NUMBERS*/
+	@Deprecated
 	public static final String PATTERN_8 = "[^0-9]";
 	
 	/**验证国内座机号*/
@@ -47,6 +50,7 @@ public final class StringContants
 	/**验证国内座机号*/
 	public static final String PATTERN_10 = "\\d{3}-\\d{8}|\\d{4}-\\{7,8}";
 	
-	/**验证国内手机号*/
+	/**验证国内手机号，建议使用cn.hutool.core.lang.PatternPool.MOBILE*/
+	@Deprecated
 	public static final String PATTERN_11 = "0?(13|14|15|18)[0-9]{9}";
 }

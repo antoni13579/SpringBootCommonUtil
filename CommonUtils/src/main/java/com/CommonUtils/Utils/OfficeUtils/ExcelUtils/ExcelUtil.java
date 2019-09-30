@@ -6,15 +6,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
-
 import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.net.URLEncoder;
 import cn.hutool.http.Header;
 
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +36,7 @@ public final class ExcelUtil
             bos = new BufferedOutputStream(os);		//缓冲输出流
             response.reset();						// 清空输出流
             
-            response.setHeader(Header.CONTENT_DISPOSITION.toString(), "attachment; filename=" + StringUtil.toUtf8String(outputFile.getName()));		// 设定输出文件头
+            response.setHeader(Header.CONTENT_DISPOSITION.toString(), "attachment; filename=" + new URLEncoder().encode(outputFile.getName(), StandardCharsets.UTF_8));		// 设定输出文件头
             response.setContentType("application/msexcel");																			// 定义输出类型
             
             fis = new FileInputStream(outputFile);

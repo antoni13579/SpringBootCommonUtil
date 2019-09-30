@@ -3,7 +3,6 @@ package com.CommonUtils.Utils.DBUtils;
 import java.nio.ByteBuffer;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -331,7 +330,7 @@ public final class RedisUtil
 		long result = 0;
 		
 		try
-		{ result = redisTemplate.delete(Arrays.asList(keys)); }
+		{ result = redisTemplate.delete(CollUtil.newArrayList(keys)); }
 		catch (Exception ex)
 		{ log.error("通过RedisTemplate删除信息出现异常，异常原因为：", ex); }
 		

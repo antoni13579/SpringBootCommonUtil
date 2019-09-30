@@ -7,12 +7,14 @@ import java.util.Date;
 
 import org.json.JSONObject;
 
-import com.CommonUtils.Utils.DataTypeUtils.DateUtils.DateContants;
 import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringContants;
 import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
 import com.CommonUtils.Utils.JsonUtils.JsonUtil;
 
+import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.lang.PatternPool;
+import cn.hutool.core.util.ReUtil;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -240,7 +242,7 @@ public class VatInvoice
 		
 		public InvoiceDate transferInvoiceDate() throws Exception
 		{
-			this.actualInvoiceDate = DateUtil.parse(this.invoiceDate, DateContants.DATE_FORMAT_7);
+			this.actualInvoiceDate = DateUtil.parse(this.invoiceDate, DatePattern.CHINESE_DATE_PATTERN);
 			return this;
 		}
 	}
@@ -381,7 +383,7 @@ public class VatInvoice
 		
 		public SellerBank splitInfo()
 		{
-			this.bankAccount = StringUtil.searchStr(StringContants.PATTERN_8, this.word);
+			this.bankAccount = ReUtil.get(PatternPool.NUMBERS.toString(), this.word, 0);
 			this.bankName = this.word.substring(0, StringUtil.getNumberStartPos(this.word))
 									 .replaceAll(",", "")
 									 .replaceAll("，", "")
@@ -403,11 +405,8 @@ public class VatInvoice
 		
 		public SellerAddress splitInfo()
 		{
-			this.address = StringUtil.searchStr(StringContants.PATTERN_11, this.word)
-					 				 .replaceAll(",", "")
-					 				 .replaceAll("，", "")
-					 				 .replaceAll("、", "");
-			this.phone = this.word.substring(StringUtil.searchStr(StringContants.PATTERN_11, this.word).length(), this.word.length());
+			this.phone = ReUtil.get(PatternPool.MOBILE.toString(), this.word, 0);
+			this.address = this.word.substring(0, this.word.indexOf(this.phone)).replaceAll(",", "").replaceAll("，", "");
 			return this;
 		}
 	}
@@ -425,7 +424,7 @@ public class VatInvoice
 		
 		public PurchaserBank splitInfo()
 		{
-			this.bankAccount = StringUtil.searchStr(StringContants.PATTERN_8, this.word);
+			this.bankAccount = ReUtil.get(PatternPool.NUMBERS.toString(), this.word, 0);
 			this.bankName = this.word.substring(0, StringUtil.getNumberStartPos(this.word))
 									 .replaceAll(",", "")
 									 .replaceAll("，", "")
@@ -449,12 +448,13 @@ public class VatInvoice
 		
 		public PurchaserAddress splitInfo()
 		{
-			this.address = StringUtil.searchStr(StringContants.PATTERN_9, this.word)
+
+			this.phone = ReUtil.get(StringContants.PATTERN_9, this.word, 0)
 									 .replaceAll(",", "")
 									 .replaceAll("，", "")
 									 .replaceAll("、", "");
 			
-			this.phone = this.word.substring(StringUtil.searchStr(StringContants.PATTERN_9, this.word).length(), this.word.length());
+			this.address = this.word.substring(0, this.word.indexOf(this.phone));
 			return this;
 		}
 	}

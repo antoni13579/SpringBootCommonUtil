@@ -28,15 +28,11 @@ import org.springframework.kafka.core.KafkaTemplate;
 
 import com.CommonUtils.Utils.DBUtils.DBContants;
 import com.CommonUtils.Utils.DBUtils.DBHandleUtil;
-import com.CommonUtils.Utils.DBUtils.PreparedStatementOperationType;
-
+import com.CommonUtils.Utils.DBUtils.DBHandleUtil.PreparedStatementOperationType;
 import com.CommonUtils.Utils.DBUtils.Bean.DBBaseInfo.AbstractDBInfo;
 import com.CommonUtils.Utils.DBUtils.Bean.DBBaseInfo.DBInfo;
 import com.CommonUtils.Utils.DBUtils.Bean.DBBaseInfo.DBInfoForDataSource;
-import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
 import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
-import com.CommonUtils.Utils.DataTypeUtils.DateUtils.DateFormat;
-import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -44,24 +40,29 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.date.format.FastDateFormat;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.text.StrSpliter;
 import cn.hutool.core.text.csv.CsvRow;
 import cn.hutool.core.text.csv.CsvUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public final class DBBatchFlowUtil
 {
-	/**读取数据库数据，经过处理后，写入到文件*/
+	/**读取数据库数据，经过处理后，写入到文件
+	 * 
+	 * dateFomat参数建议使用cn.hutool.core.date.DatePattern来提供日期格式
+	 * */
 	@SafeVarargs
 	public static boolean batchFlow(final AbstractDBInfo sourceDBInfo, 
 								 	final File targetFile, 
 								 	final String delimiter, 
 								 	final String encode, 
 								 	final boolean append, 
-								 	final DateFormat dateFomat,
+								 	final FastDateFormat dateFomat,
 								 	final ItemProcessor<Map<String, Object>> ... itemProcessors)
 	{
 		Connection sourceConnection = null;
@@ -556,7 +557,7 @@ public final class DBBatchFlowUtil
 										final ResultSetMetaData sourceResultSetMetaData,
 										final String delimiter,
 										final BufferedWriter bw,
-										final DateFormat dateFomat,
+										final FastDateFormat dateFomat,
 										final boolean useColumnName) throws Exception
 	{
 		List<Map<String, Object>> newRecords = batchProcess(records, itemProcessors);
@@ -565,7 +566,7 @@ public final class DBBatchFlowUtil
 		{
 			for (String line : lines)
 			{
-				if (!StringUtil.isStrEmpty(line))
+				if (!StrUtil.isEmptyIfStr(line))
 				{
 					bw.write(line);
 					bw.write("\r\n");
@@ -644,9 +645,9 @@ public final class DBBatchFlowUtil
 					records, 
 					(final T value, final int indx, final int length) -> 
 					{
-						ArrayUtil.arrayProcessor
+						JavaCollectionsUtil.collectionProcessor
 						(
-								itemProcessorForCollections, 
+								CollUtil.newArrayList(itemProcessorForCollections), 
 								(final JavaCollectionsUtil.ItemProcessorForCollection<T> val, final int inx, final int len) -> 
 								{ val.process(value, indx, length); }
 						);
@@ -679,9 +680,9 @@ public final class DBBatchFlowUtil
 					records, 
 					(final String key, final Object value, final int indx) -> 
 					{
-						ArrayUtil.arrayProcessor
+						JavaCollectionsUtil.collectionProcessor
 						(
-								itemProcessorForMaps, 
+								CollUtil.newArrayList(itemProcessorForMaps), 
 								(final JavaCollectionsUtil.ItemProcessorForMap<String, Object> val, final int inx, final int len) -> 
 								{ val.process(key, value, indx); }
 						);

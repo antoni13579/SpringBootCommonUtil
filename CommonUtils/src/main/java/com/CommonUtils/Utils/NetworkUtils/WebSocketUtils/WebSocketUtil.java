@@ -1,6 +1,5 @@
 package com.CommonUtils.Utils.NetworkUtils.WebSocketUtils;
 
-import java.util.Arrays;
 import java.util.Optional;
 
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
@@ -13,6 +12,7 @@ import org.springframework.web.socket.messaging.WebSocketStompClient;
 import org.springframework.web.socket.sockjs.client.SockJsClient;
 import org.springframework.web.socket.sockjs.client.WebSocketTransport;
 
+import cn.hutool.core.collection.CollUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -32,7 +32,7 @@ public final class WebSocketUtil
         try
         {         
             WebSocketTransport transport = new WebSocketTransport(new StandardWebSocketClient());
-            WebSocketStompClient stompClient = new WebSocketStompClient(new SockJsClient(Arrays.asList(transport)));
+            WebSocketStompClient stompClient = new WebSocketStompClient(new SockJsClient(CollUtil.newArrayList(transport)));
             stompClient.setMessageConverter(new MappingJackson2MessageConverter());
             session = stompClient.connect(webSocketUrl, new StompSessionHandlerAdapter() {}).get();
             session.subscribe(subscribeTopic, stompFrameHandler);

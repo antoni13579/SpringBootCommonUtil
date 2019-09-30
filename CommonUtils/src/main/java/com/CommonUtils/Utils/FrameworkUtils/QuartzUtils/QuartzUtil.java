@@ -1,7 +1,6 @@
 package com.CommonUtils.Utils.FrameworkUtils.QuartzUtils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -17,11 +16,11 @@ import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
 import org.quartz.Trigger.TriggerState;
 
-import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
 import com.CommonUtils.Utils.FrameworkUtils.QuartzUtils.Bean.QuartzJobsInfo;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -99,7 +98,7 @@ public final class QuartzUtil //implements ApplicationListener<ContextClosedEven
 	public static void deleteJobs(final Scheduler scheduler, final JobKey ... jobKeys)
 	{
 		if (!ArrayUtil.isEmpty(jobKeys))
-		{ deleteJobs(Arrays.asList(jobKeys), scheduler); }
+		{ deleteJobs(CollUtil.newArrayList(jobKeys), scheduler); }
 	}
 	
 	public static void deleteJobs(final Scheduler scheduler, final QuartzJobsInfo ... quartzJobsInfos)
@@ -143,14 +142,14 @@ public final class QuartzUtil //implements ApplicationListener<ContextClosedEven
 	public static Trigger getCronTrigger(final String schedulingCycle, final long startTime, final String jobName, final String group, final CronTriggerMisfireHandlerType cronTriggerMisfireHandlerType)
 	{
 		Trigger trigger;
-		if (startTime > 0 && StringUtil.isStrEmpty(schedulingCycle)) 
+		if (startTime > 0 && StrUtil.isEmptyIfStr(schedulingCycle)) 
         {
         	trigger = TriggerBuilder.newTrigger()
 									.withIdentity(jobName, group)
 									.startAt(new Date(startTime))
 									.build();
         }
-        else if (startTime <= 0 && !StringUtil.isStrEmpty(schedulingCycle))
+        else if (startTime <= 0 && !StrUtil.isEmptyIfStr(schedulingCycle))
         {
         	CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule(schedulingCycle);
         	switch (cronTriggerMisfireHandlerType)

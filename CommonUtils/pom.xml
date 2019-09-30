@@ -418,7 +418,7 @@
 		</dependency>
 		-->
 		
-		<!-- 引用这个包，需要使用里面的交集、差集方法与MultiKeyMap  -->
+		<!-- 引用这个包，需要使用里面的MultiKeyMap  -->
 		<dependency>
     		<groupId>org.apache.commons</groupId>
     		<artifactId>commons-collections4</artifactId>

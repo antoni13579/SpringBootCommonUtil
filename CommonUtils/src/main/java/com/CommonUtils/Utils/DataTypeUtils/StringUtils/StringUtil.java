@@ -3,30 +3,19 @@ package com.CommonUtils.Utils.DataTypeUtils.StringUtils;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.CommonUtils.Utils.DataTypeUtils.DateUtils.DateContants;
-import com.CommonUtils.Utils.DataTypeUtils.DateUtils.DateFormat;
-import com.CommonUtils.Utils.DataTypeUtils.StringUtils.Bean.Calculation;
-
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.extra.tokenizer.TokenizerUtil;
-import cn.hutool.extra.tokenizer.Word;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -46,7 +35,7 @@ public final class StringUtil
 	{
 		if (!cn.hutool.core.util.ArrayUtil.isEmpty(strings))
 		{			
-			return Arrays.asList(strings)
+			return CollUtil.newArrayList(strings)
 						 .stream()
 						 .map(String::trim)
 						 .filter(value -> !StringUtil.isStrEmpty(value))
@@ -69,8 +58,9 @@ public final class StringUtil
 	}
 	
 	/**
-	 * 检测字符串是否为空，true为空，false为非空
+	 * 检测字符串是否为空，true为空，false为非空，建议使用cn.hutool.core.util.StrUtil.isEmpty相关方法代替
 	 * */
+	@Deprecated
 	public static boolean isStrEmpty(final String str)
 	{
 		if(null == str || "".equals(str.trim()) || str.length() == 0)
@@ -80,8 +70,9 @@ public final class StringUtil
 	}
 	
 	/**
-	 * 检测两个字符串是否相等，相等则返回true，不相等则返回false
+	 * 检测两个字符串是否相等，相等则返回true，不相等则返回false，建议使用cn.hutool.core.util.StrUtil.equals
 	 * */
+	@Deprecated
 	public static boolean strEquals(final String str1, final String str2, final boolean ignoreCase)
 	{
 		//两个都是空串，则为相等
@@ -103,6 +94,8 @@ public final class StringUtil
 		}
 	}
 	
+	/**建议使用cn.hutool.core.net.URLEncoder.encode*/
+	@Deprecated
 	public static String toUtf8String(final String str) throws UnsupportedEncodingException
 	{
 		StringBuffer sb = new StringBuffer();
@@ -125,6 +118,8 @@ public final class StringUtil
         return sb.toString();
 	}
 	
+	/**建议使用cn.hutool.core.util.ObjectUtil.toString*/
+	@Deprecated
 	public static <T> String toString(final T value) throws Exception
 	{
 		if (null == value)
@@ -200,10 +195,18 @@ public final class StringUtil
 		}
 	}
 	
-	public static String toString(final oracle.sql.TIMESTAMP date, final DateFormat dateFomat) throws SQLException
+	/**
+	 * 建议使用cn.hutool.core.date.DateTime进行格式转换
+	 * */
+	@Deprecated
+	public static String toString(final oracle.sql.TIMESTAMP date, final com.CommonUtils.Utils.DataTypeUtils.DateUtils.DateFormat dateFomat) throws SQLException
 	{ return toString(date.timestampValue(), dateFomat); }
 	
-	public static String toString(final java.util.Date date, final DateFormat dateFomat)
+	/**
+	 * 建议使用cn.hutool.core.date.DateTime进行格式转换
+	 * */
+	@Deprecated
+	public static String toString(final java.util.Date date, final com.CommonUtils.Utils.DataTypeUtils.DateUtils.DateFormat dateFomat)
 	{
 		if (null == date)
 		{ return ""; }
@@ -211,14 +214,18 @@ public final class StringUtil
 		switch (dateFomat)
 		{
 			case DATE:
-				return DateUtil.format(date, DateContants.DATE_FORMAT_3);
+				return DateUtil.format(date, DatePattern.NORM_DATETIME_PATTERN);
 			case TIMESTAMP:
-				return DateUtil.format(date, DateContants.DATE_FORMAT_6);
+				return DateUtil.format(date, DatePattern.NORM_DATETIME_MS_PATTERN);
 			default:
 				return "";
 		}
 	}
 	
+	/**
+	 * 建议使用cn.hutool.core.util.StrUtil.padPre
+	 * */
+	@Deprecated
 	public static String lpad(final String str, final int length, final char replaceStr)
 	{
 		int actuallyLength = length - str.length();
@@ -232,6 +239,10 @@ public final class StringUtil
 		return sb.toString();
 	}
 	
+	/**
+	 * 建议使用cn.hutool.core.util.StrUtil.padAfter
+	 * */
+	@Deprecated
 	public static String rpad(final String str, final int length, final char replaceStr)
 	{
 		StringBuilder sb = new StringBuilder(str);
@@ -242,6 +253,8 @@ public final class StringUtil
 		return sb.toString();
 	}
 	
+	/**建议使用cn.hutool.core.util.ReUtil.get的相关方法*/ 
+	@Deprecated
 	public static String searchStr(final String regex, final String string)
 	{
 		//StringBuilder sb = new StringBuilder();
@@ -267,6 +280,8 @@ public final class StringUtil
 	 * 		  regex 正则表达式
 	 * @return 返回布尔值，true为验证通过，false为验证不通过
 	 * */
+	/**建议使用cn.hutool.core.util.ReUtil.isMatch的相关方法*/ 
+	@Deprecated
 	public static boolean validateRegular(final String string, final String regex)
 	{
 		//Pattern p = Pattern.compile(regex);
@@ -348,6 +363,10 @@ public final class StringUtil
 	}
 	*/
 	
+	/**
+	 * 建议使用cn.hutool.core.util.StrUtil.subWithLength
+	 * */
+	@Deprecated
 	public static String substr(final String str, final int startPosition, final int length)
 	{
 		if (!isStrEmpty(str))
@@ -360,11 +379,17 @@ public final class StringUtil
 	 * 数字验证
 	 * 
 	 * @param val
-	 * @return 提取的数字。
+	 * @return 提取的数字
+	 * 
+	 * 建议使用cn.hutool.core.util.ReUtil.isMatch
 	 */
+	@Deprecated
 	public static boolean isNum(final String val) 
 	{ return isStrEmpty(val) ? false : val.matches(StringContants.PATTERN_7); }
 	
+	/**建议使用cn.hutool.core.util.StrUtil.similar*/
+	/*
+	@Deprecated
 	public static Optional<Calculation> statistics(final String text1, final String text2)
 	{
 		//计算类
@@ -400,6 +425,7 @@ public final class StringUtil
         
         return Optional.ofNullable(calculation); 
 	}
+	*/
 	
 	 /**
      * 组合词频向量
@@ -408,6 +434,9 @@ public final class StringUtil
      * @param direction
      * @return
      */
+	/**建议使用cn.hutool.core.util.StrUtil.similar*/
+	/*
+	@Deprecated
     private static void statistics(Map<String,int[]> map,List<String> words ,int direction)
     {
         if(CollUtil.isEmpty(words))
@@ -433,4 +462,5 @@ public final class StringUtil
             }
         }
     }
+    */
 }

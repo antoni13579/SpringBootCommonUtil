@@ -4,7 +4,9 @@ import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.state.KeyValueIterator;
 import org.apache.kafka.streams.state.KeyValueStore;
 
-import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
+import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
+
+import cn.hutool.core.collection.CollUtil;
 
 public final class KafkaUtil 
 {
@@ -39,10 +41,10 @@ public final class KafkaUtil
 			KeyValueIterator<K, V> iter = kvStore.all();
 			while (iter.hasNext())
 			{
-				KeyValue<K, V> entry = iter.next();
-				ArrayUtil.arrayProcessor
+				KeyValue<K, V> entry = iter.next();				
+				JavaCollectionsUtil.collectionProcessor
 				(
-						itemProcessorForKeyValueStores, 
+						CollUtil.newArrayList(itemProcessorForKeyValueStores), 
 						(final ItemProcessor<K, V> itemProcessorForKeyValueStore, final int inx, final int length) -> 
 						{ itemProcessorForKeyValueStore.process(entry, kvStore); }
 				);

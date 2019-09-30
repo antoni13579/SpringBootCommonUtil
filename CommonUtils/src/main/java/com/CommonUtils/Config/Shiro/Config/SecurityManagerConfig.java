@@ -9,7 +9,9 @@ import org.apache.shiro.realm.Realm;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 
 import com.CommonUtils.Config.Shiro.Bean.RealmAndCredentialsMatcherDefinition;
-import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
+import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
+
+import cn.hutool.core.collection.CollUtil;
 
 public final class SecurityManagerConfig 
 {
@@ -20,10 +22,10 @@ public final class SecurityManagerConfig
 		if (cn.hutool.core.util.ArrayUtil.isEmpty(realmAndCredentialsMatcherDefinitions))
 		{ throw new Exception("必须设置用户鉴权逻辑！！"); }
 		
-		Collection<Realm> realms = new ArrayList<>();
-		ArrayUtil.arrayProcessor
+		Collection<Realm> realms = new ArrayList<>();		
+		JavaCollectionsUtil.collectionProcessor
 		(
-				realmAndCredentialsMatcherDefinitions, 
+				CollUtil.newArrayList(realmAndCredentialsMatcherDefinitions), 
 				(final RealmAndCredentialsMatcherDefinition value, final int indx, final int length) -> 
 				{ realms.add(value.getRealm()); }
 		);

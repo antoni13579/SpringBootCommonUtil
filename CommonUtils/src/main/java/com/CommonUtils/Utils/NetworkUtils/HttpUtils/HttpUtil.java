@@ -93,6 +93,8 @@ public final class HttpUtil
 	/**
 	 * HttpServletResponse回写信息给前端，其中contentType由MediaType提供
 	 * */
+	/**建议使用cn.hutool.extra.servlet.ServletUtil.write相关方法*/
+	@Deprecated
 	public static void responseInfo(final HttpServletResponse response, 
 									final String str, 
 									final MediaType mediaType)
@@ -115,11 +117,7 @@ public final class HttpUtil
 	 * 当前的HTTP Session也可以通过原始Servlet API以编程方式获得：
 	 * */
 	public static HttpSession getHttpSession(final boolean allowCreateSession)
-	{
-		ServletRequestAttributes attr = (ServletRequestAttributes)RequestContextHolder.currentRequestAttributes();
-		HttpSession session= attr.getRequest().getSession(allowCreateSession); // true == allow create
-		return session;
-	}
+	{ return ((ServletRequestAttributes)RequestContextHolder.currentRequestAttributes()).getRequest().getSession(allowCreateSession); }
 	
 	/**建议使用cn.hutool.http.HttpConnection*/
 	@Deprecated
@@ -146,18 +144,6 @@ public final class HttpUtil
 		httpURLConnection.setDoInput(doInput);
 		return httpURLConnection;
 	}
-	
-	/**
-	 * 获取@Scope("session")的bean
-	 * */
-	public static Object getBean(final HttpSession httpSession, final String beanName)
-	{ return httpSession.getAttribute(beanName); }
-	
-	/**
-	 * 注入@Scope("session")的bean
-	 * */
-	public static void setBean(final HttpSession httpSession, final String beanName, final Object beanInstance)
-	{ httpSession.setAttribute(beanName, beanInstance); }
 	
 	/**
 	 * 支持AJAX的页面跳转

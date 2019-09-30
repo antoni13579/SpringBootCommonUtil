@@ -14,23 +14,18 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.nio.channels.FileChannel;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
-
 import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
 import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.io.IoUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -110,6 +105,7 @@ public final class FileUtil
 	/**
 	 * 创建文件（仅仅没有的时候才创建），并返回对应的File对象列表，建议使用cn.hutool.core.io.FileUtil
 	 * */
+	/*
 	@Deprecated
 	public static Collection<File> createFiles(final File ... files)
 	{
@@ -137,10 +133,12 @@ public final class FileUtil
 		else
 		{ return Collections.emptyList(); }
 	}
+	*/
 	
 	/**
 	 * 创建文件（仅仅没有的时候才创建），并返回对应的File对象列表，建议使用cn.hutool.core.io.FileUtil
 	 * */
+	/*
 	@Deprecated
 	public static Collection<File> createFiles(final String ... filePaths)
 	{
@@ -159,10 +157,12 @@ public final class FileUtil
 		else
 		{ return Collections.emptyList(); }
 	}
+	*/
 	
 	/**
 	 * 创建文件（仅仅没有的时候才创建），并返回对应的File对象列表，建议使用cn.hutool.core.io.FileUtil
 	 * */
+	/*
 	@Deprecated
 	public static Collection<File> createFiles(final Path ... paths)
 	{
@@ -181,6 +181,7 @@ public final class FileUtil
 		else
 		{ return Collections.emptyList(); }
 	}
+	*/
 	
 	/**
 	 * 采用Nio复制文件，建议使用cn.hutool.core.io.IoUtil.copy或cn.hutool.core.io.FileUtil.copy相关方法
@@ -417,12 +418,18 @@ public final class FileUtil
 		return result;
 	}
 	
+	/**建议使用cn.hutool.core.collection.LineIter自行实现*/
+	@Deprecated
 	public static long getFileTotalRows(final Path path, final String encode)
 	{ return getFileTotalRows(path.toFile(), encode); }
 	
+	/**建议使用cn.hutool.core.collection.LineIter自行实现*/
+	@Deprecated
 	public static long getFileTotalRows(final String filePath, final String encode)
 	{ return getFileTotalRows(new File(filePath), encode); }
 	
+	/**建议使用cn.hutool.core.collection.LineIter自行实现*/
+	@Deprecated
 	public static long getFileTotalRows(final File file, final String encode)
 	{
 		InputStream fis = null;
@@ -484,9 +491,9 @@ public final class FileUtil
 		if (!cn.hutool.core.util.ArrayUtil.isEmpty(multipartFiles))
 		{
 			Set<Boolean> executeRecords = new HashSet<>();
-			ArrayUtil.arrayProcessor
+			JavaCollectionsUtil.collectionProcessor
 			(
-					multipartFiles, 
+					CollUtil.newArrayList(multipartFiles), 
 					(multipartFile, indx, length) -> 
 					{
 						if (!directory.exists())

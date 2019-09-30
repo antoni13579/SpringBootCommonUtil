@@ -5,10 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
-
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.StrUtil;
 
 public final class ParseCommandResult
 {	
@@ -36,7 +35,7 @@ public final class ParseCommandResult
 				Map<String, String> record = new HashMap<String, String>();
 				for (String str : addSeparatorStrArray)
 				{
-					if (!StringUtil.isStrEmpty(str))
+					if (!StrUtil.isEmptyIfStr(str))
 					{
 						if (0 == indx)
 						{ record.put("FILE_SYSTEM", str); }
@@ -103,7 +102,7 @@ public final class ParseCommandResult
     			Map<String, String> record = new HashMap<String, String>();
     			for (String str : addSeparatorStrArray)
     			{
-    				if (!StringUtil.isStrEmpty(str))
+    				if (!StrUtil.isEmptyIfStr(str))
     				{
     					if (0 == indx)
 						{ record.put("FILE_ATTRIBUTES", str); }

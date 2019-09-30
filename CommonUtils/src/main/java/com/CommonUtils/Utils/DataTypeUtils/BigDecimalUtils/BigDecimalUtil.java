@@ -3,7 +3,6 @@ package com.CommonUtils.Utils.DataTypeUtils.BigDecimalUtils;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -13,10 +12,13 @@ import java.util.function.Function;
 import org.eclipse.collections.impl.collector.BigDecimalSummaryStatistics;
 import org.eclipse.collections.impl.collector.Collectors2;
 
+import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
+
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.text.StrSpliter;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -48,7 +50,7 @@ public final class BigDecimalUtil
 			   														   final T ... params)
 	{
 		if (!ArrayUtil.isEmpty(params))
-		{ return groupBy(classifier, mapper, Arrays.asList(params)); }
+		{ return groupBy(classifier, mapper, CollUtil.newArrayList(params)); }
 		else
 		{ return Collections.emptyMap(); }
 	}
@@ -72,10 +74,10 @@ public final class BigDecimalUtil
 				{
 					List<String> tmp = StrSpliter.split(groupByKey, delimiter, false, false);
 					//String[] groupByFields = StringUtils.splitPreserveAllTokens(groupByKey, groupByKey);
-					String[] groupByFields = tmp.toArray(new String[tmp.size()]);
-					com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil.arrayProcessor
+					String[] groupByFields = tmp.toArray(new String[tmp.size()]);					
+					JavaCollectionsUtil.collectionProcessor
 					(
-							processors, 
+							CollUtil.newArrayList(processors), 
 							(final ItemProcessorForProcessGroupByResult val, final int inx, final int length) -> 
 							{ val.process(groupByResult, groupByFields); }
 					);
@@ -83,15 +85,23 @@ public final class BigDecimalUtil
 		);
 	}
 	
+	/**建议使用cn.hutool.core.util.ObjectUtil.defaultIfNull*/ 
+	@Deprecated
 	public static <T> BigDecimal ifNull(final T t)
 	{ return ifNull(t, 0); }
 	
+	/**建议使用cn.hutool.core.util.ObjectUtil.defaultIfNull*/ 
+	@Deprecated
 	public static <T> BigDecimal ifNull(final T t, final int defaultValue)
 	{ return nvl(t, defaultValue); }
 	
+	/**建议使用cn.hutool.core.util.ObjectUtil.defaultIfNull*/ 
+	@Deprecated
 	public static <T> BigDecimal nvl(final T t)
 	{ return nvl(t, 0); }
 	
+	/**建议使用cn.hutool.core.util.ObjectUtil.defaultIfNull*/ 
+	@Deprecated
 	public static <T> BigDecimal nvl(final T t, final int defaultValue)
 	{
 		BigDecimal result = null;

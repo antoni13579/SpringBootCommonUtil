@@ -13,7 +13,6 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -31,26 +30,23 @@ import com.CommonUtils.Utils.DBUtils.Bean.DBBaseInfo.DBInfo;
 import com.CommonUtils.Utils.DBUtils.Bean.DBBaseInfo.DBInfoForDataSource;
 import com.CommonUtils.Utils.DBUtils.Bean.DBTable.Column;
 import com.CommonUtils.Utils.DBUtils.Bean.DBTable.Table;
-import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
-import com.CommonUtils.Utils.DataTypeUtils.DateUtils.DateContants;
-import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
+import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.db.meta.JdbcType;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public final class DBHandleUtil 
 {
 	private DBHandleUtil() {}
-	
-	public static void main(String[] args)
-	{
-		System.out.println(JdbcType.valueOf(123));
-	}
 	
 	/**数据库连接还原AutoCommit配置与提交事务*/
 	public static void resetConnectionsSetting(final boolean commit, final Connection ... connections)
@@ -190,9 +186,10 @@ public final class DBHandleUtil
 		StringBuilder sb = new StringBuilder().append("INSERT INTO ")
 											  .append(tableName)
 											  .append("(");
-		ArrayUtil.arrayProcessor
+		
+		JavaCollectionsUtil.collectionProcessor
 		(
-				columnNames, 
+				CollUtil.newArrayList(columnNames), 
 				(final String value, final int indx, final int length) -> 
 				{
 					sb.append(value);
@@ -201,9 +198,10 @@ public final class DBHandleUtil
 		);
 		sb.append(") VALUES(");
 		
-		ArrayUtil.arrayProcessor
+		
+		JavaCollectionsUtil.collectionProcessor
 		(
-				columnNames,
+				CollUtil.newArrayList(columnNames), 
 				(final String value, final int indx, final int length) -> 
 				{
 					sb.append("?");
@@ -312,12 +310,14 @@ public final class DBHandleUtil
 	
 	public static String getPrimaryKeyForVarchar()
 	{
-		String prefix = DateUtil.format(new Date(), DateContants.DATE_FORMAT_4);
+		String prefix = DateUtil.format(new Date(), DatePattern.PURE_DATETIME_PATTERN);
 		
 		//(数据类型)(最小值+Math.random()*(最大值-最小值+1))
 		int randomNum = (int)(1 + Math.random() * (99999999 - 1 + 1));
 		
-		String suffix = StringUtil.lpad(Integer.toString(randomNum), 8, '0');
+		String suffix = StrUtil.padPre(Integer.toString(randomNum), 8, '0');
+		
+		//StrUtil.padPre()
 		
 		StringBuilder sb = new StringBuilder();
 		sb.append(prefix);
@@ -382,9 +382,9 @@ public final class DBHandleUtil
 	public static void releaseRelatedResourcesNoDataSource(final Connection[] connections, final ResultSet[] resultSets, final PreparedStatement[] preparedStatements)
 	{
 		DBHandleUtil.resetConnectionsSetting(true, connections);
-		if (null != resultSets && resultSets.length > 0) { Arrays.asList(resultSets).forEach(resultSet -> { JdbcUtils.closeResultSet(resultSet); }); }
-		if (null != preparedStatements && preparedStatements.length > 0) { Arrays.asList(preparedStatements).forEach(preparedStatement -> { JdbcUtils.closeStatement(preparedStatement); }); }
-		if (null != connections && connections.length > 0) { Arrays.asList(connections).forEach(connection -> { JdbcUtils.closeConnection(connection); }); }
+		if (null != resultSets && resultSets.length > 0) { CollUtil.newArrayList(resultSets).forEach(resultSet -> { JdbcUtils.closeResultSet(resultSet); }); }
+		if (null != preparedStatements && preparedStatements.length > 0) { CollUtil.newArrayList(preparedStatements).forEach(preparedStatement -> { JdbcUtils.closeStatement(preparedStatement); }); }
+		if (null != connections && connections.length > 0) { CollUtil.newArrayList(connections).forEach(connection -> { JdbcUtils.closeConnection(connection); }); }
 	}
 	
 	public static void batchWrite(final AbstractDBInfo abstractDBInfo)
@@ -494,5 +494,18 @@ public final class DBHandleUtil
 		{ DBHandleUtil.releaseRelatedResourcesNoDataSource(new Connection[] {connection}, new ResultSet[] {resultSet}, new PreparedStatement[] {preparedStatement}); }
 		
 		return result;
+	}
+	
+	@ToString
+	@Getter
+	public enum PreparedStatementOperationType 
+	{
+		READ("以读取模式配置PreparedStatement"),
+		WRITE("以修改模式配置PreparedStatement");
+		
+		private final String preparedStatementOperationType;
+		
+		private PreparedStatementOperationType(final String preparedStatementOperationType) 
+		{ this.preparedStatementOperationType = preparedStatementOperationType; }
 	}
 }

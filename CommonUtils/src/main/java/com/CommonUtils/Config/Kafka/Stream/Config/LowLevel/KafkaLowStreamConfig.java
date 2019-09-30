@@ -14,10 +14,11 @@ import org.apache.kafka.streams.processor.Punctuator;
 import org.apache.kafka.streams.state.KeyValueStore;
 import org.apache.kafka.streams.state.Stores;
 
-import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
+import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
 import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.CustomCollections.Properties;
 import com.CommonUtils.Utils.SystemUtils.KafkaUtils.KafkaUtil;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.util.ObjectUtil;
@@ -207,9 +208,9 @@ public final class KafkaLowStreamConfig
 					Object tmpValue = ObjectUtil.deserialize(value);
 					if (null != tmpValue)
 					{
-						ArrayUtil.arrayProcessor
+						JavaCollectionsUtil.collectionProcessor
 						(
-								JobProcessor.this.itemProcessors, 
+								CollUtil.newArrayList(JobProcessor.this.itemProcessors), 
 								(final ItemProcessor itemProcessor, final int indx, final int length) -> 
 								{ itemProcessor.process(tmpValue, JobProcessor.this.processorContext, JobProcessor.this.kvStore); }
 						);

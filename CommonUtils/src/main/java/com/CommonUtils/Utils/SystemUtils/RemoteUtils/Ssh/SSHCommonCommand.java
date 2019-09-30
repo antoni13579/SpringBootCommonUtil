@@ -1,8 +1,7 @@
 package com.CommonUtils.Utils.SystemUtils.RemoteUtils.Ssh;
 
-import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
-
 import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.StrUtil;
 
 public final class SSHCommonCommand 
 {
@@ -22,7 +21,7 @@ public final class SSHCommonCommand
 			String result = MV_COMMAND;
 			for (int i = 0; i < args.length; i++)
 			{
-				if (!StringUtil.isStrEmpty(args[i]))
+				if (!StrUtil.isEmptyIfStr(args[i]))
 				{ result = result.replaceAll("param" + i, args[i]); }
 			}
 			
@@ -41,7 +40,7 @@ public final class SSHCommonCommand
 			result.append(" | ");
 			for (int i = 0; i < pipes.length; i++)
 			{
-				if (!StringUtil.isStrEmpty(pipes[i]))
+				if (!StrUtil.isEmptyIfStr(pipes[i]))
 				{
 					result.append(pipes[i]);
 					
@@ -57,7 +56,7 @@ public final class SSHCommonCommand
 	
 	public static String getPerlCommand(final String filePath, final String ... args)
 	{
-		if (!StringUtil.isStrEmpty(filePath))
+		if (!StrUtil.isEmptyIfStr(filePath))
 		{
 			String result = PERL_COMMAND.replaceAll("filePath", filePath);
 			
@@ -65,7 +64,7 @@ public final class SSHCommonCommand
 			{
 				for (int i = 0; i < args.length; i++)
 				{
-					if (!StringUtil.isStrEmpty(args[i]))
+					if (!StrUtil.isEmptyIfStr(args[i]))
 					{
 						if (0 == i)
 						{ result = result.replaceAll("paramN", args[i]); }
@@ -94,7 +93,7 @@ public final class SSHCommonCommand
 			String result = FIND_COMMAND;
 			for (int i = 0; i < args.length; i++)
 			{
-				if (!StringUtil.isStrEmpty(args[i]))
+				if (!StrUtil.isEmptyIfStr(args[i]))
 				{ result = result.replaceAll("param" + i, args[i]); }
 			}
 			
@@ -106,7 +105,7 @@ public final class SSHCommonCommand
 	
 	public static String getZcatAndWcCommand(final String arg)
 	{
-		if (!StringUtil.isStrEmpty(arg))
+		if (!StrUtil.isEmptyIfStr(arg))
 		{
 			String result = ZCAT_AND_WC_COMMAND;
 			result = result.replaceAll("param0", arg);
@@ -118,7 +117,7 @@ public final class SSHCommonCommand
 	
 	public static String getCatAndWcCommand(final String arg)
 	{
-		if (!StringUtil.isStrEmpty(arg))
+		if (!StrUtil.isEmptyIfStr(arg))
 		{
 			String result = CAT_AND_WC_COMMAND;
 			result = result.replaceAll("param0", arg);

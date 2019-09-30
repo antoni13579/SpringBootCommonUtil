@@ -5,9 +5,9 @@ import java.util.Map;
 
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
-import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
 import com.CommonUtils.Utils.ReflectUtils.ReflectUtil;
 
+import cn.hutool.core.util.StrUtil;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -42,7 +42,7 @@ public final class QuartzJobsInfo
 		this.startTime = startTime;
 		this.params = params;
 		
-		if (!StringUtil.isStrEmpty(group))
+		if (!StrUtil.isEmptyIfStr(group))
 		{ this.group = group; }
 		else
 		{ this.group = executorClassPath; }

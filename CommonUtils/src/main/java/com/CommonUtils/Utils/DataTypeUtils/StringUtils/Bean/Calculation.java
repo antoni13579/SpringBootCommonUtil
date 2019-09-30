@@ -12,6 +12,7 @@ import lombok.experimental.Accessors;
 @Getter
 @Setter
 @ToString
+@Deprecated
 public final class Calculation 
 {
 	private BigDecimal elementA = new BigDecimal(0);

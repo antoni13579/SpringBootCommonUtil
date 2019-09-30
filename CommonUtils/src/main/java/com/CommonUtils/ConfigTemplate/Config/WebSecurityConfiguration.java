@@ -28,9 +28,9 @@ import org.springframework.security.web.session.HttpSessionEventPublisher;
 import com.CommonUtils.Config.SpringSecurity.Config.Encoder.BCryptPasswordEncoderConfig;
 import com.CommonUtils.Config.SpringSecurity.Config.Role.RoleHierarchyConfig;
 import com.CommonUtils.Utils.FrameworkUtils.SecurityUtils.SpringSecurityUtil;
-import com.CommonUtils.Utils.NetworkUtils.HttpUtils.HttpUtil;
 import com.CommonUtils.Utils.NetworkUtils.HttpUtils.Bean.SimpleResponse;
 
+import cn.hutool.extra.servlet.ServletUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @Configuration
@@ -98,16 +98,16 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter
 			    (
 			    		(HttpServletRequest request, HttpServletResponse response, Authentication authentication) -> 
 			    		{
-			    			HttpUtil.responseInfo
+			    			ServletUtil.write
 			    			(
 			    					response, 
 			    					new SimpleResponse()
 			    						.setObject(authentication)
 			    						.setStatus(HttpStatus.OK.value())
 			    						.setStatusDesc("登录成功")
-			    						.toJson(), 
-			    					MediaType.APPLICATION_JSON_UTF8
-			    			);
+			    						.toJson(),
+		    					    MediaType.APPLICATION_JSON_UTF8.toString()
+		    				);
 			    			
 			    			UserDetails user = SpringSecurityUtil.getUser(authentication);
 			    			String userName = user.getUsername();
@@ -132,7 +132,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter
 			    (
 			    		(request, response, exception) -> 
 			    		{
-			    			HttpUtil.responseInfo
+			    			ServletUtil.write
 			    			(
 			    					response, 
 			    					new SimpleResponse()
@@ -140,8 +140,8 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter
 			    						.setStatus(HttpStatus.UNAUTHORIZED.value())
 			    						.setStatusDesc("找不到对应的用户，是用户名不正确？还是密码不正确？还是说。。。。没有注册？")
 			    						.toJson(),
-			    					MediaType.APPLICATION_PROBLEM_JSON_UTF8
-			    			);
+			    					MediaType.APPLICATION_PROBLEM_JSON_UTF8.toString()
+		    				);
 			    		}
 			    ).permitAll()
 				

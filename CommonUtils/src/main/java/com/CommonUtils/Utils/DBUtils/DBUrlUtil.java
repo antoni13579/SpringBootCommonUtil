@@ -6,7 +6,8 @@ import com.CommonUtils.Utils.DBUtils.Bean.Url.OracleUrl;
 import com.CommonUtils.Utils.DBUtils.Bean.Url.PostgreSqlUrl;
 import com.CommonUtils.Utils.DBUtils.Bean.Url.SqlServerUrl;
 import com.CommonUtils.Utils.DBUtils.Bean.Url.TeradataUrl;
-import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
+
+import cn.hutool.core.util.StrUtil;
 
 public final class DBUrlUtil 
 {
@@ -84,7 +85,7 @@ public final class DBUrlUtil
 	{
 		StringBuilder result = new StringBuilder();
 		result.append(ORACLE_URL);
-		if (!StringUtil.isStrEmpty(oracleUrl.getTnsname()))
+		if (!StrUtil.isEmptyIfStr(oracleUrl.getTnsname()))
 		{ result.append(oracleUrl.getTnsname()); }
 		else
 		{

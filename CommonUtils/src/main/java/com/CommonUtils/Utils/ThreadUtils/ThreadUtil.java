@@ -1,7 +1,6 @@
 package com.CommonUtils.Utils.ThreadUtils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -17,6 +16,8 @@ import java.util.concurrent.locks.StampedLock;
 import java.util.function.Supplier;
 
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+
+import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ArrayUtil;
@@ -79,7 +80,7 @@ public final class ThreadUtil
 	}
 	
 	public static void waitForFinished(final long sleepTime, final boolean remove, final Future<?> ... futures)
-	{ waitForFinished(sleepTime, remove, Arrays.asList(futures)); }
+	{ waitForFinished(sleepTime, remove, CollUtil.newArrayList(futures)); }
 	
 	@SneakyThrows(InterruptedException.class)
 	public static void waitForFinished(final long sleepTime, final boolean remove, final Collection<Future<?>> futures)
@@ -183,9 +184,9 @@ public final class ThreadUtil
 	 * */
 	public static boolean countDownAll(final CountDownLatch ... countDownLatchs)
 	{
-		return com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil.arrayProcessor
+		return JavaCollectionsUtil.collectionProcessor
 		(
-				countDownLatchs, 
+				CollUtil.newArrayList(countDownLatchs), 
 				(countDownLatch, indx, length) -> 
 				{
 					while (null != countDownLatch && countDownLatch.getCount() != 0L)

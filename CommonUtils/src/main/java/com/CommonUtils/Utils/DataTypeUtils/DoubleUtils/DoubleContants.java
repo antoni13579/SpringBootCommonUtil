@@ -1,5 +1,6 @@
 package com.CommonUtils.Utils.DataTypeUtils.DoubleUtils;
 
+@Deprecated
 public final class DoubleContants 
 {
 	private DoubleContants() {}

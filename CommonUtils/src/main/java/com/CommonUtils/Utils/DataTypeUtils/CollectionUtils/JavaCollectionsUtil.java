@@ -13,24 +13,22 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.keyvalue.MultiKey;
 import org.apache.commons.collections4.map.MultiKeyMap;
 
 import com.CommonUtils.Utils.DBUtils.Bean.DBTable.Column;
 import com.CommonUtils.Utils.DBUtils.Bean.DBTable.Table;
-import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
-import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil.ItemProcessor;
-import com.CommonUtils.Utils.DataTypeUtils.DateUtils.DateFormat;
-import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.format.FastDateFormat;
 import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.util.ObjectUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -144,6 +142,8 @@ public final class JavaCollectionsUtil
 		return false;
 	}
 	
+	/*
+	@Deprecated
 	public static boolean collectionEquals(final Collection<String[]> records1, final Collection<String[]> records2)
     {
     	//两个都是空，则为相等
@@ -177,6 +177,7 @@ public final class JavaCollectionsUtil
     		return false;
     	}
     }
+    */
 	
 	/**建议使用cn.hutool.core.collection.CollUtil.get相关函数*/ 
 	@Deprecated
@@ -209,10 +210,13 @@ public final class JavaCollectionsUtil
 		{ return false; }
 	}
 	
+	/**
+	 * dateFomat参数建议使用cn.hutool.core.date.DatePattern来提供日期格式
+	 * */
 	public static <K, V> Collection<String> getMapValues(final Collection<Map<K, V>> records, 
 														 final ResultSetMetaData resultSetMetaData, 
 														 final String delimiter,
-														 final DateFormat dateFomat,
+														 final FastDateFormat dateFomat,
 														 final boolean useColumnName) throws Exception
 	{
 		if (!isCollectionEmpty(records))
@@ -236,28 +240,17 @@ public final class JavaCollectionsUtil
 						Object columnValue = record.get(columnName);
 						
 						String value = null;
+						
 						if (columnValue instanceof java.util.Date)
-						{
-							java.util.Date date = Convert.toDate(columnValue);
-							value = StringUtil.toString(date, dateFomat); 
-						}
+						{ value = DateTime.of(Convert.toDate(columnValue)).toString(dateFomat); }
 						else if (columnValue instanceof java.sql.Date)
-						{
-							java.sql.Date date = Convert.convert(java.sql.Date.class, columnValue);
-							value = StringUtil.toString(date, dateFomat); 
-						}
+						{ value = DateTime.of(new java.util.Date(Convert.convert(java.sql.Date.class, columnValue).getTime())).toString(dateFomat); }
 						else if (columnValue instanceof java.sql.Timestamp)
-						{
-							java.sql.Timestamp date = Convert.convert(java.sql.Timestamp.class, columnValue);
-							value = StringUtil.toString(date, dateFomat); 
-						}
+						{ value = DateTime.of(new java.util.Date(Convert.convert(java.sql.Timestamp.class, columnValue).getTime())).toString(dateFomat); }
 						else if (columnValue instanceof oracle.sql.TIMESTAMP)
-						{
-							oracle.sql.TIMESTAMP date = Convert.convert(oracle.sql.TIMESTAMP.class, columnValue);
-							value = StringUtil.toString(date, dateFomat); 
-						}
+						{ value = DateTime.of(new java.util.Date(Convert.convert(oracle.sql.TIMESTAMP.class, columnValue).timestampValue().getTime())).toString(dateFomat); }
 						else
-						{ value = StringUtil.toString(columnValue); }
+						{ value = ObjectUtil.toString(columnValue); }
 
 						line.append(value);
 						
@@ -387,25 +380,27 @@ public final class JavaCollectionsUtil
 		);
 	}
 	
+	/*
 	@SafeVarargs
+	@Deprecated
 	public static <T> boolean collectionProcessor(final Collection<T[]> records, final ItemProcessor<T> ... itemProcessors)
 	{ return collectionProcessor(records, (final T[] values, final int indx, final int length) -> { ArrayUtil.arrayProcessor(values, itemProcessors); }); }
+	*/
 	
-	public static <T> Collection<T> collectionOperation(final Collection<T> a, final Collection<T> b, final OperationType operationType)
-	{
-		if (null == a || null == b || null == operationType)
-		{ return Collections.emptyList(); }
-		
+	public static <T> Collection<T> collectionOperation(final Set<T> a, final Set<T> b, final OperationType operationType)
+	{		
 		switch (operationType)
 		{
 			case INTER_SECTION:
 				return CollUtil.intersection(a, b);
 				
 			case LEFT_SUBTRACT:
-				return CollectionUtils.subtract(a, b);
+				//return CollectionUtils.subtract(a, b);
+				return CollUtil.disjunction(a, b).stream().filter((val) -> { return a.contains(val); }).collect(Collectors.toList());
 				
 			case RIGHT_SUBTRACT:
-				return CollectionUtils.subtract(b, a);
+				//return CollectionUtils.subtract(b, a);
+				return CollUtil.disjunction(a, b).stream().filter((val) -> { return b.contains(val); }).collect(Collectors.toList());
 			
 			case UNION:
 				return CollUtil.union(a, b);
@@ -421,6 +416,7 @@ public final class JavaCollectionsUtil
 	/**
 	 * List转Set
 	 * */
+	@Deprecated
 	public static <T> Set<T> toSet(final List<T> list, final CollectionType collectionType)
 	{
 		if (isCollectionEmpty(list))
@@ -442,6 +438,7 @@ public final class JavaCollectionsUtil
 	/**
 	 * Set转List
 	 * */
+	@Deprecated
 	public static <T> List<T> toList(final Set<T> set, final CollectionType collectionType)
 	{
 		if (isCollectionEmpty(set))
@@ -528,9 +525,13 @@ public final class JavaCollectionsUtil
 		return result;
 	}
 	
+	/**建议使用cn.hutool.core.util.ObjectUtil.defaultIfNull*/ 
+	@Deprecated
 	public static <T> Collection<T> ifNullForCollection(final T val)
 	{ return nvlForCollection(val); }
 	
+	/**建议使用cn.hutool.core.util.ObjectUtil.defaultIfNull*/ 
+	@Deprecated
 	public static <T> Collection<T> nvlForCollection(final T val)
 	{
 		Collection<T> result = null;
@@ -575,9 +576,13 @@ public final class JavaCollectionsUtil
 		return result;
 	}
 	
+	/**建议使用cn.hutool.core.util.ObjectUtil.defaultIfNull*/ 
+	@Deprecated
 	public static <K, T, V> Map<K, V> ifNullForMap(final T val)
 	{ return nvlForMap(val); }
 	
+	/**建议使用cn.hutool.core.util.ObjectUtil.defaultIfNull*/ 
+	@Deprecated
 	public static <K, T, V> Map<K, V> nvlForMap(final T val)
 	{
 		Map<K, V> result = null;
@@ -611,6 +616,7 @@ public final class JavaCollectionsUtil
 		return result;
 	}
 	
+	@Deprecated
 	public enum CollectionType
 	{
 		HashSet,
@@ -620,6 +626,7 @@ public final class JavaCollectionsUtil
 		LinkedList
 	}
 	
+	@Deprecated
 	public enum MapType
 	{
 		HashMap,

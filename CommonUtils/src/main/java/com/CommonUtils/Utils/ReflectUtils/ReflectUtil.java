@@ -2,7 +2,6 @@ package com.CommonUtils.Utils.ReflectUtils;
 
 import java.lang.reflect.Field;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -50,8 +49,8 @@ public final class ReflectUtil
 			Field[] declaredFields = obj.getClass().getDeclaredFields();
 			
 			Set<Field> fieldSets = new HashSet<Field>();
-			fieldSets.addAll(Arrays.asList(fields));
-			fieldSets.addAll(Arrays.asList(declaredFields));
+			fieldSets.addAll(CollUtil.newArrayList(fields));
+			fieldSets.addAll(CollUtil.newArrayList(declaredFields));
 			
 			for (Field field : fieldSets)
 			{			
@@ -87,8 +86,8 @@ public final class ReflectUtil
 			Field[] declaredFields = obj.getClass().getDeclaredFields();
 			
 			Set<Field> fieldSets = new HashSet<Field>();
-			fieldSets.addAll(Arrays.asList(fields));
-			fieldSets.addAll(Arrays.asList(declaredFields));
+			fieldSets.addAll(CollUtil.newArrayList(fields));
+			fieldSets.addAll(CollUtil.newArrayList(declaredFields));
 			
 			for (Field field : fieldSets)
 			{			

@@ -30,8 +30,6 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.CommonUtils.ConfigTemplate.Bean.ExcelBean;
 import com.CommonUtils.ConfigTemplate.Config.SpringIntegrationConfig.MainGateWay;
-import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringContants;
-import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
 import com.CommonUtils.Utils.FrameworkUtils.SecurityUtils.SpringSecurityUtil;
 import com.CommonUtils.Utils.NetworkUtils.HttpUtils.Bean.RegisterInfo;
 import com.CommonUtils.Utils.NetworkUtils.HttpUtils.Bean.SimpleResponse;
@@ -39,6 +37,8 @@ import com.CommonUtils.Utils.TreeUtils.Bean.TreeNode;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.lang.PatternPool;
+import cn.hutool.core.util.ReUtil;
 import cn.hutool.poi.excel.ExcelReader;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -71,7 +71,7 @@ public class HomeRestController
 		SimpleResponse result = new SimpleResponse();
 		
 		//邮箱地址验证不通过
-		if (!StringUtil.validateRegular(email, StringContants.PATTERN_6))
+		if (!ReUtil.isMatch(PatternPool.EMAIL, email))
 		{
 			return result.setStatus(HttpStatus.BAD_REQUEST.value())
 						 .setStatusDesc("邮箱格式验证不通过，无法注册");

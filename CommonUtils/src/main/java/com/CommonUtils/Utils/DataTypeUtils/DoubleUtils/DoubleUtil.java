@@ -1,7 +1,7 @@
 package com.CommonUtils.Utils.DataTypeUtils.DoubleUtils;
 
 import java.text.DecimalFormat;
-import java.util.Arrays;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.DoubleSummaryStatistics;
@@ -11,19 +11,22 @@ import java.util.function.Function;
 import java.util.function.ToDoubleFunction;
 import java.util.stream.Collectors;
 
-import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
+import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.text.StrSpliter;
 import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.StrUtil;
 
 public final class DoubleUtil 
 {
 	private DoubleUtil() {}
 	
+	/**建议使用cn.hutool.core.util.NumberUtil.roundStr代替*/ 
+	@Deprecated
 	public static String formatDoubleToStr(final double number, final String format)
 	{
-		if (StringUtil.isStrEmpty(format))
+		if (StrUtil.isEmptyIfStr(format))
 		{ return ""; }
 		
 		return new DecimalFormat(format).format(number);
@@ -53,7 +56,7 @@ public final class DoubleUtil
 			   													   final T ... params)
 	{
 		if (!ArrayUtil.isEmpty(params))
-		{ return groupBy(classifier, mapper, Arrays.asList(params)); }
+		{ return groupBy(classifier, mapper, CollUtil.newArrayList(params)); }
 		else
 		{ return Collections.emptyMap(); }
 	}
@@ -77,10 +80,10 @@ public final class DoubleUtil
 				{
 					List<String> tmp = StrSpliter.split(groupByKey, delimiter, false, false);
 					//String[] groupByFields = StringUtils.splitPreserveAllTokens(groupByKey, delimiter);
-					String[] groupByFields = tmp.toArray(new String[tmp.size()]);
-					com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil.arrayProcessor
+					String[] groupByFields = tmp.toArray(new String[tmp.size()]);					
+					JavaCollectionsUtil.collectionProcessor
 					(
-							processors, 
+							CollUtil.newArrayList(processors), 
 							(final ItemProcessorForProcessGroupByResult val, final int inx, final int length) -> 
 							{ val.process(groupByResult, groupByFields); }
 					);

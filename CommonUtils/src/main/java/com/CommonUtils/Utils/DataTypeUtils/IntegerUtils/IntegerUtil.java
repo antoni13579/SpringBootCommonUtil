@@ -1,6 +1,5 @@
 package com.CommonUtils.Utils.DataTypeUtils.IntegerUtils;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.IntSummaryStatistics;
@@ -9,6 +8,8 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
+
+import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.text.StrSpliter;
@@ -42,7 +43,7 @@ public final class IntegerUtil
 			   													final T ... params)
 	{
 		if (!ArrayUtil.isEmpty(params))
-		{ return groupBy(classifier, mapper, Arrays.asList(params)); }
+		{ return groupBy(classifier, mapper, CollUtil.newArrayList(params)); }
 		else
 		{ return Collections.emptyMap(); }
 	}
@@ -67,9 +68,9 @@ public final class IntegerUtil
 					List<String> tmp = StrSpliter.split(groupByKey, delimiter, false, false);
 					//String[] groupByFields = StringUtils.splitPreserveAllTokens(groupByKey, delimiter);
 					String[] groupByFields = tmp.toArray(new String[tmp.size()]);
-					com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil.arrayProcessor
+					JavaCollectionsUtil.collectionProcessor
 					(
-							processors, 
+							CollUtil.newArrayList(processors), 
 							(final ItemProcessorForProcessGroupByResult val, final int inx, final int length) -> 
 							{ val.process(groupByResult, groupByFields); }
 					);

@@ -46,13 +46,13 @@ import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 
 import com.CommonUtils.Config.MiddleWare.ServletWebServerFactoryConfig;
 import com.CommonUtils.Config.MiddleWare.GracefulShutdowns.GracefulShutdownTomcat;
 import com.CommonUtils.Config.Web.MultipartConfigElementConfig;
-import com.CommonUtils.Utils.DataTypeUtils.DateUtils.DateContants;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -178,7 +178,7 @@ public class WebConfiguration implements WebMvcConfigurer, WebApplicationInitial
 	public void addFormatters(FormatterRegistry registry)
 	{
 		//加入字符串自动转换为时间的功能，主要是表单提交了时间，后台用bean接收，如果没有这个转换，会报异常		
-		registry.addConverter(String.class, Date.class, (String source) -> { return DateUtil.parse(source, DateContants.DATE_FORMAT_3); });
+		registry.addConverter(String.class, Date.class, (String source) -> { return DateUtil.parse(source, DatePattern.NORM_DATETIME_PATTERN); });
 	}
 	
 	@Override

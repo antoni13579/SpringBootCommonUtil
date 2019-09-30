@@ -3,14 +3,16 @@ package com.CommonUtils.Utils.DataTypeUtils.CharacterUtils;
 import java.util.Optional;
 
 import cn.hutool.core.util.ArrayUtil;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@Deprecated
 public final class CharacterUtil 
 {
 	private CharacterUtil() {}
 	
-	/**String转char, radix为进制数，转换为10进制、16进制等等*/
+	/**String转char, radix为进制数，转换为10进制、16进制等等，建议使用(char)cn.hutool.core.util.NumberUtil.parseInt("0x1b")代替*/
 	public static char toChar(final String str, final int radix)
 	{
 		char result = Character.MIN_VALUE;
@@ -41,7 +43,6 @@ public final class CharacterUtil
 	}
 	
 	/**建议使用cn.hutool.core.convert.Convert.toChar*/ 
-	@Deprecated
 	public static <T> char getChar(final T obj) throws Exception
 	{
 		if (obj instanceof Character)
