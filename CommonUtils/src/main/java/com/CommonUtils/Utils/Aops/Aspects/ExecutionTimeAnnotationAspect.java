@@ -12,6 +12,7 @@ import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
 
 import lombok.extern.slf4j.Slf4j;
 
+/**建议使用cn.hutool.core.date.StopWatch*/
 @Deprecated
 @Aspect
 @Component

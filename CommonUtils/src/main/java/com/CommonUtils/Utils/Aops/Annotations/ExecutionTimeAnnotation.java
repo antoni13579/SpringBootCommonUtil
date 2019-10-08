@@ -8,6 +8,7 @@ import java.lang.annotation.Target;
 
 import org.springframework.stereotype.Component;
 
+/**建议使用cn.hutool.core.date.StopWatch*/
 @Deprecated
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)

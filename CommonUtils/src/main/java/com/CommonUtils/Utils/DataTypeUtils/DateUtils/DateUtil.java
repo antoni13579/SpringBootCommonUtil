@@ -21,13 +21,13 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DatePattern;
 import lombok.extern.slf4j.Slf4j;
 
+@Deprecated
 @Slf4j
 public final class DateUtil
 {
 	private DateUtil() {}
 	
 	/**建议使用cn.hutool.core.convert.Convert.convert(java.sql.Date.class, obj)*/ 
-	@Deprecated
 	public static <T> java.sql.Date getSqlDate(final T obj) throws Exception
 	{
 		if (obj instanceof java.sql.Date)
@@ -37,7 +37,6 @@ public final class DateUtil
 	}
 	
 	/**建议使用cn.hutool.core.convert.Convert.toDate*/ 
-	@Deprecated
 	public static <T> java.util.Date getDate(final T obj) throws Exception
 	{
 		if (obj instanceof java.util.Date)
@@ -54,32 +53,26 @@ public final class DateUtil
 	}
 	
 	/**java.util.Date转换为java.sql.Date，建议使用cn.hutool.core.date.DateTime.toSqlDate*/
-	@Deprecated
 	public static java.sql.Date getDate(final Date date)
 	{ return new java.sql.Date(date.getTime()); }
 	
 	/**java.sql.Date转换为java.util.Date，建议使用cn.hutool.core.date.DateTime.toJdkDate*/
-	@Deprecated
 	public static Date getDate(final java.sql.Date date)
 	{ return new Date(date.getTime()); }
 	
 	/**java.sql.Timestamp转换为java.util.Date，建议使用cn.hutool.core.date.DateTime.toJdkDate*/
-	@Deprecated
 	public static Date getDate(final Timestamp timestamp)
 	{ return new Date(timestamp.getTime()); }
 	
 	/**建议使用cn.hutool.core.date.DateTime.toJdkDate*/
-	@Deprecated
 	public static Date getDate(final oracle.sql.TIMESTAMP timestamp) throws SQLException
 	{ return getDate(timestamp.timestampValue()); }
 	
 	/**建议使用cn.hutool.core.date.DateTime.toTimestamp*/
-	@Deprecated
 	public static Timestamp getTimestamp(final oracle.sql.TIMESTAMP timestamp) throws SQLException
 	{ return timestamp.timestampValue(); }
 	
 	/**建议使用cn.hutool.core.convert.Convert.convert(java.sql.Timestamp.class, obj)*/ 
-	@Deprecated
 	public static <T> java.sql.Timestamp getTimestamp(final T obj) throws Exception
 	{
 		if (obj instanceof java.sql.Timestamp)
@@ -89,7 +82,6 @@ public final class DateUtil
 	}
 	
 	/**建议使用cn.hutool.core.convert.Convert.convert(oracle.sql.TIMESTAMP.class, obj)*/ 
-	@Deprecated
 	public static <T> oracle.sql.TIMESTAMP getOracleTimestamp(final T obj) throws Exception
 	{
 		if (obj instanceof oracle.sql.TIMESTAMP)
@@ -112,7 +104,6 @@ public final class DateUtil
 	 * 
 	 * 建议使用cn.hutool.core.date.DateUtil.offset相关方法
 	 * */
-	@Deprecated
 	public static Date getDate(final Date stlDate, final int cnt, final int type)
 	{
 		Calendar cal = Calendar.getInstance();
@@ -126,7 +117,6 @@ public final class DateUtil
 	 * 获取日期指定信息，如年，月等
 	 * @param type 如Calendar.DATE、Calendar.YEAR等，建议使用cn.hutool.core.date.DateTime的getField方法
 	 * */
-	@Deprecated
 	public static int getField(final Date date, final int type)
 	{
 		Calendar cal = Calendar.getInstance();
@@ -138,7 +128,6 @@ public final class DateUtil
 	 * 建议使用cn.hutool.core.date.DateUtil.range相关方法
 	 * */
 	/*
-	@Deprecated
 	public static Collection<Date> getRangeCondition(final Date start, final Date end, final String timeType, final String ... params)
 	{
 		Collection<Date> dates = DateUtil.getRange(start, end);
@@ -182,7 +171,6 @@ public final class DateUtil
 	/**
 	 * 根据开始日期与结束日期，获取其时间范围，建议使用cn.hutool.core.date.DateUtil.range相关方法
 	 * */
-	@Deprecated
 	public static Collection<Date> getRange(final Date start, final Date end)
 	{
 		//开始日期为空，结束日期为空，开始时间大于结束时间都要返回空集合
@@ -205,7 +193,6 @@ public final class DateUtil
 	/**
 	 * 建议使用cn.hutool.core.date.DateUtil.range相关方法
 	 * */
-	@Deprecated
 	public static Collection<String> getRangeForMonth(final Date start, final Date end)
 	{
 		Collection<Date> dateRange = getRange(start, end);
@@ -226,7 +213,6 @@ public final class DateUtil
 	/**
 	 * 日期类型格式化输出为字符串，建议使用cn.hutool.core.date.DateUtil.format相关方法
 	 * */
-	@Deprecated
 	public static String formatDateToStr(final Date date, final String format)
 	{
 		if (null == date || StringUtil.isStrEmpty(format))
@@ -240,7 +226,6 @@ public final class DateUtil
 	/**
 	 * 字符串类型格式化输出为对应的日期，建议使用cn.hutool.core.date.DateUtil.parse相关方法
 	 * */
-	@Deprecated
 	public static Optional<Date> formatStrToDate(final String str, final String format)
 	{
 		if (StringUtil.isStrEmpty(str) || StringUtil.isStrEmpty(format))
@@ -256,7 +241,6 @@ public final class DateUtil
 	}
 	
 	/**模仿Oracle实现的MONTHS_BETWEEN函数，建议使用cn.hutool.core.date.DateUtil.betweenMonth相关方法*/
-	@Deprecated
 	public static double monthsBetween(final Date startDate, final Date endDate)
 	{
 		if (null == startDate || null == endDate || startDate.compareTo(endDate) == 1)
@@ -303,7 +287,6 @@ public final class DateUtil
 	 *  对于年，建议使用cn.hutool.core.date.DateUtil.endOfYear
 	 * 对于月，建议使用cn.hutool.core.date.DateUtil.endOfMonth
 	 * */
-	@Deprecated
 	public static Date getLastDate(final Date stlDate, final int type)
 	{
 		Calendar cal = Calendar.getInstance();
@@ -320,7 +303,6 @@ public final class DateUtil
 	 * 对于年，建议使用cn.hutool.core.date.DateUtil.beginOfYear
 	 * 对于月，建议使用cn.hutool.core.date.DateUtil.beginOfMonth
 	 * */
-	@Deprecated
 	public static Date getFirstDate(final Date stlDate, final int type)
 	{
 		Calendar cal = Calendar.getInstance();
@@ -330,7 +312,6 @@ public final class DateUtil
 	}
 	
 	/**建议使用cn.hutool.core.date.DateUtil.dayOfWeek相关方法*/
-	@Deprecated
 	public static DayOfWeekType getDateOfWeek(final Date stlDate)
 	{
 		Calendar cal = Calendar.getInstance();
@@ -348,23 +329,22 @@ public final class DateUtil
 	}
 	
 	/**建议使用cn.hutool.core.date.DateUtil.year*/ 
-	@Deprecated
 	public static int getYear(final Date date)
 	{ return getField(date, Calendar.YEAR); }
 	
 	/**建议使用cn.hutool.core.date.DateUtil.month*/ 
-	@Deprecated
 	public static int getMonth(final Date date)
 	{ return getField(date, Calendar.MONTH) + 1; }
 	
 	/**建议使用cn.hutool.core.date.DateUtil.dayOfMonth*/ 
-	@Deprecated
 	public static int getDay(final Date date)
 	{ return getField(date, Calendar.DAY_OF_MONTH); }
 	
+	/**建议使用cn.hutool.core.date.DateUtil.getEndValue(calendar, DateField.DAY_OF_MONTH.getValue())*/ 
 	public static int getTotalDayForMonth(final Date date)
 	{ return getTotalDayForMonth(getYear(date), getMonth(date)); }
 	
+	/**建议使用cn.hutool.core.date.DateUtil.getEndValue(calendar, DateField.DAY_OF_MONTH.getValue())*/ 
 	public static int getTotalDayForMonth(final int year, final int month)
 	{
 		Calendar c = Calendar.getInstance();
@@ -372,12 +352,15 @@ public final class DateUtil
 		return c.get(Calendar.DAY_OF_MONTH);
 	}
 	
+	/**建议使用cn.hutool.core.date.DateUtil.isLeapYear判断是否闰年，然后计算总天数*/
 	public static int getTotalDayForYear(final int year)
 	{ return year % 4 == 0 ? 366 : 365; }
 	
+	/**建议使用cn.hutool.core.date.DateUtil.isLeapYear判断是否闰年，然后计算总天数*/
 	public static int getTotalDayForYear(final Date date)
 	{ return getTotalDayForYear(getYear(date)); }
 	
+	/**建议先用TreeSet缓存日期，然后用cn.hutool.core.collection.CollUtil.getFirst或getLast获取最大值最小值*/
 	public static Map<String, Date> getMaxAndMin(final Collection<Date> dates)
 	{
 		if (!CollUtil.isEmpty(dates))
@@ -386,6 +369,7 @@ public final class DateUtil
 		{ return Collections.emptyMap(); }
 	}
 	
+	/**建议先用TreeSet缓存日期，然后用cn.hutool.core.collection.CollUtil.getFirst或getLast获取最大值最小值*/
 	public static Map<String, Date> getMaxAndMin(final Date ... dates)
 	{
 		if (!cn.hutool.core.util.ArrayUtil.isEmpty(dates))

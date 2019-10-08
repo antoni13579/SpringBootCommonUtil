@@ -47,6 +47,25 @@ public final class StringUtil
 		{ return Collections.emptyMap(); }
 	}
 	
+	public static int getNumberStartPos(final String str)
+	{
+		if (isStrEmpty(str))
+		{ return -1; }
+		
+		int result = -1;
+		for (int i = 0; i < str.length(); i++)
+		{
+			char c = str.charAt(i);
+			if (c >='0' && c <='9')
+			{
+				result = i;
+				break;
+			}
+		}
+		
+		return result;
+	}
+	
 	/**建议使用cn.hutool.core.convert.Convert.toStr*/ 
 	@Deprecated
 	public static <T> String getString(final T obj) throws Exception
@@ -290,25 +309,6 @@ public final class StringUtil
         
         return Pattern.matches(regex, string);
         //return m.matches();
-	}
-	
-	public static int getNumberStartPos(final String str)
-	{
-		if (isStrEmpty(str))
-		{ return -1; }
-		
-		int result = -1;
-		for (int i = 0; i < str.length(); i++)
-		{
-			char c = str.charAt(i);
-			if (c >='0' && c <='9')
-			{
-				result = i;
-				break;
-			}
-		}
-		
-		return result;
 	}
 	
 	/**

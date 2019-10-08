@@ -455,6 +455,7 @@ public final class JavaCollectionsUtil
 		}
 	}
 	
+	@Deprecated
 	public static <K, V> Map<K, V> toMap(final MultiKeyMap<K, V> map, final int keyIndex, final MapType mapType)
 	{
 		if (isMapEmpty(map))
@@ -487,6 +488,7 @@ public final class JavaCollectionsUtil
 		return result;
 	}
 	
+	@Deprecated
 	public static Collection<Map<String, Column>> toMaps(final Table table, final int keyIndex, final MapType mapType, final CollectionType collectionType)
 	{
 		if (null == table || isCollectionEmpty(table.getColumns()))
