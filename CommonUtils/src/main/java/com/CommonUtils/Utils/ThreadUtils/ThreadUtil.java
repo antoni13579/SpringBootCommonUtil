@@ -20,6 +20,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.lang.Replacer;
 import cn.hutool.core.util.ArrayUtil;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -130,7 +131,7 @@ public final class ThreadUtil
 	 * @param countDownLatchProcess CountDownLatch处理接口，可以使用Lambda表达式
 	 * @param params 用于传入多个需处理的变量
 	 * */
-	public static Map<String, Object> countDownLatchProcessUtil(final int count, final CountDownLatchProcess countDownLatchProcess, final Map<String, Object> params)
+	public static Map<String, Object> countDownLatchProcessUtil(final int count, final CountDownLatchProcess<Map<String, Object>> countDownLatchProcess, final Map<String, Object> params)
 	{
 		Map<String, Object> result = null;
 		
@@ -159,7 +160,7 @@ public final class ThreadUtil
 	 * @param timeout 超时时间
 	 * @param unit 时间单位
 	 * */
-	public static Map<String, Object> countDownLatchProcessUtil(final int count, final CountDownLatchProcess countDownLatchProcess, final long timeout, final TimeUnit unit, final Map<String, Object> params)
+	public static Map<String, Object> countDownLatchProcessUtil(final int count, final CountDownLatchProcess<Map<String, Object>> countDownLatchProcess, final long timeout, final TimeUnit unit, final Map<String, Object> params)
 	{
 		Map<String, Object> result = null;
 		
@@ -259,27 +260,27 @@ public final class ThreadUtil
 	public static <T> CompletableFuture<T> getCompletableFuture(final Executor executor, final Supplier<T> supplier)
 	{ return CompletableFuture.supplyAsync(supplier, executor); }
 	
-	public static Map<String, Object> stampedLockProcessWithWriteMode(final StampedLockProcess stampedLockProcess, final Map<String, Object> params)
+	public static Map<String, Object> stampedLockProcessWithWriteMode(final Replacer<Map<String, Object>> stampedLockProcess, final Map<String, Object> params)
 	{
 		StampedLock sl = new StampedLock();
 		
 		// 获取写锁，返回一个版本号（戳）
         long stamp = sl.writeLock();
         
-        Map<String, Object>  result = stampedLockProcess.process(params);
+        Map<String, Object>  result = stampedLockProcess.replace(params);
         
         // 释放写锁，需要传入上面获取的版本号
         sl.unlockWrite(stamp);
         return result;
 	}
 	
-	public static Map<String, Object> stampedLockProcessWithOptimisticReadMode(final StampedLockProcess stampedLockProcess, final Map<String, Object> params)
+	public static Map<String, Object> stampedLockProcessWithOptimisticReadMode(final Replacer<Map<String, Object>> stampedLockProcess, final Map<String, Object> params)
 	{
 		StampedLock sl = new StampedLock();
 		
 		// 乐观读
         long stamp = sl.tryOptimisticRead();
-        Map<String, Object> result = stampedLockProcess.process(params);
+        Map<String, Object> result = stampedLockProcess.replace(params);
         
         // 验证版本号是否有变化
         if (!sl.validate(stamp))
@@ -287,7 +288,7 @@ public final class ThreadUtil
         	// 版本号变了，乐观读转悲观读
         	stamp = sl.readLock();
         	
-        	result = stampedLockProcess.process(params);
+        	result = stampedLockProcess.replace(params);
         	
         	// 释放读锁，需要传入上面获取的版本号
         	sl.unlockRead(stamp);
@@ -299,7 +300,7 @@ public final class ThreadUtil
     /**
      * @param flag 这个需要填写布尔表达式，如修改x，y变量，但是只有x==0 && y==0才能修改，那么boolean flag = (x == 0 && y == 0)
      * */
-	public static Map<String, Object> stampedLockProcessWithReadMode(final StampedLockProcess stampedLockProcess, final boolean flag, final Map<String, Object> params)
+	public static Map<String, Object> stampedLockProcessWithReadMode(final Replacer<Map<String, Object>> stampedLockProcess, final boolean flag, final Map<String, Object> params)
 	{
 		StampedLock sl = new StampedLock();
 		
@@ -316,7 +317,7 @@ public final class ThreadUtil
             if (ws != 0L) 
             {
                 stamp = ws;
-                result = stampedLockProcess.process(params);
+                result = stampedLockProcess.replace(params);
                 break;
             }
             else 

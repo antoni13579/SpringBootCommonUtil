@@ -1,7 +1,6 @@
 package com.CommonUtils.Utils.NetworkUtils.HttpUtils.Bean;
 
-import com.CommonUtils.Utils.JsonUtils.JsonUtil;
-
+import cn.hutool.json.JSONUtil;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -18,5 +17,5 @@ public class SimpleResponse
 	private Object object;
 	
 	public String toJson()
-	{ return JsonUtil.toJson(this); }
+	{ return JSONUtil.toJsonStr(this); }
 }

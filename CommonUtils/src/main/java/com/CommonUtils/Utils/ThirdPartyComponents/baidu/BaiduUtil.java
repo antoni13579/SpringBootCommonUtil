@@ -11,6 +11,9 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -22,6 +25,7 @@ import com.baidu.aip.util.Base64Util;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.lang.func.Func1;
 import cn.hutool.http.ContentType;
 import cn.hutool.http.Header;
 import cn.hutool.http.HttpConnection;
@@ -184,5 +188,17 @@ public final class BaiduUtil
 		}
 		
 		return Optional.ofNullable(result);
+	}
+	
+	public static <T> Collection<T> jsonArrayToCollection(final org.json.JSONArray jsonArray, final Func1<org.json.JSONObject, T> handlerForJsonArrayTransferToCollection) throws Exception
+	{
+		if (null == jsonArray || null == handlerForJsonArrayTransferToCollection)
+		{ return Collections.emptyList(); }
+		
+		Collection<T> collection = new ArrayList<>();
+		for (Object obj : jsonArray)
+		{ collection.add(handlerForJsonArrayTransferToCollection.call((org.json.JSONObject)obj)); }
+
+		return collection;
 	}
 }

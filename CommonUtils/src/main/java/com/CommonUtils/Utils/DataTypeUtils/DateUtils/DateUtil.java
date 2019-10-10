@@ -52,7 +52,7 @@ public final class DateUtil
 		return cn.hutool.core.date.DateUtil.parse(String.valueOf(year) + monthStr + dayStr, DatePattern.PURE_DATE_PATTERN);
 	}
 	
-	/**java.util.Date转换为java.sql.Date，建议使用cn.hutool.core.date.DateTime.toSqlDate*/
+	/**java.util.Date转换为java.sql.Date，建议使用cn.hutool.core.date.DateTime.toSqlDate或cn.hutool.db.sql.SqlUtil.toSqlDate*/
 	public static java.sql.Date getDate(final Date date)
 	{ return new java.sql.Date(date.getTime()); }
 	

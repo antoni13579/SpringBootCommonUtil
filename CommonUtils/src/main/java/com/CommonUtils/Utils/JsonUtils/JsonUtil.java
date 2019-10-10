@@ -1,14 +1,12 @@
 package com.CommonUtils.Utils.JsonUtils;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
 
+/**Object转换为json建议使用cn.hutool.json.JSONUtil.toJsonPrettyStr或toJsonStr*/
 @Slf4j
+@Deprecated
 public final class JsonUtil 
 {
 	private JsonUtil() {}
@@ -28,20 +26,6 @@ public final class JsonUtil
 		return result;
 	}
 	
-	public static <T> Collection<T> jsonArrayToCollection(final org.json.JSONArray jsonArray, final HandlerForJsonArrayTransferToCollection<T> handlerForJsonArrayTransferToCollection)
-	{
-		if (null == jsonArray || null == handlerForJsonArrayTransferToCollection)
-		{ return Collections.emptyList(); }
-		
-		Collection<T> collection = new ArrayList<>();
-		jsonArray.forEach
-		(
-				obj -> 
-				{ collection.add(handlerForJsonArrayTransferToCollection.process((org.json.JSONObject)obj)); }
-		);
-		return collection;
-	}
-	
 	private static ObjectMapper getInstanceForObjectMapper()
 	{
 		if (null == OBJECT_MAPPER)
@@ -55,8 +39,4 @@ public final class JsonUtil
 		
 		return OBJECT_MAPPER;
 	}
-	
-	@FunctionalInterface
-	public interface HandlerForJsonArrayTransferToCollection<T>
-	{ T process(final org.json.JSONObject jsonObject); }
 }

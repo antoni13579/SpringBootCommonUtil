@@ -1,6 +1,5 @@
 package com.CommonUtils.Utils.DataTypeUtils.CollectionUtils;
 
-import java.sql.ResultSetMetaData;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -27,10 +26,9 @@ import com.CommonUtils.Utils.DBUtils.Bean.DBTable.Table;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
-import cn.hutool.core.date.DateTime;
-import cn.hutool.core.date.format.FastDateFormat;
 import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.util.ObjectUtil;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -208,64 +206,6 @@ public final class JavaCollectionsUtil
 		//为空直接是false
 		else
 		{ return false; }
-	}
-	
-	/**
-	 * dateFomat参数建议使用cn.hutool.core.date.DatePattern来提供日期格式
-	 * */
-	public static <K, V> Collection<String> getMapValues(final Collection<Map<K, V>> records, 
-														 final ResultSetMetaData resultSetMetaData, 
-														 final String delimiter,
-														 final FastDateFormat dateFomat,
-														 final boolean useColumnName) throws Exception
-	{
-		if (!isCollectionEmpty(records))
-		{
-			Collection<String> lines = new ArrayList<>();
-			//迭代每一行数据
-			for (Map<K, V> record : records)
-			{
-				if (!isMapEmpty(record))
-				{
-					StringBuilder line = new StringBuilder();
-					//根据ResultSetMetaData提供的表结构，获取变量record对应的值
-					for (int i = 1; i <= resultSetMetaData.getColumnCount(); i++) 
-					{
-						String columnName = null;
-						if (useColumnName)
-						{ columnName = resultSetMetaData.getColumnName(i); }
-						else
-						{ columnName = resultSetMetaData.getColumnLabel(i); }
-						
-						Object columnValue = record.get(columnName);
-						
-						String value = null;
-						
-						if (columnValue instanceof java.util.Date)
-						{ value = DateTime.of(Convert.toDate(columnValue)).toString(dateFomat); }
-						else if (columnValue instanceof java.sql.Date)
-						{ value = DateTime.of(new java.util.Date(Convert.convert(java.sql.Date.class, columnValue).getTime())).toString(dateFomat); }
-						else if (columnValue instanceof java.sql.Timestamp)
-						{ value = DateTime.of(new java.util.Date(Convert.convert(java.sql.Timestamp.class, columnValue).getTime())).toString(dateFomat); }
-						else if (columnValue instanceof oracle.sql.TIMESTAMP)
-						{ value = DateTime.of(new java.util.Date(Convert.convert(oracle.sql.TIMESTAMP.class, columnValue).timestampValue().getTime())).toString(dateFomat); }
-						else
-						{ value = ObjectUtil.toString(columnValue); }
-
-						line.append(value);
-						
-						if (i < resultSetMetaData.getColumnCount())
-						{ line.append(delimiter); }
-					}
-					lines.add(line.toString());
-				}
-				else
-				{ return Collections.emptyList(); }
-			}
-			return lines;
-		}
-		else
-		{ return Collections.emptyList(); }
 	}
 	
 	/**建议使用cn.hutool.core.collection.CollUtil.values*/ 

@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
+import java.nio.charset.Charset;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -17,10 +18,10 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -32,7 +33,9 @@ import com.CommonUtils.Utils.DBUtils.DBHandleUtil.PreparedStatementOperationType
 import com.CommonUtils.Utils.DBUtils.Bean.DBBaseInfo.AbstractDBInfo;
 import com.CommonUtils.Utils.DBUtils.Bean.DBBaseInfo.DBInfo;
 import com.CommonUtils.Utils.DBUtils.Bean.DBBaseInfo.DBInfoForDataSource;
+
 import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
+import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.CustomCollections.HashSet;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -40,13 +43,26 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.convert.Convert;
+import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.format.FastDateFormat;
 import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.lang.Replacer;
 import cn.hutool.core.text.StrSpliter;
+import cn.hutool.core.text.csv.CsvParser;
+import cn.hutool.core.text.csv.CsvReadConfig;
 import cn.hutool.core.text.csv.CsvRow;
 import cn.hutool.core.text.csv.CsvUtil;
+import cn.hutool.core.text.csv.CsvWriteConfig;
+import cn.hutool.core.text.csv.CsvWriter;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.poi.excel.BigExcelWriter;
+import cn.hutool.poi.excel.ExcelUtil;
+import cn.hutool.poi.excel.sax.handler.RowHandler;
+
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -57,13 +73,13 @@ public final class DBBatchFlowUtil
 	 * dateFomat参数建议使用cn.hutool.core.date.DatePattern来提供日期格式
 	 * */
 	@SafeVarargs
-	public static boolean batchFlow(final AbstractDBInfo sourceDBInfo, 
-								 	final File targetFile, 
-								 	final String delimiter, 
-								 	final String encode, 
-								 	final boolean append, 
-								 	final FastDateFormat dateFomat,
-								 	final ItemProcessor<Map<String, Object>> ... itemProcessors)
+	public static boolean dbToTextFile(final AbstractDBInfo sourceDBInfo, 
+								 	   final File targetFile, 
+								 	   final String delimiter, 
+								 	   final Charset encode, 
+								 	   final boolean append, 
+								 	   final FastDateFormat dateFomat,
+								 	   final Replacer<Map<String, Object>> ... itemProcessors)
 	{
 		Connection sourceConnection = null;
 		PreparedStatement sourcePreparedStatement = null;
@@ -89,7 +105,7 @@ public final class DBBatchFlowUtil
 			
 			while (sourceResultSet.next())
 			{
-				Map<String, Object> record = new HashMap<String, Object>();
+				Map<String, Object> record = new LinkedHashMap<String, Object>();
 				for (int i = 1; i <= sourceResultSetMetaData.getColumnCount(); i++) 
 				{
 					String columnName = null;
@@ -104,10 +120,61 @@ public final class DBBatchFlowUtil
 				
 				records.add(record);
 				
-				if (records.size() % DBContants.fetchSize == 0)
-				{ processAndWrite(itemProcessors, records, sourceResultSetMetaData, delimiter, bw, dateFomat, sourceDBInfo.isUseColumnName()); }
+				if (records.size() % DBContants.fetchSize == 0 || sourceResultSet.isLast())
+				{
+					Collection<String> lines = new ArrayList<>();
+					List<Map<String, Object>> newRecords = batchProcess(records, itemProcessors);
+					//迭代每一行数据
+					for (Map<String, Object> tempRecord : newRecords)
+					{
+						StringBuilder line = new StringBuilder();
+						//根据ResultSetMetaData提供的表结构，获取变量record对应的值
+						for (int i = 1; i <= sourceResultSetMetaData.getColumnCount(); i++) 
+						{
+							String columnName = null;
+							if (sourceDBInfo.isUseColumnName())
+							{ columnName = sourceResultSetMetaData.getColumnName(i); }
+							else
+							{ columnName = sourceResultSetMetaData.getColumnLabel(i); }
+							
+							Object columnValue = tempRecord.get(columnName);
+							
+							String value = null;
+							
+							if (columnValue instanceof java.util.Date)
+							{ value = DateTime.of(Convert.toDate(columnValue)).toString(dateFomat); }
+							else if (columnValue instanceof java.sql.Date)
+							{ value = DateTime.of(new java.util.Date(Convert.convert(java.sql.Date.class, columnValue).getTime())).toString(dateFomat); }
+							else if (columnValue instanceof java.sql.Timestamp)
+							{ value = DateTime.of(new java.util.Date(Convert.convert(java.sql.Timestamp.class, columnValue).getTime())).toString(dateFomat); }
+							else if (columnValue instanceof oracle.sql.TIMESTAMP)
+							{ value = DateTime.of(new java.util.Date(Convert.convert(oracle.sql.TIMESTAMP.class, columnValue).timestampValue().getTime())).toString(dateFomat); }
+							else
+							{ value = ObjectUtil.toString(columnValue); }
+
+							line.append(value);
+							
+							if (i < sourceResultSetMetaData.getColumnCount())
+							{ line.append(delimiter); }
+						}
+						lines.add(line.toString());
+					}
+					
+					if (!CollUtil.isEmpty(lines))
+					{
+						for (String line : lines)
+						{
+							if (!StrUtil.isEmptyIfStr(line))
+							{
+								bw.write(line);
+								bw.write("\r\n");
+							}
+						}
+						bw.flush();
+					}
+					records.clear();
+				}
 			}
-			processAndWrite(itemProcessors, records, sourceResultSetMetaData, delimiter, bw, dateFomat, sourceDBInfo.isUseColumnName());
 			result = true;
 		}
 		catch (Exception ex)
@@ -127,98 +194,356 @@ public final class DBBatchFlowUtil
 	}
 	
 	@SafeVarargs
-	public static boolean batchFlow(final File srcFile, final AbstractDBInfo targetDBInfo, final String encode, final ItemProcessor<String[]> ... itemProcessors)
-	{ return batchFlow(srcFile, targetDBInfo, encode, -1, itemProcessors); }
-	
-	@SafeVarargs
-	public static boolean batchFlow(final File srcFile, final AbstractDBInfo targetDBInfo, final String encode, final long skipRow, final ItemProcessor<String[]> ... itemProcessors)
+	public static boolean dbToKafka(final AbstractDBInfo sourceDBInfo, 
+								    final KafkaTemplate<Object, Object> kafkaTemplate, 
+									final String topic,
+									final String key,
+									final Replacer<Map<String, Object>> ... itemProcessors)
 	{
-		FileInputStream fos = null;
-    	BufferedInputStream bis = null;
-    	InputStreamReader isr = null;
-    	BufferedReader br = null;
-    	
-    	Connection targetConnection = null;
-		PreparedStatement targetPreparedStatement = null;
-		JdbcTemplate targetJdbcTemplate = null;
-		boolean usePool = false;
-    	
+		Connection sourceConnection = null;
+		PreparedStatement sourcePreparedStatement = null;
+		ResultSet sourceResultSet = null;
 		boolean result = false;
 		try
 		{
-			fos = new FileInputStream(srcFile);
-    		bis = new BufferedInputStream(fos);
-    		isr = new InputStreamReader(bis, encode);
-    		br = new BufferedReader(isr);
-    		
-    		if (targetDBInfo instanceof DBInfo)
+			List<Map<String, Object>> records = new ArrayList<Map<String, Object>>();
+			
+			//源数据库初始化
+			sourceConnection = DBHandleUtil.getConnection(sourceDBInfo);
+			sourcePreparedStatement = DBHandleUtil.getPreparedStatement(PreparedStatementOperationType.READ, sourceConnection, sourceDBInfo.getSql());
+			DBHandleUtil.setPreparedStatement(PreparedStatementOperationType.READ, sourcePreparedStatement, sourceDBInfo.getBindingParams());
+			sourceResultSet = sourcePreparedStatement.executeQuery();
+			ResultSetMetaData sourceResultSetMetaData = sourcePreparedStatement.getMetaData();
+			
+			//开始处理数据
+			while (sourceResultSet.next())
+			{
+				Map<String, Object> record = new LinkedHashMap<String, Object>();
+				for (int i = 1; i <= sourceResultSetMetaData.getColumnCount(); i++) 
+				{
+					String columnName = null;
+					if (sourceDBInfo.isUseColumnName())
+					{ columnName = sourceResultSetMetaData.getColumnName(i); }
+					else
+					{ columnName = sourceResultSetMetaData.getColumnLabel(i); }
+					
+					Object columnValue = sourceResultSet.getObject(columnName);
+					record.put(columnName, columnValue);
+				}
+				
+				records.add(record);
+				
+				if (records.size() % DBContants.fetchSize == 0 || sourceResultSet.isLast())
+				{
+					kafkaTemplate.send(topic, key, ObjectUtil.serialize(batchProcess(records, itemProcessors)));
+					records.clear();
+				}
+			}
+			
+			result = true;
+		}
+		catch (Exception ex)
+		{
+			log.error("批量数据流处理执行失败，异常原因为：", ex);			
+			result = false;
+		}
+		finally
+		{ DBHandleUtil.releaseRelatedResourcesNoDataSource(new Connection[] {sourceConnection}, new ResultSet[] {sourceResultSet}, new PreparedStatement[] {sourcePreparedStatement}); }
+		
+		return result;
+	}
+	
+	@SafeVarargs
+	public static boolean dbToDb(final AbstractDBInfo sourceDBInfo, 
+								 final AbstractDBInfo targetDBInfo, 
+								 final Replacer<Map<String, Object>> ... itemProcessors)
+	{
+		Connection sourceConnection = null;
+		Connection targetConnection = null;
+		
+		PreparedStatement sourcePreparedStatement = null;
+		PreparedStatement targetPreparedStatement = null;
+		
+		JdbcTemplate targetJdbcTemplate = null;
+		ResultSet sourceResultSet = null;
+		boolean usePool = false;
+		boolean result = false;
+		try
+		{
+			List<Map<String, Object>> records = new ArrayList<Map<String, Object>>();
+			
+			//源数据库初始化
+			sourceConnection = DBHandleUtil.getConnection(sourceDBInfo);
+			sourcePreparedStatement = DBHandleUtil.getPreparedStatement(PreparedStatementOperationType.READ, sourceConnection, sourceDBInfo.getSql());
+			DBHandleUtil.setPreparedStatement(PreparedStatementOperationType.READ, sourcePreparedStatement, sourceDBInfo.getBindingParams());
+			sourceResultSet = sourcePreparedStatement.executeQuery();
+			ResultSetMetaData sourceResultSetMetaData = sourcePreparedStatement.getMetaData();
+			
+			//目标数据库初始化
+			DBInfoForDataSource targetDBinfoForDataSource = null;
+			if (targetDBInfo instanceof DBInfo)
 			{
 				targetConnection = DBHandleUtil.getConnection(targetDBInfo);
 				targetPreparedStatement = DBHandleUtil.getPreparedStatement(PreparedStatementOperationType.WRITE, targetConnection, targetDBInfo.getSql());
 			}
 			else if (targetDBInfo instanceof DBInfoForDataSource)
 			{
+				targetDBinfoForDataSource = (DBInfoForDataSource)targetDBInfo;
 				usePool = true;
-				DBInfoForDataSource dbInfoForDataSource = (DBInfoForDataSource)targetDBInfo;
-				targetJdbcTemplate = dbInfoForDataSource.getJdbcTemplate();
+				targetJdbcTemplate = targetDBinfoForDataSource.getJdbcTemplate();
 			}
 			else
 			{ throw new Exception("出现了新的AbstractDBInfo继承子类，请及时处理"); }
-    		
-    		List<String[]> records = new ArrayList<>();
-    		Iterator<CsvRow> iter = CsvUtil.getReader().read(br).iterator();
-    		long rows = 0;
-    		while (iter.hasNext())
-    		{
-    			++rows;
-    			if (rows == skipRow)
-    			{ continue; }
-    			
-    			CsvRow tmp = iter.next();
-    			String[] record = tmp.toArray(new String[tmp.size()]);
-    			records.add(record);
-    			if (records.size() % DBContants.fetchSize == 0)
-    			{
-    				if (usePool)
-					{ processAndWrite(itemProcessors, records, targetJdbcTemplate, targetDBInfo.getSql()); }
+			
+			//开始处理数据
+			while (sourceResultSet.next())
+			{
+				Map<String, Object> record = new LinkedHashMap<String, Object>();
+				for (int i = 1; i <= sourceResultSetMetaData.getColumnCount(); i++) 
+				{
+					String columnName = null;
+					if (sourceDBInfo.isUseColumnName())
+					{ columnName = sourceResultSetMetaData.getColumnName(i); }
 					else
-					{ processAndWrite(itemProcessors, records, targetPreparedStatement, targetConnection); }
-    			}
-    		}
-    		
-    		if (usePool)
-			{ processAndWrite(itemProcessors, records, targetJdbcTemplate, targetDBInfo.getSql()); }
-			else
-			{ processAndWrite(itemProcessors, records, targetPreparedStatement, targetConnection); }
-    		
+					{ columnName = sourceResultSetMetaData.getColumnLabel(i); }
+					
+					Object columnValue = sourceResultSet.getObject(columnName);
+					
+					record.put(columnName, columnValue);
+				}
+				
+				records.add(record);
+				
+				if (records.size() % DBContants.fetchSize == 0 || sourceResultSet.isLast())
+				{
+					if (usePool)
+					{
+						List<Map<String, Object>> newRecords = batchProcess(records, itemProcessors);
+						targetJdbcTemplate.batchUpdate
+						(
+								targetDBinfoForDataSource.getSql(), 
+								new BatchPreparedStatementSetter() 
+								{
+									@Override
+									public void setValues(PreparedStatement ps, int indx) throws SQLException 
+									{
+										Map<String, Object> finalRecord = newRecords.get(indx);
+										for (int i = 1; i <= sourceResultSetMetaData.getColumnCount(); i++) 
+										{
+											String columnName = null;
+											if (sourceDBInfo.isUseColumnName())
+											{ columnName = sourceResultSetMetaData.getColumnName(i); }
+											else
+											{ columnName = sourceResultSetMetaData.getColumnLabel(i); }
+											
+											Object columnValue = finalRecord.get(columnName);
+											ps.setObject(i, columnValue);
+										}
+									}
+
+									@Override
+									public int getBatchSize() 
+									{ return newRecords.size(); }
+								}
+						);
+						records.clear();
+					}
+					else
+					{
+						DBHandleUtil.setPreparedStatement(PreparedStatementOperationType.WRITE, targetPreparedStatement, sourceResultSetMetaData, batchProcess(records, itemProcessors), sourceDBInfo.isUseColumnName());
+						DBHandleUtil.commit(new PreparedStatement[] {targetPreparedStatement}, new Connection[] {targetConnection}, true);
+						records.clear();
+					}
+				}
+			}
+			
 			result = true;
 		}
 		catch (Exception ex)
 		{
-			log.error("读取文件文件数据后，对其进去入库出现异常，异常原因为：", ex);
+			log.error("批量数据流处理执行失败，异常原因为：", ex);
 			if (!usePool)
 			{ DBHandleUtil.rollback(targetConnection); }
 			
 			result = false;
 		}
 		finally
+		{ DBHandleUtil.releaseRelatedResourcesNoDataSource(new Connection[] {sourceConnection, targetConnection}, new ResultSet[] {sourceResultSet}, new PreparedStatement[] {sourcePreparedStatement, targetPreparedStatement}); }
+		
+		return result;
+	}
+	
+	/**读取数据库，并写入到EXCEL文件*/
+	@SafeVarargs
+	public static boolean dbToExcel(final AbstractDBInfo sourceDBInfo, 
+		 							final File targetFile,
+		 							final String sheetName,
+		 							final Replacer<Map<String, Object>> ... itemProcessors)
+	{
+		Connection sourceConnection = null;
+		PreparedStatement sourcePreparedStatement = null;
+		ResultSet sourceResultSet = null;
+		BigExcelWriter bigExcelWriter = null;
+		boolean result = false;
+		try
 		{
-			IoUtil.close(br);
-			IoUtil.close(isr);
-			IoUtil.close(bis);
-			IoUtil.close(fos);
-			DBHandleUtil.releaseRelatedResourcesNoDataSource(new Connection[] {targetConnection}, null, new PreparedStatement[] {targetPreparedStatement});
+			List<Map<String, Object>> records = new ArrayList<>();
+			sourceConnection = DBHandleUtil.getConnection(sourceDBInfo);
+			sourcePreparedStatement = DBHandleUtil.getPreparedStatement(PreparedStatementOperationType.READ, sourceConnection, sourceDBInfo.getSql());
+			DBHandleUtil.setPreparedStatement(PreparedStatementOperationType.READ, sourcePreparedStatement, sourceDBInfo.getBindingParams());
+			
+			sourceResultSet = sourcePreparedStatement.executeQuery();
+			ResultSetMetaData sourceResultSetMetaData = sourcePreparedStatement.getMetaData();
+			
+			bigExcelWriter = ExcelUtil.getBigWriter(targetFile, sheetName);
+			
+			while (sourceResultSet.next())
+			{
+				Map<String, Object> record = new LinkedHashMap<String, Object>();
+				for (int i = 1; i <= sourceResultSetMetaData.getColumnCount(); i++) 
+				{
+					String columnName = null;
+					if (sourceDBInfo.isUseColumnName())
+					{ columnName = sourceResultSetMetaData.getColumnName(i); }
+					else
+					{ columnName = sourceResultSetMetaData.getColumnLabel(i); }
+					
+					Object columnValue = sourceResultSet.getObject(columnName);
+					record.put(columnName, columnValue);
+				}
+				
+				records.add(record);
+				
+				if (records.size() % DBContants.fetchSize == 0 || sourceResultSet.isLast())
+				{
+					bigExcelWriter.write(batchProcess(records, itemProcessors), true).flush();
+					records.clear();
+				}
+			}
+			
+			result = true;
+		}
+		catch (Exception ex)
+		{
+			log.error("读取数据库后，并写入到EXCEL出现异常，异常原因为：", ex);
+			result = false;
+		}
+		finally
+		{
+			IoUtil.close(bigExcelWriter);
+			DBHandleUtil.releaseRelatedResourcesNoDataSource(new Connection[] { sourceConnection }, new ResultSet[] { sourceResultSet }, new PreparedStatement[] { sourcePreparedStatement });
+		}
+		
+		return result;
+	}
+	
+	/**读取数据库，并写入到CSV文件*/
+	@SafeVarargs
+	public static boolean dbToCsv(final AbstractDBInfo sourceDBInfo, 
+								  final File targetFile,
+								  final Charset encode,
+								  final boolean isAppend,
+								  final FastDateFormat dateFomat,
+								  final CsvWriteConfig csvWriteConfig,
+								  final Replacer<Map<String, Object>> ... itemProcessors)
+	{
+		Connection sourceConnection = null;
+		PreparedStatement sourcePreparedStatement = null;
+		ResultSet sourceResultSet = null;
+		
+		CsvWriter csvWriter = null;
+		boolean result = false;
+		try
+		{
+			List<Map<String, Object>> records = new ArrayList<Map<String, Object>>();
+			sourceConnection = DBHandleUtil.getConnection(sourceDBInfo);
+			sourcePreparedStatement = DBHandleUtil.getPreparedStatement(PreparedStatementOperationType.READ, sourceConnection, sourceDBInfo.getSql());
+			DBHandleUtil.setPreparedStatement(PreparedStatementOperationType.READ, sourcePreparedStatement, sourceDBInfo.getBindingParams());
+			
+			sourceResultSet = sourcePreparedStatement.executeQuery();
+			ResultSetMetaData sourceResultSetMetaData = sourcePreparedStatement.getMetaData();
+			
+			csvWriter = CsvUtil.getWriter(targetFile, encode, isAppend, csvWriteConfig);
+			
+			while (sourceResultSet.next())
+			{
+				Map<String, Object> record = new LinkedHashMap<String, Object>();
+				for (int i = 1; i <= sourceResultSetMetaData.getColumnCount(); i++) 
+				{
+					String columnName = null;
+					if (sourceDBInfo.isUseColumnName())
+					{ columnName = sourceResultSetMetaData.getColumnName(i); }
+					else
+					{ columnName = sourceResultSetMetaData.getColumnLabel(i); }
+					
+					Object columnValue = sourceResultSet.getObject(columnName);
+					record.put(columnName, columnValue);
+				}
+				
+				records.add(record);
+				
+				if (records.size() % DBContants.fetchSize == 0 || sourceResultSet.isLast())
+				{					
+					Collection<String[]> lines = new ArrayList<>();
+					List<Map<String, Object>> newRecords = batchProcess(records, itemProcessors);
+					for (Map<String, Object> tempRecord : newRecords)
+					{
+						List<String> line = new ArrayList<>();
+						for (int i = 1; i <= sourceResultSetMetaData.getColumnCount(); i++) 
+						{
+							String columnName = null;
+							if (sourceDBInfo.isUseColumnName())
+							{ columnName = sourceResultSetMetaData.getColumnName(i); }
+							else
+							{ columnName = sourceResultSetMetaData.getColumnLabel(i); }
+							
+							Object columnValue = tempRecord.get(columnName);
+							
+							String value = null;
+							
+							if (columnValue instanceof java.util.Date)
+							{ value = DateTime.of(Convert.toDate(columnValue)).toString(dateFomat); }
+							else if (columnValue instanceof java.sql.Date)
+							{ value = DateTime.of(new java.util.Date(Convert.convert(java.sql.Date.class, columnValue).getTime())).toString(dateFomat); }
+							else if (columnValue instanceof java.sql.Timestamp)
+							{ value = DateTime.of(new java.util.Date(Convert.convert(java.sql.Timestamp.class, columnValue).getTime())).toString(dateFomat); }
+							else if (columnValue instanceof oracle.sql.TIMESTAMP)
+							{ value = DateTime.of(new java.util.Date(Convert.convert(oracle.sql.TIMESTAMP.class, columnValue).timestampValue().getTime())).toString(dateFomat); }
+							else
+							{ value = ObjectUtil.toString(columnValue); }
+							
+							line.add(value);
+						}
+						lines.add(line.toArray(new String[line.size()]));
+					}
+					csvWriter.write(lines);
+					csvWriter.flush();
+					records.clear();
+				}
+			}
+			result = true;
+		}
+		catch (Exception ex)
+		{
+			log.error("读取数据库后，写入到CSV文件出现异常，异常原因为：", ex);
+			result = false;
+		}
+		finally
+		{
+			IoUtil.close(csvWriter);
+			DBHandleUtil.releaseRelatedResourcesNoDataSource(new Connection[] { sourceConnection }, new ResultSet[] { sourceResultSet }, new PreparedStatement[] { sourcePreparedStatement });
 		}
 		
 		return result;
 	}
 	
 	@SafeVarargs
-	public static boolean batchFlow(final File srcFile, final AbstractDBInfo targetDBInfo, final String delimiter, final String encode, final ItemProcessor<String[]> ... itemProcessors)
-	{ return batchFlow(srcFile, targetDBInfo, delimiter, encode, -1, itemProcessors); }
-	
-	@SafeVarargs
-	public static boolean batchFlow(final File srcFile, final AbstractDBInfo targetDBInfo, final String delimiter, final String encode, final long skipRow, final ItemProcessor<String[]> ... itemProcessors)
+	public static boolean textFileToDb(final File srcFile, 
+									   final AbstractDBInfo targetDBInfo, 
+									   final String delimiter, 
+									   final Charset encode, 
+									   final long skipRow, 
+									   final Replacer<String[]> ... itemProcessors)
 	{
 		InputStream fis = null;
 		Reader isr = null;
@@ -296,93 +621,21 @@ public final class DBBatchFlowUtil
 		return result;
 	}
 	
+	/**读取EXCEL文件，并写入到数据库*/
 	@SafeVarargs
-	public static boolean batchFlow(final AbstractDBInfo sourceDBInfo, 
-								    final KafkaTemplate<Object, Object> kafkaTemplate, 
-									final String topic,
-									final String key,
-									final ItemProcessor<Map<String, Object>> ... itemProcessors)
+	public static boolean excelToDb(final File srcFile, 
+									final AbstractDBInfo targetDBInfo, 
+									final int sheetIndx,
+									final int skipRow,
+									final Replacer<Object[]> ... itemProcessors)
 	{
-		Connection sourceConnection = null;
-		PreparedStatement sourcePreparedStatement = null;
-		ResultSet sourceResultSet = null;
-		boolean result = false;
-		try
-		{
-			List<Map<String, Object>> records = new ArrayList<Map<String, Object>>();
-			
-			//源数据库初始化
-			sourceConnection = DBHandleUtil.getConnection(sourceDBInfo);
-			sourcePreparedStatement = DBHandleUtil.getPreparedStatement(PreparedStatementOperationType.READ, sourceConnection, sourceDBInfo.getSql());
-			DBHandleUtil.setPreparedStatement(PreparedStatementOperationType.READ, sourcePreparedStatement, sourceDBInfo.getBindingParams());
-			sourceResultSet = sourcePreparedStatement.executeQuery();
-			ResultSetMetaData sourceResultSetMetaData = sourcePreparedStatement.getMetaData();
-			
-			//开始处理数据
-			while (sourceResultSet.next())
-			{
-				Map<String, Object> record = new HashMap<String, Object>();
-				for (int i = 1; i <= sourceResultSetMetaData.getColumnCount(); i++) 
-				{
-					String columnName = null;
-					if (sourceDBInfo.isUseColumnName())
-					{ columnName = sourceResultSetMetaData.getColumnName(i); }
-					else
-					{ columnName = sourceResultSetMetaData.getColumnLabel(i); }
-					
-					Object columnValue = sourceResultSet.getObject(columnName);
-					record.put(columnName, columnValue);
-				}
-				
-				records.add(record);
-				
-				if (records.size() % DBContants.fetchSize == 0)
-				{ processAndSend(itemProcessors, records, topic, kafkaTemplate, key); }
-			}
-			
-			processAndSend(itemProcessors, records, topic, kafkaTemplate, key);
-			
-			result = true;
-		}
-		catch (Exception ex)
-		{
-			log.error("批量数据流处理执行失败，异常原因为：", ex);			
-			result = false;
-		}
-		finally
-		{ DBHandleUtil.releaseRelatedResourcesNoDataSource(new Connection[] {sourceConnection}, new ResultSet[] {sourceResultSet}, new PreparedStatement[] {sourcePreparedStatement}); }
-		
-		return result;
-	}
-	
-	@SafeVarargs
-	public static boolean batchFlow(final AbstractDBInfo sourceDBInfo, 
-								 	final AbstractDBInfo targetDBInfo, 
-								 	final ItemProcessor<Map<String, Object>> ... itemProcessors)
-	{
-		Connection sourceConnection = null;
 		Connection targetConnection = null;
-		
-		PreparedStatement sourcePreparedStatement = null;
 		PreparedStatement targetPreparedStatement = null;
-		
-		JdbcTemplate targetJdbcTemplate = null;
-		ResultSet sourceResultSet = null;
-		boolean usePool = false;
+		JdbcTemplate targetJdbcTemplate = null;		
+		Set<Boolean> usePools = new HashSet<Boolean>().getSet();
 		boolean result = false;
 		try
 		{
-			List<Map<String, Object>> records = new ArrayList<Map<String, Object>>();
-			
-			//源数据库初始化
-			sourceConnection = DBHandleUtil.getConnection(sourceDBInfo);
-			sourcePreparedStatement = DBHandleUtil.getPreparedStatement(PreparedStatementOperationType.READ, sourceConnection, sourceDBInfo.getSql());
-			DBHandleUtil.setPreparedStatement(PreparedStatementOperationType.READ, sourcePreparedStatement, sourceDBInfo.getBindingParams());
-			sourceResultSet = sourcePreparedStatement.executeQuery();
-			ResultSetMetaData sourceResultSetMetaData = sourcePreparedStatement.getMetaData();
-			
-			//目标数据库初始化
-			DBInfoForDataSource targetDBinfoForDataSource = null;
 			if (targetDBInfo instanceof DBInfo)
 			{
 				targetConnection = DBHandleUtil.getConnection(targetDBInfo);
@@ -390,155 +643,162 @@ public final class DBBatchFlowUtil
 			}
 			else if (targetDBInfo instanceof DBInfoForDataSource)
 			{
-				targetDBinfoForDataSource = (DBInfoForDataSource)targetDBInfo;
-				usePool = true;
-				targetJdbcTemplate = targetDBinfoForDataSource.getJdbcTemplate();
+				usePools.add(true);
+				DBInfoForDataSource dbInfoForDataSource = (DBInfoForDataSource)targetDBInfo;
+				targetJdbcTemplate = dbInfoForDataSource.getJdbcTemplate();
 			}
 			else
 			{ throw new Exception("出现了新的AbstractDBInfo继承子类，请及时处理"); }
 			
-			//开始处理数据
-			while (sourceResultSet.next())
-			{
-				Map<String, Object> record = new HashMap<String, Object>();
-				for (int i = 1; i <= sourceResultSetMetaData.getColumnCount(); i++) 
-				{
-					String columnName = null;
-					if (sourceDBInfo.isUseColumnName())
-					{ columnName = sourceResultSetMetaData.getColumnName(i); }
-					else
-					{ columnName = sourceResultSetMetaData.getColumnLabel(i); }
-					
-					Object columnValue = sourceResultSet.getObject(columnName);
-					
-					record.put(columnName, columnValue);
-				}
-				
-				records.add(record);
-				
-				if (records.size() % DBContants.fetchSize == 0)
-				{
-					if (usePool)
-					{ processAndWrite(itemProcessors, records, sourceResultSetMetaData, targetJdbcTemplate, targetDBinfoForDataSource.getSql(), sourceDBInfo.isUseColumnName()); }
-					else
-					{ processAndWrite(itemProcessors, records, sourceResultSetMetaData, targetPreparedStatement, targetConnection, sourceDBInfo.isUseColumnName()); }
-				}
-			}
+			List<Object[]> records = new ArrayList<>();
+			ExcelUtil.readBySax
+			(
+					srcFile, 
+					sheetIndx, 
+					new RowHandlerImpl()
+						.setAbstractDBInfo(targetDBInfo)
+						.setConnection(targetConnection)
+						.setItemProcessors(itemProcessors)
+						.setJdbcTemplate(targetJdbcTemplate)
+						.setPreparedStatement(targetPreparedStatement)
+						.setRecords(records)
+						.setSkipRow(skipRow)
+						.setUsePools(usePools)
+			);
 			
-			if (usePool)
-			{ processAndWrite(itemProcessors, records, sourceResultSetMetaData, targetJdbcTemplate, targetDBinfoForDataSource.getSql(), sourceDBInfo.isUseColumnName()); }
+			if (JavaCollectionsUtil.getOperationFlowResult(usePools))
+			{ processAndWrite(itemProcessors, records, targetJdbcTemplate, targetDBInfo.getSql()); }
 			else
-			{ processAndWrite(itemProcessors, records, sourceResultSetMetaData, targetPreparedStatement, targetConnection, sourceDBInfo.isUseColumnName()); }
+			{ processAndWrite(itemProcessors, records, targetPreparedStatement, targetConnection); }
 			
 			result = true;
 		}
 		catch (Exception ex)
 		{
-			log.error("批量数据流处理执行失败，异常原因为：", ex);
+			log.error("读取Excel文件数据后，对其进去入库出现异常，异常原因为：", ex);
+			if (!JavaCollectionsUtil.getOperationFlowResult(usePools))
+			{ DBHandleUtil.rollback(targetConnection); }
+			
+			result = false;
+		}
+		finally
+		{ DBHandleUtil.releaseRelatedResourcesNoDataSource(new Connection[] {targetConnection}, null, new PreparedStatement[] {targetPreparedStatement}); }
+		
+		return result;
+	}
+	
+	/**读取CSV文件，并写入到数据库*/
+	@SafeVarargs
+	public static boolean csvToDb(final File srcFile, final AbstractDBInfo targetDBInfo, final Charset encode, final long skipRow, final CsvReadConfig csvReadConfig, final Replacer<String[]> ... itemProcessors)
+	{
+		FileInputStream fos = null;
+    	BufferedInputStream bis = null;
+    	InputStreamReader isr = null;
+    	BufferedReader br = null;
+    	CsvParser csvParser = null;
+    	
+    	Connection targetConnection = null;
+		PreparedStatement targetPreparedStatement = null;
+		JdbcTemplate targetJdbcTemplate = null;
+		boolean usePool = false;
+    	
+		boolean result = false;
+		try
+		{
+			fos = new FileInputStream(srcFile);
+    		bis = new BufferedInputStream(fos);
+    		isr = new InputStreamReader(bis, encode);
+    		br = new BufferedReader(isr);
+    		csvParser = new CsvParser(br, csvReadConfig);
+    		
+    		
+    		if (targetDBInfo instanceof DBInfo)
+			{
+				targetConnection = DBHandleUtil.getConnection(targetDBInfo);
+				targetPreparedStatement = DBHandleUtil.getPreparedStatement(PreparedStatementOperationType.WRITE, targetConnection, targetDBInfo.getSql());
+			}
+			else if (targetDBInfo instanceof DBInfoForDataSource)
+			{
+				usePool = true;
+				DBInfoForDataSource dbInfoForDataSource = (DBInfoForDataSource)targetDBInfo;
+				targetJdbcTemplate = dbInfoForDataSource.getJdbcTemplate();
+			}
+			else
+			{ throw new Exception("出现了新的AbstractDBInfo继承子类，请及时处理"); }
+    		
+    		List<String[]> records = new ArrayList<>();
+    		long rows = 0;
+    		CsvRow csvRow;
+    		while ((csvRow = csvParser.nextRow()) != null)
+    		{
+    			++rows;
+    			if (rows == skipRow)
+    			{ continue; }
+
+    			String[] record = csvRow.toArray(new String[csvRow.size()]);
+    			records.add(record);
+    			if (records.size() % DBContants.fetchSize == 0)
+    			{
+    				if (usePool)
+					{ processAndWrite(itemProcessors, records, targetJdbcTemplate, targetDBInfo.getSql()); }
+					else
+					{ processAndWrite(itemProcessors, records, targetPreparedStatement, targetConnection); }
+    			}
+    		}
+    		
+    		if (usePool)
+			{ processAndWrite(itemProcessors, records, targetJdbcTemplate, targetDBInfo.getSql()); }
+			else
+			{ processAndWrite(itemProcessors, records, targetPreparedStatement, targetConnection); }
+    		
+			result = true;
+		}
+		catch (Exception ex)
+		{
+			log.error("读取文件文件数据后，对其进去入库出现异常，异常原因为：", ex);
 			if (!usePool)
 			{ DBHandleUtil.rollback(targetConnection); }
 			
 			result = false;
 		}
 		finally
-		{ DBHandleUtil.releaseRelatedResourcesNoDataSource(new Connection[] {sourceConnection, targetConnection}, new ResultSet[] {sourceResultSet}, new PreparedStatement[] {sourcePreparedStatement, targetPreparedStatement}); }
+		{
+			IoUtil.close(csvParser);
+			IoUtil.close(br);
+			IoUtil.close(isr);
+			IoUtil.close(bis);
+			IoUtil.close(fos);
+			DBHandleUtil.releaseRelatedResourcesNoDataSource(new Connection[] {targetConnection}, null, new PreparedStatement[] {targetPreparedStatement});
+		}
 		
 		return result;
 	}
 	
-	private static void processAndSend(final ItemProcessor<Map<String, Object>>[] itemProcessors, 
-			   						   final List<Map<String, Object>> records,
-			   						   final String topic,
-			   						   final KafkaTemplate<Object, Object> kafkaTemplate,
-			   						   final String key)
+	private static <T> void processAndWrite(final Replacer<T[]>[] itemProcessors,
+											final List<T[]> records,
+											final PreparedStatement targetPreparedStatement, 
+											final Connection targetConnection) throws SQLException
 	{
-		Collection<Map<String, Object>> newRecords = batchProcess(records, itemProcessors);
-		kafkaTemplate.send(topic, key, ObjectUtil.serialize(newRecords));
-		records.clear();
-	}
-	
-	private static void processAndWrite(final ItemProcessor<Map<String, Object>>[] itemProcessors, 
-										final List<Map<String, Object>> records, 
-										final ResultSetMetaData sourceResultSetMetaData, 
-										final PreparedStatement targetPreparedStatement, 
-										final Connection targetConnection,
-										final boolean useColumnName) throws SQLException
-	{
-		Collection<Map<String, Object>> newRecords = batchProcess(records, itemProcessors);
-		
-		DBHandleUtil.setPreparedStatement(PreparedStatementOperationType.WRITE, targetPreparedStatement, sourceResultSetMetaData, newRecords, useColumnName);
-		DBHandleUtil.commit(new PreparedStatement[] {targetPreparedStatement}, new Connection[] {targetConnection}, true);
-		
-		records.clear();
-	}
-	
-	private static void processAndWrite(final ItemProcessor<Map<String, Object>>[] itemProcessors, 
-										final List<Map<String, Object>> records, 
-										final ResultSetMetaData sourceResultSetMetaData, 
-										final JdbcTemplate targetJdbcTemplate, 
-										final String sql,
-										final boolean useColumnName) throws SQLException
-	{
-		List<Map<String, Object>> newRecords = batchProcess(records, itemProcessors);
-		
-		targetJdbcTemplate.batchUpdate
-		(
-				sql, 
-				new BatchPreparedStatementSetter() 
-				{
-					@Override
-					public void setValues(PreparedStatement ps, int indx) throws SQLException 
-					{
-						Map<String, Object> finalRecord = newRecords.get(indx);
-						for (int i = 1; i <= sourceResultSetMetaData.getColumnCount(); i++) 
-						{
-							String columnName = null;
-							if (useColumnName)
-							{ columnName = sourceResultSetMetaData.getColumnName(i); }
-							else
-							{ columnName = sourceResultSetMetaData.getColumnLabel(i); }
-							
-							Object columnValue = finalRecord.get(columnName);
-							ps.setObject(i, columnValue);
-						}
-					}
-
-					@Override
-					public int getBatchSize() 
-					{ return newRecords.size(); }
-				}
-		);
-		
-		records.clear();
-	}
-	
-	private static void processAndWrite(final ItemProcessor<String[]>[] itemProcessors,
-										final List<String[]> records,
-										final PreparedStatement targetPreparedStatement, 
-										final Connection targetConnection) throws SQLException
-	{
-		Collection<String[]> newRecords = batchProcess(records, itemProcessors);		
-		DBHandleUtil.setPreparedStatement(PreparedStatementOperationType.WRITE, targetPreparedStatement, newRecords);
+		DBHandleUtil.setPreparedStatement(PreparedStatementOperationType.WRITE, targetPreparedStatement, batchProcess(records, itemProcessors));
 		DBHandleUtil.commit(new PreparedStatement[] {targetPreparedStatement}, new Connection[] {targetConnection}, true);
 		records.clear();
 	}
 	
-	private static void processAndWrite(final ItemProcessor<String[]>[] itemProcessors,
-										final List<String[]> records,
-										final JdbcTemplate targetJdbcTemplate, 
-										final String sql)
+	private static <T> void processAndWrite(final Replacer<T[]>[] itemProcessors,
+											final List<T[]> records,
+											final JdbcTemplate targetJdbcTemplate, 
+											final String sql)
 	{
-		List<String[]> newRecords = batchProcess(records, itemProcessors);
-		
+		List<T[]> newRecords = batchProcess(records, itemProcessors);
 		targetJdbcTemplate.batchUpdate
 		(
 				sql, 
 				new BatchPreparedStatementSetter() 
-				{
+				{					
 					@Override
 					public void setValues(PreparedStatement ps, int indx) throws SQLException 
 					{
-						String[] finalRecord = newRecords.get(indx);
+						T[] finalRecord = newRecords.get(indx);
 						for (int i = 1; i <= finalRecord.length; i++)
 						{ ps.setObject(i, finalRecord[i - 1]); }
 					}
@@ -548,37 +808,11 @@ public final class DBBatchFlowUtil
 					{ return newRecords.size(); }
 				}
 	    );
-		
-		records.clear();
-	}
-	
-	private static void processAndWrite(final ItemProcessor<Map<String, Object>>[] itemProcessors, 
-										final List<Map<String, Object>> records,
-										final ResultSetMetaData sourceResultSetMetaData,
-										final String delimiter,
-										final BufferedWriter bw,
-										final FastDateFormat dateFomat,
-										final boolean useColumnName) throws Exception
-	{
-		List<Map<String, Object>> newRecords = batchProcess(records, itemProcessors);
-		Collection<String> lines = JavaCollectionsUtil.getMapValues(newRecords, sourceResultSetMetaData, delimiter, dateFomat, useColumnName);
-		if (!CollUtil.isEmpty(lines))
-		{
-			for (String line : lines)
-			{
-				if (!StrUtil.isEmptyIfStr(line))
-				{
-					bw.write(line);
-					bw.write("\r\n");
-				}
-			}
-			bw.flush();
-		}
 		records.clear();
 	}
 	
 	@SafeVarargs
-	private static <T> List<T> batchProcess(final List<T> records, final ItemProcessor<T> ... itemProcessors)
+	private static <T> List<T> batchProcess(final List<T> records, final Replacer<T> ... itemProcessors)
 	{
 		if (!cn.hutool.core.util.ArrayUtil.isEmpty(itemProcessors))
 		{
@@ -591,7 +825,7 @@ public final class DBBatchFlowUtil
 					for (T record : records)
 					{
 						T deepCopyRecords = ObjectUtil.cloneByStream(record);
-						T newRecord = itemProcessors[i].process(deepCopyRecords);
+						T newRecord = itemProcessors[i].replace(deepCopyRecords);
 						newRecords.add(newRecord);
 					}
 				}
@@ -602,7 +836,7 @@ public final class DBBatchFlowUtil
 					for (T newRecord : newRecords)
 					{
 						T deepCopyRecords = ObjectUtil.cloneByStream(newRecord);
-						T tempRecord = itemProcessors[i].process(deepCopyRecords);
+						T tempRecord = itemProcessors[i].replace(deepCopyRecords);
 						tempRecords.add(tempRecord);
 					}
 					
@@ -617,9 +851,40 @@ public final class DBBatchFlowUtil
 		{ return records; }
 	}
 	
-	@FunctionalInterface
-	public interface ItemProcessor<T>
-	{ T process(final T itemData); }
+	@Accessors(chain = true)
+	@Setter
+	private static class RowHandlerImpl implements RowHandler
+	{
+		private int skipRow;
+		private List<Object[]> records;
+		private Set<Boolean> usePools;
+		private Replacer<Object[]>[] itemProcessors;
+		private Connection connection;
+		private PreparedStatement preparedStatement;
+		private JdbcTemplate jdbcTemplate;
+		private AbstractDBInfo abstractDBInfo;
+		
+		@Override
+		public void handle(int sheetIndex, int rowIndex, List<Object> rowList) 
+		{
+			if (rowIndex != this.skipRow)
+			{
+				this.records.add(rowList.toArray());
+				if (this.records.size() % DBContants.fetchSize == 0)
+				{
+					if (JavaCollectionsUtil.getOperationFlowResult(this.usePools))
+					{ processAndWrite(this.itemProcessors, this.records, this.jdbcTemplate, this.abstractDBInfo.getSql()); }
+					else
+					{
+						try 
+						{ processAndWrite(this.itemProcessors, this.records, this.preparedStatement, this.connection); } 
+						catch (SQLException e) 
+						{ log.error("读取Excel文件数据后，使用传统模式写入到数据库出现异常，请注意处理，异常原因为：", e); }
+					}
+				}
+			}
+		}
+	}
 	
 	@SafeVarargs
 	public static <T> void pageQueryHandlerBean(final double totalDataCount, 

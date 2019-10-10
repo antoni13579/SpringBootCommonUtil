@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.charset.Charset;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -47,30 +48,6 @@ import lombok.extern.slf4j.Slf4j;
 public final class DBHandleUtil 
 {
 	private DBHandleUtil() {}
-	
-	/**数据库连接还原AutoCommit配置与提交事务*/
-	public static void resetConnectionsSetting(final boolean commit, final Connection ... connections)
-	{
-		if (null != connections && connections.length > 0)
-		{
-			for (Connection connection : connections)
-			{
-				if (null != connection)
-				{
-					try
-					{
-						if (commit) 
-						{
-							connection.commit();
-							connection.setAutoCommit(true);
-						}
-					}
-					catch (Exception ex)
-					{ log.error("数据库连接还原AutoCommit配置与提交事务出现异常，异常原因为：", ex); }
-				}
-			}
-		}
-	}
 	
 	public static void commit(final PreparedStatement[] preparedStatements, final Connection[] connections, final boolean useBatch) throws SQLException
 	{
@@ -331,7 +308,7 @@ public final class DBHandleUtil
 	 * 1、不能有注释
 	 * 2、若多条查询SQL，必须有半角分号区分
 	 * */
-	public static Collection<String> getQuerySql(final File file, final String encode)
+	public static Collection<String> getQuerySql(final File file, final Charset encode)
 	{
 		if (!FileUtil.isFile(file))
 		{ return Collections.emptyList(); }
@@ -380,11 +357,29 @@ public final class DBHandleUtil
 	 * 释放相关资源，但不包含数据库连接池
 	 * */
 	public static void releaseRelatedResourcesNoDataSource(final Connection[] connections, final ResultSet[] resultSets, final PreparedStatement[] preparedStatements)
-	{
-		DBHandleUtil.resetConnectionsSetting(true, connections);
-		if (null != resultSets && resultSets.length > 0) { CollUtil.newArrayList(resultSets).forEach(resultSet -> { JdbcUtils.closeResultSet(resultSet); }); }
-		if (null != preparedStatements && preparedStatements.length > 0) { CollUtil.newArrayList(preparedStatements).forEach(preparedStatement -> { JdbcUtils.closeStatement(preparedStatement); }); }
-		if (null != connections && connections.length > 0) { CollUtil.newArrayList(connections).forEach(connection -> { JdbcUtils.closeConnection(connection); }); }
+	{		
+		CollUtil.newArrayList(resultSets).forEach(resultSet -> { JdbcUtils.closeResultSet(resultSet); });
+		CollUtil.newArrayList(preparedStatements).forEach(preparedStatement -> { JdbcUtils.closeStatement(preparedStatement); });
+		CollUtil.newArrayList(connections)
+				.forEach
+				(
+						connection -> 
+						{
+							/**数据库连接还原AutoCommit配置与提交事务*/
+							if (null != connection)
+							{
+								try
+								{
+									connection.commit();
+									connection.setAutoCommit(true);
+								}
+								catch (Exception ex)
+								{ log.error("数据库连接还原AutoCommit配置与提交事务出现异常，异常原因为：", ex); }
+							}
+							
+							JdbcUtils.closeConnection(connection);
+						}
+				);
 	}
 	
 	public static void batchWrite(final AbstractDBInfo abstractDBInfo)

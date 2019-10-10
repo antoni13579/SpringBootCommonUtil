@@ -19,8 +19,10 @@ import cn.hutool.http.Header;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@Deprecated
 public final class ExcelUtil 
 {	
+	/**建议统一使用com.CommonUtils.Utils.NetworkUtils.HttpUtils.HttpUtil.downloadResponse相关方法解决*/
 	public static void exportExcel(final HttpServletRequest request, final HttpServletResponse response, final File outputFile)
 	{
 		OutputStream bos = null;
@@ -59,9 +61,11 @@ public final class ExcelUtil
 		}
 	}
 	
+	/**建议统一使用com.CommonUtils.Utils.NetworkUtils.HttpUtils.HttpUtil.downloadResponse相关方法解决*/
 	public static void exportExcel(final HttpServletRequest request, final HttpServletResponse response, final String outputFile)
 	{ exportExcel(request, response, new File(outputFile)); }
 	
+	/**建议统一使用com.CommonUtils.Utils.NetworkUtils.HttpUtils.HttpUtil.downloadResponse相关方法解决*/
 	public static void exportExcel(final HttpServletRequest request, final HttpServletResponse response, final Path outputFile)
 	{ exportExcel(request, response, outputFile.toFile()); }
 	

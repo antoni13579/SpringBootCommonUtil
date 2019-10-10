@@ -9,12 +9,13 @@ import org.json.JSONObject;
 
 import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringContants;
 import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
-import com.CommonUtils.Utils.JsonUtils.JsonUtil;
+import com.CommonUtils.Utils.ThirdPartyComponents.baidu.BaiduUtil;
 
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.PatternPool;
 import cn.hutool.core.util.ReUtil;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -146,49 +147,49 @@ public class VatInvoice
 		JSONObject jsonObject = new JSONObject(json);
 		JSONObject wordsResult = jsonObject.getJSONObject("words_result");
 		
-		Collection<CommodityTaxRate> commodityTaxRateList = JsonUtil.jsonArrayToCollection
+		Collection<CommodityTaxRate> commodityTaxRateList = BaiduUtil.jsonArrayToCollection
 		(
 				wordsResult.getJSONArray("CommodityTaxRate"), 
 				(paramJsonObject) -> { return new CommodityTaxRate().setRow(paramJsonObject.getInt("row")).setWord(paramJsonObject.getString("word")).transferTaxRate(); }
 		);
 			
-		Collection<CommodityAmount> commodityAmountList = JsonUtil.jsonArrayToCollection
+		Collection<CommodityAmount> commodityAmountList = BaiduUtil.jsonArrayToCollection
 		(
 				wordsResult.getJSONArray("CommodityAmount"),
 				(paramJsonObject) -> { return new CommodityAmount().setRow(paramJsonObject.getInt("row")).setWord(paramJsonObject.getString("word")).transferAmount(); }
 		);
 		
-		Collection<CommodityTax> commodityTaxList = JsonUtil.jsonArrayToCollection
+		Collection<CommodityTax> commodityTaxList = BaiduUtil.jsonArrayToCollection
 		(
 				wordsResult.getJSONArray("CommodityTax"), 
 				(paramJsonObject) -> { return new CommodityTax().setRow(paramJsonObject.getInt("row")).setWord(paramJsonObject.getString("word")).transferTax(); }
 		);
 		
-		Collection<CommodityNum> commodityNumList = JsonUtil.jsonArrayToCollection
+		Collection<CommodityNum> commodityNumList = BaiduUtil.jsonArrayToCollection
 		(
 				wordsResult.getJSONArray("CommodityNum"), 
 				(paramJsonObject) -> { return new CommodityNum().setRow(paramJsonObject.getInt("row")).setWord(paramJsonObject.getString("word")).transferNum(); }
 		);
 		
-		Collection<CommodityUnit> commodityUnitList = JsonUtil.jsonArrayToCollection
+		Collection<CommodityUnit> commodityUnitList = BaiduUtil.jsonArrayToCollection
 		(
 				wordsResult.getJSONArray("CommodityUnit"), 
 				(paramJsonObject) -> { return new CommodityUnit().setRow(paramJsonObject.getInt("row")).setWord(paramJsonObject.getString("word")); }
 		);
 		
-		Collection<CommodityPrice> commodityPriceList = JsonUtil.jsonArrayToCollection
+		Collection<CommodityPrice> commodityPriceList = BaiduUtil.jsonArrayToCollection
 		(
 				wordsResult.getJSONArray("CommodityPrice"), 
 				(paramJsonObject) -> { return new CommodityPrice().setRow(paramJsonObject.getInt("row")).setWord(paramJsonObject.getString("word")).transferPrice(); }
 		);
 		
-		Collection<CommodityName> commodityNameList = JsonUtil.jsonArrayToCollection
+		Collection<CommodityName> commodityNameList = BaiduUtil.jsonArrayToCollection
 		(
 				wordsResult.getJSONArray("CommodityName"), 
 				(paramJsonObject) -> { return new CommodityName().setRow(paramJsonObject.getInt("row")).setWord(paramJsonObject.getString("word")); }
 		);
 		
-		Collection<CommodityType> commodityTypeList = JsonUtil.jsonArrayToCollection
+		Collection<CommodityType> commodityTypeList = BaiduUtil.jsonArrayToCollection
 		(
 				wordsResult.getJSONArray("CommodityType"), 
 				(paramJsonObject) -> { return new CommodityType().setRow(paramJsonObject.getInt("row")).setWord(paramJsonObject.getString("word")); }

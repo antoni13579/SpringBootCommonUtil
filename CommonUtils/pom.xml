@@ -30,6 +30,7 @@
 		<!-- <opencsv.version>4.2</opencsv.version> -->
 		<!-- <tomcat.databasepool.version>6.0.36</tomcat.databasepool.version> -->
 		<!-- <poi.ooxml.version>3.17</poi.ooxml.version> -->
+		<!-- <xerces.version>2.12.0</xerces.version> -->
 		<kettle.version>7.1.0.0-12</kettle.version>
 		<jython.version>2.7.0</jython.version>
 		<!-- <commons-compress.version>1.18</commons-compress.version> -->
@@ -51,7 +52,7 @@
 		<webjars-stomp-websocket.version>2.3.4</webjars-stomp-websocket.version>
 		<!-- <jackson-databind.version>2.9.10</jackson-databind.version> -->
 		<!-- <jasypt.version>1.9.2</jasypt.version> -->
-		<hutool.version>4.6.6</hutool.version>
+		<hutool.version>4.6.8</hutool.version>
 		<!-- <google.zxing.core.version>3.3.3</google.zxing.core.version> -->
 		<!-- <ikanalyzer.version>2012_u6</ikanalyzer.version> -->
 		<swagger.version>2.9.2</swagger.version>
@@ -349,6 +350,15 @@
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
 			<version>${poi.ooxml.version}</version>
+		</dependency>
+		-->
+		
+		<!-- Excel组件其中一部分，主要是hutool使用sax读取，需要用到这个组件 -->
+		<!--  
+		<dependency>
+    		<groupId>xerces</groupId>
+    		<artifactId>xercesImpl</artifactId>
+    		<version>${xerces.version}</version>
 		</dependency>
 		-->
 		
