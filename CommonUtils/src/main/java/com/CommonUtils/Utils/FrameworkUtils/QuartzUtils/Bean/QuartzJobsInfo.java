@@ -5,8 +5,9 @@ import java.util.Map;
 
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
-import com.CommonUtils.Utils.ReflectUtils.ReflectUtil;
-
+import cn.hutool.core.convert.Convert;
+import cn.hutool.core.lang.TypeReference;
+import cn.hutool.core.util.ClassLoaderUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.Getter;
 import lombok.Setter;
@@ -54,51 +55,51 @@ public final class QuartzJobsInfo
 			  			  final long startTime,
 			  			  final Map<String, Object> params,
 			  			  final String group)
-	{ init(jobName, executorClassPath, ReflectUtil.getCastResult(executorClassPath, QuartzJobBean.class), schedulingCycle, startTime, params, group); }
+	{ init(jobName, executorClassPath, Convert.convert(new TypeReference<QuartzJobBean>() {}, ClassLoaderUtil.loadClass(executorClassPath, false)).getClass(), schedulingCycle, startTime, params, group); }
 	
 	public QuartzJobsInfo(final String jobName, 
 			  			  final String executorClassPath, 
 			  			  final long startTime,
 			  			  final Map<String, Object> params,
 			  			  final String group)
-	{ init(jobName, executorClassPath, ReflectUtil.getCastResult(executorClassPath, QuartzJobBean.class), "", startTime, params, group); }
+	{ init(jobName, executorClassPath, Convert.convert(new TypeReference<QuartzJobBean>() {}, ClassLoaderUtil.loadClass(executorClassPath, false)).getClass(), "", startTime, params, group); }
 	
 	public QuartzJobsInfo(final String jobName, 
 			  			  final String executorClassPath, 
 			  			  final String schedulingCycle,
 			  			  final long startTime,
 			  			  final String group)
-	{ init(jobName, executorClassPath, ReflectUtil.getCastResult(executorClassPath, QuartzJobBean.class), schedulingCycle, startTime, Collections.emptyMap(), group); }
+	{ init(jobName, executorClassPath, Convert.convert(new TypeReference<QuartzJobBean>() {}, ClassLoaderUtil.loadClass(executorClassPath, false)).getClass(), schedulingCycle, startTime, Collections.emptyMap(), group); }
 	
 	public QuartzJobsInfo(final String jobName, 
 			  			  final String executorClassPath, 
 			  			  final long startTime,
 			  			  final String group)
-	{ init(jobName, executorClassPath, ReflectUtil.getCastResult(executorClassPath, QuartzJobBean.class), "", startTime, Collections.emptyMap(), group); }
+	{ init(jobName, executorClassPath, Convert.convert(new TypeReference<QuartzJobBean>() {}, ClassLoaderUtil.loadClass(executorClassPath, false)).getClass(), "", startTime, Collections.emptyMap(), group); }
 	
 	public QuartzJobsInfo(final String jobName, 
 			  			  final String executorClassPath, 
 			  			  final String schedulingCycle,
 			  			  final long startTime,
 			  			  final Map<String, Object> params)
-	{ init(jobName, executorClassPath, ReflectUtil.getCastResult(executorClassPath, QuartzJobBean.class), schedulingCycle, startTime, params, ""); }
+	{ init(jobName, executorClassPath, Convert.convert(new TypeReference<QuartzJobBean>() {}, ClassLoaderUtil.loadClass(executorClassPath, false)).getClass(), schedulingCycle, startTime, params, ""); }
 	
 	public QuartzJobsInfo(final String jobName, 
 			  			  final String executorClassPath, 
 			  			  final long startTime,
 			  			  final Map<String, Object> params)
-	{ init(jobName, executorClassPath, ReflectUtil.getCastResult(executorClassPath, QuartzJobBean.class), "", startTime, params, ""); }
+	{ init(jobName, executorClassPath, Convert.convert(new TypeReference<QuartzJobBean>() {}, ClassLoaderUtil.loadClass(executorClassPath, false)).getClass(), "", startTime, params, ""); }
 	
 	public QuartzJobsInfo(final String jobName, 
 			  			  final String executorClassPath, 
 			  			  final String schedulingCycle,
 			  			  final long startTime)
-	{ init(jobName, executorClassPath, ReflectUtil.getCastResult(executorClassPath, QuartzJobBean.class), schedulingCycle, startTime, Collections.emptyMap(), ""); }
+	{ init(jobName, executorClassPath, Convert.convert(new TypeReference<QuartzJobBean>() {}, ClassLoaderUtil.loadClass(executorClassPath, false)).getClass(), schedulingCycle, startTime, Collections.emptyMap(), ""); }
 	
 	public QuartzJobsInfo(final String jobName, 
 			  			  final String executorClassPath, 
 			  			  final long startTime)
-	{ init(jobName, executorClassPath, ReflectUtil.getCastResult(executorClassPath, QuartzJobBean.class), "", startTime, Collections.emptyMap(), ""); }
+	{ init(jobName, executorClassPath, Convert.convert(new TypeReference<QuartzJobBean>() {}, ClassLoaderUtil.loadClass(executorClassPath, false)).getClass(), "", startTime, Collections.emptyMap(), ""); }
 	
 	public QuartzJobsInfo(final String jobName, 
 			  			  final Class<? extends QuartzJobBean> executorClass, 

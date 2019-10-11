@@ -221,16 +221,23 @@ public final class DBHandleUtil
 	public static PreparedStatement getPreparedStatement(final PreparedStatementOperationType preparedStatementOperationType, final Connection connection, final String sql) throws SQLException
 	{
 		PreparedStatement preparedStatement = null;
-		if (Objects.equals(preparedStatementOperationType.name(), PreparedStatementOperationType.READ.name()))
+		
+		switch (preparedStatementOperationType)
 		{
-			preparedStatement = connection.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
-			preparedStatement.setFetchSize(DBContants.fetchSize);
-			preparedStatement.setFetchDirection(ResultSet.FETCH_FORWARD);
+			case READ:
+				preparedStatement = connection.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+				preparedStatement.setFetchSize(DBContants.fetchSize);
+				preparedStatement.setFetchDirection(ResultSet.FETCH_FORWARD);
+				break;
+				
+			case WRITE:
+				preparedStatement = connection.prepareStatement(sql);
+				break;
+				
+			default:
+				throw new SQLException("无法生成PreparedStatement，因PreparedStatement操作类型选择不正确");
 		}
-		else if (Objects.equals(preparedStatementOperationType.name(), PreparedStatementOperationType.WRITE.name()))
-		{ preparedStatement = connection.prepareStatement(sql); }
-		else
-		{ throw new SQLException("无法生成PreparedStatement，因PreparedStatement操作类型选择不正确"); }
+		
 		return preparedStatement;
 	}
 	
@@ -354,8 +361,9 @@ public final class DBHandleUtil
 	}
 	
 	/**
-	 * 释放相关资源，但不包含数据库连接池
+	 * 释放相关资源，但不包含数据库连接池，建议使用cn.hutool.db.DbUtil.close
 	 * */
+	@Deprecated
 	public static void releaseRelatedResourcesNoDataSource(final Connection[] connections, final ResultSet[] resultSets, final PreparedStatement[] preparedStatements)
 	{		
 		CollUtil.newArrayList(resultSets).forEach(resultSet -> { JdbcUtils.closeResultSet(resultSet); });

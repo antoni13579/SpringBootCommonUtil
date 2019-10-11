@@ -165,6 +165,7 @@ public final class QuartzUtil //implements ApplicationListener<ContextClosedEven
         			break;
         		default:
         			log.warn("CronTriggerMisfireHandlerType枚举指定不正确");
+        			break;
         	}
         	
         	trigger = TriggerBuilder.newTrigger()

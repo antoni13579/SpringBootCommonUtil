@@ -28,9 +28,8 @@ public final class TreeUtil
 		{ return Collections.emptyList(); }
 	}
 	
-	/*
 	@Deprecated
-	public static Collection<TreeNode<Map<String, Object>>> excelDataToTreeNodes(final ExcelData excelData)
+	public static Collection<TreeNode<Map<String, Object>>> excelDataToTreeNodes(final com.CommonUtils.Utils.OfficeUtils.ExcelUtils.Bean.ExcelData excelData)
 	{
 		if (null != excelData)
 		{
@@ -40,7 +39,6 @@ public final class TreeUtil
 		else
 		{ return Collections.emptyList(); }
 	}
-	*/
 	
 	/**
 	 * 生成基于Map的树形结构

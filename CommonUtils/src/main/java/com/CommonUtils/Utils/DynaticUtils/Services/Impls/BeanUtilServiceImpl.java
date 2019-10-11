@@ -11,6 +11,8 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -25,7 +27,6 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Service;
 
 import com.CommonUtils.Utils.NetworkUtils.HttpUtils.HttpUtil;
-import com.CommonUtils.Utils.ReflectUtils.ReflectUtil;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -58,7 +59,7 @@ public final class BeanUtilServiceImpl implements ApplicationContextAware
 	public static <T> Map<String, Object> beanToMap(final T bean, final boolean isGetAll) throws IllegalArgumentException, IllegalAccessException
 	{
 		if (isGetAll)
-		{ return ReflectUtil.getBeanFieldValue(bean); }
+		{ return com.CommonUtils.Utils.ReflectUtils.ReflectUtil.getBeanFieldValue(bean); }
 		
 		Map<String, Object> result = new HashMap<String, Object>();
 		if (null != bean)
@@ -209,14 +210,22 @@ public final class BeanUtilServiceImpl implements ApplicationContextAware
 	/**
 	 * 获取@Scope("session")的bean
 	 * */
+	@Deprecated
 	public static Object getBean(final boolean allowCreateSession, final String beanName)
 	{ return HttpUtil.getHttpSession(allowCreateSession).getAttribute(beanName); }
+	
+	public static Object getBean(final HttpServletRequest httpServletRequest, final boolean allowCreateSession, final String beanName)
+	{ return httpServletRequest.getSession(allowCreateSession).getAttribute(beanName); }
 	
 	/**
 	 * 注入@Scope("session")的bean
 	 * */
+	@Deprecated
 	public static void setBean(final boolean allowCreateSession, final String beanName, final Object beanInstance)
 	{ HttpUtil.getHttpSession(allowCreateSession).setAttribute(beanName, beanInstance); }
+	
+	public static void setBean(final HttpServletRequest httpServletRequest, final boolean allowCreateSession, final String beanName, final Object beanInstance)
+	{ httpServletRequest.getSession(allowCreateSession).setAttribute(beanName, beanInstance); }
 	
 	public static <T> Optional<T> getBean(final Class<T> clazz)
 	{

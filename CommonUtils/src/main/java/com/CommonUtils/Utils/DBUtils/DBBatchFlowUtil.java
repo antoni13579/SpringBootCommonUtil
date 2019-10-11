@@ -46,7 +46,6 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.format.FastDateFormat;
-import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.lang.Replacer;
 import cn.hutool.core.text.StrSpliter;
 import cn.hutool.core.text.csv.CsvParser;
@@ -55,8 +54,10 @@ import cn.hutool.core.text.csv.CsvRow;
 import cn.hutool.core.text.csv.CsvUtil;
 import cn.hutool.core.text.csv.CsvWriteConfig;
 import cn.hutool.core.text.csv.CsvWriter;
+import cn.hutool.core.util.CharUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.db.DbUtil;
 import cn.hutool.poi.excel.BigExcelWriter;
 import cn.hutool.poi.excel.ExcelUtil;
 import cn.hutool.poi.excel.sax.handler.RowHandler;
@@ -91,6 +92,7 @@ public final class DBBatchFlowUtil
 		boolean result = false;
 		try
 		{
+			char[] lineDelimiter = {CharUtil.CR, CharUtil.LF};
 			List<Map<String, Object>> records = new ArrayList<Map<String, Object>>();
 			sourceConnection = DBHandleUtil.getConnection(sourceDBInfo);
 			sourcePreparedStatement = DBHandleUtil.getPreparedStatement(PreparedStatementOperationType.READ, sourceConnection, sourceDBInfo.getSql());
@@ -167,7 +169,8 @@ public final class DBBatchFlowUtil
 							if (!StrUtil.isEmptyIfStr(line))
 							{
 								bw.write(line);
-								bw.write("\r\n");
+								//bw.write("\r\n");
+								bw.write(lineDelimiter);
 							}
 						}
 						bw.flush();
@@ -183,12 +186,7 @@ public final class DBBatchFlowUtil
 			result = false;
 		}
 		finally
-		{
-			IoUtil.close(bw);
-			IoUtil.close(osw);
-			IoUtil.close(fos);
-			DBHandleUtil.releaseRelatedResourcesNoDataSource(new Connection[] { sourceConnection }, new ResultSet[] { sourceResultSet }, new PreparedStatement[] { sourcePreparedStatement });
-		}
+		{ DbUtil.close(bw, osw, fos, sourceResultSet, sourcePreparedStatement, sourceConnection); }
 		
 		return result;
 	}
@@ -248,7 +246,7 @@ public final class DBBatchFlowUtil
 			result = false;
 		}
 		finally
-		{ DBHandleUtil.releaseRelatedResourcesNoDataSource(new Connection[] {sourceConnection}, new ResultSet[] {sourceResultSet}, new PreparedStatement[] {sourcePreparedStatement}); }
+		{ DbUtil.close(sourceResultSet, sourcePreparedStatement, sourceConnection); }
 		
 		return result;
 	}
@@ -368,7 +366,7 @@ public final class DBBatchFlowUtil
 			result = false;
 		}
 		finally
-		{ DBHandleUtil.releaseRelatedResourcesNoDataSource(new Connection[] {sourceConnection, targetConnection}, new ResultSet[] {sourceResultSet}, new PreparedStatement[] {sourcePreparedStatement, targetPreparedStatement}); }
+		{ DbUtil.close(sourceResultSet, sourcePreparedStatement, targetPreparedStatement, sourceConnection, targetConnection); }
 		
 		return result;
 	}
@@ -429,10 +427,7 @@ public final class DBBatchFlowUtil
 			result = false;
 		}
 		finally
-		{
-			IoUtil.close(bigExcelWriter);
-			DBHandleUtil.releaseRelatedResourcesNoDataSource(new Connection[] { sourceConnection }, new ResultSet[] { sourceResultSet }, new PreparedStatement[] { sourcePreparedStatement });
-		}
+		{ DbUtil.close(bigExcelWriter, sourceResultSet, sourcePreparedStatement, sourceConnection); }
 		
 		return result;
 	}
@@ -529,10 +524,7 @@ public final class DBBatchFlowUtil
 			result = false;
 		}
 		finally
-		{
-			IoUtil.close(csvWriter);
-			DBHandleUtil.releaseRelatedResourcesNoDataSource(new Connection[] { sourceConnection }, new ResultSet[] { sourceResultSet }, new PreparedStatement[] { sourcePreparedStatement });
-		}
+		{ DbUtil.close(csvWriter, sourceResultSet, sourcePreparedStatement, sourceConnection); }
 		
 		return result;
 	}
@@ -611,12 +603,7 @@ public final class DBBatchFlowUtil
 			result = false;
 		}
 		finally
-		{			
-			IoUtil.close(br);
-			IoUtil.close(isr);
-			IoUtil.close(fis);
-			DBHandleUtil.releaseRelatedResourcesNoDataSource(new Connection[] {targetConnection}, null, new PreparedStatement[] {targetPreparedStatement});
-		}
+		{ DbUtil.close(br, isr, fis, targetPreparedStatement, targetConnection); }
 		
 		return result;
 	}
@@ -682,7 +669,7 @@ public final class DBBatchFlowUtil
 			result = false;
 		}
 		finally
-		{ DBHandleUtil.releaseRelatedResourcesNoDataSource(new Connection[] {targetConnection}, null, new PreparedStatement[] {targetPreparedStatement}); }
+		{ DbUtil.close(targetPreparedStatement, targetConnection); }
 		
 		return result;
 	}
@@ -762,14 +749,7 @@ public final class DBBatchFlowUtil
 			result = false;
 		}
 		finally
-		{
-			IoUtil.close(csvParser);
-			IoUtil.close(br);
-			IoUtil.close(isr);
-			IoUtil.close(bis);
-			IoUtil.close(fos);
-			DBHandleUtil.releaseRelatedResourcesNoDataSource(new Connection[] {targetConnection}, null, new PreparedStatement[] {targetPreparedStatement});
-		}
+		{ DbUtil.close(csvParser, br, isr, bis, fos, targetPreparedStatement, targetConnection); }
 		
 		return result;
 	}

@@ -140,7 +140,6 @@ public final class JavaCollectionsUtil
 		return false;
 	}
 	
-	/*
 	@Deprecated
 	public static boolean collectionEquals(final Collection<String[]> records1, final Collection<String[]> records2)
     {
@@ -164,7 +163,7 @@ public final class JavaCollectionsUtil
     		{
     			for (String[] needUpdateRecord : records2)
     			{
-    				if (ArrayUtil.arrayEquals(fileRecord, needUpdateRecord))
+    				if (com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil.arrayEquals(fileRecord, needUpdateRecord))
     				{ matched++; }
     			}
     		}
@@ -175,7 +174,6 @@ public final class JavaCollectionsUtil
     		return false;
     	}
     }
-    */
 	
 	/**建议使用cn.hutool.core.collection.CollUtil.get相关函数*/ 
 	@Deprecated
@@ -320,12 +318,11 @@ public final class JavaCollectionsUtil
 		);
 	}
 	
-	/*
+	@SuppressWarnings("deprecation")
 	@SafeVarargs
 	@Deprecated
-	public static <T> boolean collectionProcessor(final Collection<T[]> records, final ItemProcessor<T> ... itemProcessors)
-	{ return collectionProcessor(records, (final T[] values, final int indx, final int length) -> { ArrayUtil.arrayProcessor(values, itemProcessors); }); }
-	*/
+	public static <T> boolean collectionProcessor(final Collection<T[]> records, final com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil.ItemProcessor<T> ... itemProcessors)
+	{ return collectionProcessor(records, (final T[] values, final int indx, final int length) -> { com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil.arrayProcessor(values, itemProcessors); }); }
 	
 	public static <T> Collection<T> collectionOperation(final Set<T> a, final Set<T> b, final OperationType operationType)
 	{		

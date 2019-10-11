@@ -1,12 +1,24 @@
 package com.CommonUtils.Utils.DistributedLocksUtils;
 
+import java.util.Collections;
+
+import org.apache.zookeeper.CreateMode;
+import org.apache.zookeeper.KeeperException;
+import org.apache.zookeeper.ZooDefs.Ids;
+import org.apache.zookeeper.ZooDefs.Perms;
+import org.apache.zookeeper.ZooKeeper;
+import org.apache.zookeeper.data.ACL;
+import org.apache.zookeeper.data.Stat;
+
+import lombok.extern.slf4j.Slf4j;
+
 /**Spring Boot没有提供一个统一的访问zk工具，相对来说zk客户端很多，建议由使用方自己实现zk的分布式工具*/
 @Deprecated
+@Slf4j
 public final class DistributedLockZookeeper 
 {
 	private DistributedLockZookeeper() {}
 	
-	/*
 	public synchronized static boolean lock(final ZooKeeper zooKeeperClient, final String path)
 	{
 		try
@@ -46,5 +58,4 @@ public final class DistributedLockZookeeper
 	
 	private static Stat getStat(final ZooKeeper zooKeeper, final String path) throws KeeperException, InterruptedException
 	{ return zooKeeper.exists(path, true); }
-	*/
 }

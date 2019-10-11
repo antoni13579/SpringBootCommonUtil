@@ -1,21 +1,33 @@
 package com.CommonUtils.Utils.DataTypeUtils.StringUtils;
 
+import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.wltea.analyzer.core.IKSegmenter;
+import org.wltea.analyzer.core.Lexeme;
+
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.extra.tokenizer.TokenizerUtil;
+import cn.hutool.extra.tokenizer.Word;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -339,7 +351,6 @@ public final class StringUtil
 	//输出：这 两个 方法 的 区别 在于 返回 值
 	String resultStr = CollUtil.join((Iterator<Word>)result, " ");
 	 * */ 
-	/*
 	@Deprecated
 	public static List<String> divideText(final String text)
 	{
@@ -361,7 +372,6 @@ public final class StringUtil
         
         return resultList;
 	}
-	*/
 	
 	/**
 	 * 建议使用cn.hutool.core.util.StrUtil.subWithLength
@@ -388,12 +398,11 @@ public final class StringUtil
 	{ return isStrEmpty(val) ? false : val.matches(StringContants.PATTERN_7); }
 	
 	/**建议使用cn.hutool.core.util.StrUtil.similar*/
-	/*
 	@Deprecated
-	public static Optional<Calculation> statistics(final String text1, final String text2)
+	public static Optional<com.CommonUtils.Utils.DataTypeUtils.StringUtils.Bean.Calculation> statistics(final String text1, final String text2)
 	{
 		//计算类
-        Calculation calculation = null;
+		com.CommonUtils.Utils.DataTypeUtils.StringUtils.Bean.Calculation calculation = null;
         
 		if (StringUtil.isStrEmpty(text1) || StringUtil.isStrEmpty(text2))
 		{ return Optional.ofNullable(calculation); }
@@ -407,7 +416,7 @@ public final class StringUtil
         statistics(resultMap, CollUtil.list(false, (Iterable<Word>)TokenizerUtil.createEngine().parse(text1)).stream().map((word) -> { return word.getText(); }).collect(Collectors.toList()), 1);
         statistics(resultMap, CollUtil.list(false, (Iterable<Word>)TokenizerUtil.createEngine().parse(text2)).stream().map((word) -> { return word.getText(); }).collect(Collectors.toList()), 0);
         
-        calculation = new Calculation();
+        calculation = new com.CommonUtils.Utils.DataTypeUtils.StringUtils.Bean.Calculation();
         Iterator<Map.Entry<String, int[]>> entries = resultMap.entrySet().iterator();
 		while (entries.hasNext())
 		{
@@ -425,7 +434,6 @@ public final class StringUtil
         
         return Optional.ofNullable(calculation); 
 	}
-	*/
 	
 	 /**
      * 组合词频向量
@@ -435,7 +443,6 @@ public final class StringUtil
      * @return
      */
 	/**建议使用cn.hutool.core.util.StrUtil.similar*/
-	/*
 	@Deprecated
     private static void statistics(Map<String,int[]> map,List<String> words ,int direction)
     {
@@ -462,5 +469,4 @@ public final class StringUtil
             }
         }
     }
-    */
 }

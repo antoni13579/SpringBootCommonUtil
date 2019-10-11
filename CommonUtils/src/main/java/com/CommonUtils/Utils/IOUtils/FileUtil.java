@@ -14,9 +14,13 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.nio.channels.FileChannel;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -31,12 +35,12 @@ import cn.hutool.core.io.IoUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@Deprecated
 public final class FileUtil 
 {
 	/**
 	 * 判断指定的路径是否为文件类型，文件类型返回true，不是则返回false，建议使用cn.hutool.core.io.FileUtil.isFile
 	 * */
-	@Deprecated
 	public static boolean isFile(final String path)
 	{
 		File file = new File(path);
@@ -49,7 +53,6 @@ public final class FileUtil
 	/**
 	 * 判断指定的路径是否为文件类型，文件类型返回true，不是则返回false，建议使用cn.hutool.core.io.FileUtil.isFile
 	 * */
-	@Deprecated
 	public static boolean isFile(final File file)
 	{
 		if (null != file && file.exists() && file.isFile())
@@ -61,7 +64,6 @@ public final class FileUtil
 	/**
 	 * 判断指定的路径是否为文件类型，文件类型返回true，不是则返回false，建议使用cn.hutool.core.io.FileUtil.isFile
 	 * */
-	@Deprecated
 	public static boolean isFile(final Path path)
 	{
 		if (null == path)
@@ -71,7 +73,6 @@ public final class FileUtil
 	}
 	
 	/**建议使用cn.hutool.core.io.IoUtil.write或cn.hutool.core.io.FileUtil相关write方法*/
-	@Deprecated
 	public static boolean writeInfo(final File file, final boolean append, final String encode, final String info)
 	{
 		FileOutputStream fos = null;
@@ -105,14 +106,12 @@ public final class FileUtil
 	/**
 	 * 创建文件（仅仅没有的时候才创建），并返回对应的File对象列表，建议使用cn.hutool.core.io.FileUtil
 	 * */
-	/*
-	@Deprecated
 	public static Collection<File> createFiles(final File ... files)
 	{
-		if (!ArrayUtil.isArrayEmpty(files))
+		if (!com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil.isArrayEmpty(files))
 		{
 			List<File> result = new ArrayList<File>();
-			ArrayUtil.arrayProcessor
+			com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil.arrayProcessor
 			(
 					files, 
 					(final File file, final int indx, final int length) -> 
@@ -133,19 +132,16 @@ public final class FileUtil
 		else
 		{ return Collections.emptyList(); }
 	}
-	*/
 	
 	/**
 	 * 创建文件（仅仅没有的时候才创建），并返回对应的File对象列表，建议使用cn.hutool.core.io.FileUtil
 	 * */
-	/*
-	@Deprecated
 	public static Collection<File> createFiles(final String ... filePaths)
 	{
-		if (!ArrayUtil.isArrayEmpty(filePaths))
+		if (!com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil.isArrayEmpty(filePaths))
 		{
 			List<File> files = new ArrayList<>();
-			ArrayUtil.arrayProcessor
+			com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil.arrayProcessor
 			(
 					filePaths, 
 					(final String filePath, final int indx, final int length) -> 
@@ -157,19 +153,16 @@ public final class FileUtil
 		else
 		{ return Collections.emptyList(); }
 	}
-	*/
 	
 	/**
 	 * 创建文件（仅仅没有的时候才创建），并返回对应的File对象列表，建议使用cn.hutool.core.io.FileUtil
 	 * */
-	/*
-	@Deprecated
 	public static Collection<File> createFiles(final Path ... paths)
 	{
-		if (!ArrayUtil.isArrayEmpty(paths))
+		if (!com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil.isArrayEmpty(paths))
 		{
 			List<File> files = new ArrayList<>();
-			ArrayUtil.arrayProcessor
+			com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil.arrayProcessor
 			(
 					paths, 
 					(final Path path, final int indx, final int length) -> 
@@ -181,12 +174,10 @@ public final class FileUtil
 		else
 		{ return Collections.emptyList(); }
 	}
-	*/
 	
 	/**
 	 * 采用Nio复制文件，建议使用cn.hutool.core.io.IoUtil.copy或cn.hutool.core.io.FileUtil.copy相关方法
 	 * */
-	@Deprecated
 	public static String copyFileNio(final File srcFile, final File destFile)
 	{
 		FileInputStream fis = null;
@@ -242,35 +233,30 @@ public final class FileUtil
 	/**
 	 * 采用Nio复制文件，建议使用cn.hutool.core.io.IoUtil.copy或cn.hutool.core.io.FileUtil.copy相关方法
 	 * */
-	@Deprecated
 	public static String copyFileNio(final String srcFilePath, final String destFilePath)
 	{ return copyFileNio(new File(srcFilePath), new File(destFilePath)); }
 	
 	/**
 	 * 采用Nio复制文件，建议使用cn.hutool.core.io.IoUtil.copy或cn.hutool.core.io.FileUtil.copy相关方法
 	 * */
-	@Deprecated
 	public static String copyFileNio(final Path srcPath, final Path destPath)
 	{ return copyFileNio(srcPath.toFile(), destPath.toFile()); }
 	
 	/**
 	 * 采用Bio复制文件，建议使用cn.hutool.core.io.IoUtil.copy或cn.hutool.core.io.FileUtil.copy相关方法
 	 * */
-	@Deprecated
 	public static void copyFileBio(final InputStream srcIs, final Path destPath)
 	{ copyFileBio(srcIs, destPath.toFile()); }
 	
 	/**
 	 * 采用Bio复制文件，建议使用cn.hutool.core.io.IoUtil.copy或cn.hutool.core.io.FileUtil.copy相关方法
 	 * */
-	@Deprecated
 	public static void copyFileBio(final InputStream srcIs, final String destFilePath)
 	{ copyFileBio(srcIs, new File(destFilePath)); }
 	
 	/**
 	 * 采用Bio复制文件，建议使用cn.hutool.core.io.IoUtil.copy或cn.hutool.core.io.FileUtil.copy相关方法
 	 * */
-	@Deprecated
 	public static void copyFileBio(final InputStream srcIs, final File destFile)
 	{
 		InputStream bis = null;
@@ -304,7 +290,6 @@ public final class FileUtil
 	/**
 	 * 采用Bio复制文件，建议使用cn.hutool.core.io.IoUtil.copy或cn.hutool.core.io.FileUtil.copy相关方法
 	 * */
-	@Deprecated
 	public static String copyFileBio(final File srcFile, final File destFile)
 	{
 		InputStream fis = null;
@@ -347,29 +332,24 @@ public final class FileUtil
 	/**
 	 * 采用Bio复制文件，建议使用cn.hutool.core.io.IoUtil.copy或cn.hutool.core.io.FileUtil.copy相关方法
 	 * */
-	@Deprecated
 	public static String copyFileBio(final String srcFilePath, final String destFilePath)
 	{ return copyFileBio(new File(srcFilePath), new File(destFilePath)); }
 	
 	/**
 	 * 采用Bio复制文件，建议使用cn.hutool.core.io.IoUtil.copy或cn.hutool.core.io.FileUtil.copy相关方法
 	 * */
-	@Deprecated
 	public static String copyFileBio(final Path srcPath, final Path destPath)
 	{ return copyFileBio(srcPath.toFile(), destPath.toFile()); }
 	
 	/**建议使用cn.hutool.core.io.IoUtil.readHex28Upper*/
-	@Deprecated
 	public static String getFileHeader(final String filePath, final boolean toUpper)
 	{ return getFileHeader(new File(filePath), toUpper); }
 	
 	/**建议使用cn.hutool.core.io.IoUtil.readHex28Upper*/
-	@Deprecated
 	public static String getFileHeader(final Path path, final boolean toUpper)
 	{ return getFileHeader(path.toFile(), toUpper); }
 	
 	/**建议使用cn.hutool.core.io.IoUtil.readHex28Upper*/
-	@Deprecated
 	public static String getFileHeader(final File file, final boolean toUpper)
 	{
 		InputStream fis = null;
@@ -391,17 +371,14 @@ public final class FileUtil
 	}
 	
 	/**建议使用cn.hutool.core.io.FileTypeUtil.getType*/
-	@Deprecated
 	public static Collection<String> getFileType(final Path path)
 	{ return getFileType(path.toFile()); }
 	
 	/**建议使用cn.hutool.core.io.FileTypeUtil.getType*/
-	@Deprecated
 	public static Collection<String> getFileType(final String filePath)
 	{ return getFileType(new File(filePath)); }
 	
 	/**建议使用cn.hutool.core.io.FileTypeUtil.getType*/
-	@Deprecated
 	public static Collection<String> getFileType(final File file)
 	{
 		String fileHeader = getFileHeader(file, true);
@@ -419,17 +396,14 @@ public final class FileUtil
 	}
 	
 	/**建议使用cn.hutool.core.collection.LineIter自行实现*/
-	@Deprecated
 	public static long getFileTotalRows(final Path path, final String encode)
 	{ return getFileTotalRows(path.toFile(), encode); }
 	
 	/**建议使用cn.hutool.core.collection.LineIter自行实现*/
-	@Deprecated
 	public static long getFileTotalRows(final String filePath, final String encode)
 	{ return getFileTotalRows(new File(filePath), encode); }
 	
 	/**建议使用cn.hutool.core.collection.LineIter自行实现*/
-	@Deprecated
 	public static long getFileTotalRows(final File file, final String encode)
 	{
 		InputStream fis = null;
@@ -462,30 +436,45 @@ public final class FileUtil
 	/**
 	 * 建议使用cn.hutool.core.io.FileUtil.size
 	 * */
-	@Deprecated
 	public static long getFileSize(final Path path)
 	{ return getFileSize(path.toFile()); }
 	
 	/**
 	 * 建议使用cn.hutool.core.io.FileUtil.size
 	 * */
-	@Deprecated
 	public static long getFileSize(final String filePath)
 	{ return getFileSize(new File(filePath)); }
 	
 	/**
 	 * 建议使用cn.hutool.core.io.FileUtil.size
 	 * */
-	@Deprecated
 	public static long getFileSize(final File file)
 	{ return file.length(); }
 	
+	/**
+	 * 建议使用hutool相关工具，代码例子如下
+	 * 1、cn.hutool.extra.servlet.getMultipart获取MultipartFormData对象
+	 * 2、MultipartFormData对象中，通过getFileMap获取需上传文件的相关信息
+	 * 3、调用UploadFile里面的write写入到本地
+	 * */
 	public static boolean uploadFilesLocal(final Path directoryPath, final MultipartFile ... multipartFiles)
 	{ return uploadFilesLocal(directoryPath.toFile(), multipartFiles); }
 	
+	/**
+	 * 建议使用hutool相关工具，代码例子如下
+	 * 1、cn.hutool.extra.servlet.getMultipart获取MultipartFormData对象
+	 * 2、MultipartFormData对象中，通过getFileMap获取需上传文件的相关信息
+	 * 3、调用UploadFile里面的write写入到本地
+	 * */
 	public static boolean uploadFilesLocal(final String directoryStr, final MultipartFile ... multipartFiles)
 	{ return uploadFilesLocal(new File(directoryStr), multipartFiles); }
 	
+	/**
+	 * 建议使用hutool相关工具，代码例子如下
+	 * 1、cn.hutool.extra.servlet.getMultipart获取MultipartFormData对象
+	 * 2、MultipartFormData对象中，通过getFileMap获取需上传文件的相关信息
+	 * 3、调用UploadFile里面的write写入到本地
+	 * */
 	public static boolean uploadFilesLocal(final File directory, final MultipartFile ... multipartFiles)
 	{
 		if (!cn.hutool.core.util.ArrayUtil.isEmpty(multipartFiles))
@@ -519,7 +508,6 @@ public final class FileUtil
 	}
 	
 	/**建议使用cn.hutool.core.io.IoUtil.readBytes或cn.hutool.core.io.FileUtil.readBytes*/
-	@Deprecated
 	public static Optional<byte[]> toBytes(final File file)
 	{
 		byte[] data = null;
@@ -549,12 +537,10 @@ public final class FileUtil
 	}
 	
 	/**建议使用cn.hutool.core.io.IoUtil.readBytes或cn.hutool.core.io.FileUtil.readBytes*/
-	@Deprecated
 	public static Optional<byte[]> toBytes(final Path path)
 	{ return toBytes(path.toFile()); }
 	
 	/**建议使用cn.hutool.core.io.IoUtil.readBytes或cn.hutool.core.io.FileUtil.readBytes*/
-	@Deprecated
 	public static Optional<byte[]> toBytes(final String filePath)
 	{ return toBytes(new File(filePath)); }
 }

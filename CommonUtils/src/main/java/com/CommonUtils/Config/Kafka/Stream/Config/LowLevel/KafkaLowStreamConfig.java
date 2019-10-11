@@ -226,4 +226,18 @@ public final class KafkaLowStreamConfig
 	@FunctionalInterface
 	public interface ItemProcessor
 	{ void process(final Object value, final ProcessorContext processorContext, final KeyValueStore<String, byte[]> kvStore); }
+	
+	public enum EKeyValueStoreType
+	{
+		Persistent,
+		InMemory,
+		LruMap
+	}
+	
+	public enum EStoreBuilderType 
+	{
+		WindowStoreBuilder,
+		KeyValueStoreBuilder,
+		SessionStoreBuilder;
+	}
 }

@@ -6,23 +6,47 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.collections4.MapUtils;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringContants;
+import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
+import com.CommonUtils.Utils.IOUtils.FileUtil;
+import com.CommonUtils.Utils.OfficeUtils.ExcelUtils.Bean.ExcelData;
+
+import cn.hutool.core.io.FileTypeUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.net.URLEncoder;
 import cn.hutool.http.Header;
-
+import cn.hutool.json.JSONUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Deprecated
 public final class ExcelUtil 
 {	
-	/**建议统一使用com.CommonUtils.Utils.NetworkUtils.HttpUtils.HttpUtil.downloadResponse相关方法解决*/
+	/**建议cn.hutool.extra.servlet.ServletUtil.write*/
 	public static void exportExcel(final HttpServletRequest request, final HttpServletResponse response, final File outputFile)
 	{
 		OutputStream bos = null;
@@ -61,17 +85,15 @@ public final class ExcelUtil
 		}
 	}
 	
-	/**建议统一使用com.CommonUtils.Utils.NetworkUtils.HttpUtils.HttpUtil.downloadResponse相关方法解决*/
+	/**建议cn.hutool.extra.servlet.ServletUtil.write*/
 	public static void exportExcel(final HttpServletRequest request, final HttpServletResponse response, final String outputFile)
 	{ exportExcel(request, response, new File(outputFile)); }
 	
-	/**建议统一使用com.CommonUtils.Utils.NetworkUtils.HttpUtils.HttpUtil.downloadResponse相关方法解决*/
+	/**建议cn.hutool.extra.servlet.ServletUtil.write*/
 	public static void exportExcel(final HttpServletRequest request, final HttpServletResponse response, final Path outputFile)
 	{ exportExcel(request, response, outputFile.toFile()); }
 	
 	/**请使用cn.hutool.poi包里面相关Excel工具类*/
-	/*
-	@Deprecated
 	public static String getCellValueStr(final Cell cell)
 	{
 		String cellValue = "";
@@ -111,14 +133,11 @@ public final class ExcelUtil
 		}
 		return cellValue;
 	}
-	*/
 	
 	/**
 	 * 获取单元格数据，可兼容xls与xlsx版本
 	 * */
 	/**请使用cn.hutool.poi包里面相关Excel工具类*/
-	/*
-	@Deprecated
 	public static Object getCellValue(final Cell cell) 
 	{
 		Object cellValue = new Object();
@@ -154,14 +173,11 @@ public final class ExcelUtil
 		}
 		return cellValue;
 	}
-	*/
 	
 	/**
 	 * 设置单元格数据，可兼容xls与xlsx版本，此重载版用于Cell重新设置值
 	 * */
 	/**请使用cn.hutool.poi包里面相关Excel工具类*/
-	/*
-	@Deprecated
 	public static void setCellValue(final Cell cell)
 	{
 		switch (cell.getCellTypeEnum())
@@ -189,14 +205,11 @@ public final class ExcelUtil
     			break;
     	}
 	}
-	*/
 	
 	/**
 	 * 设置单元格数据，可兼容xls与xlsx版本，此重载版用于在Map获取值并赋值到Cell中
 	 * */
 	/**请使用cn.hutool.poi包里面相关Excel工具类*/
-	/*
-	@Deprecated
 	public static void setCellValue(final Cell cell, 
 									final Map<String, Object> dataValue, 
 									final String key) 
@@ -244,45 +257,27 @@ public final class ExcelUtil
 				break;
 		}
 	}
-	*/
 	
 	/**请使用cn.hutool.poi包里面相关Excel工具类*/
-	/*
-	@Deprecated
 	public static String toJson(final Collection<ExcelData> records)
-	{ return JSON.toJSONString(records); }
-	*/
+	{ return JSONUtil.toJsonStr(records); }
 	
 	/**请使用cn.hutool.poi包里面相关Excel工具类*/
-	/*
-	@Deprecated
 	public static Collection<ExcelData> read(final File file)
 	{ return read(file, null, 0, 0, 0, 0, 0, 0); }
-	*/
 	
-	/*
-	@Deprecated
 	public static Collection<ExcelData> read(final File file, final String sheetName)
 	{ return read(file, sheetName, 0, 0, 0, 0, 0, 0); }
-	*/
 	
 	/**请使用cn.hutool.poi包里面相关Excel工具类*/
-	/*
-	@Deprecated
 	public static Collection<ExcelData> read(final URL url)
 	{ return read(url, null, 0, 0, 0, 0, 0, 0); }
-	*/
 	
 	/**请使用cn.hutool.poi包里面相关Excel工具类*/
-	/*
-	@Deprecated
 	public static Collection<ExcelData> read(final URL url, final String sheetName)
 	{ return read(url, sheetName, 0, 0, 0, 0, 0, 0); }
-	*/
 	
 	/**请使用cn.hutool.poi包里面相关Excel工具类*/
-	/*
-	@Deprecated
 	private static Collection<ExcelData> read(final URL url, 
 			  								  final String sheetName,
 			  								  final int startSheet,
@@ -306,11 +301,8 @@ public final class ExcelUtil
 		}
 		return result;
 	}
-	*/
 	
 	/**请使用cn.hutool.poi包里面相关Excel工具类*/
-	/*
-	@Deprecated
 	private static Collection<ExcelData> read(final File file, 
 			  								  final String sheetName,
 			  								  final int startSheet,
@@ -375,11 +367,8 @@ public final class ExcelUtil
 		
 		return result;
 	}
-	*/
 	
 	/**请使用cn.hutool.poi包里面相关Excel工具类*/
-	/*
-	@Deprecated
 	private static boolean isXls(final File file)
 	{
 		if (!FileUtil.isFile(file))
@@ -387,11 +376,8 @@ public final class ExcelUtil
 		
 		return FileTypeUtil.getType(file).equalsIgnoreCase("xls");
 	}
-	*/
 	
 	/**请使用cn.hutool.poi包里面相关Excel工具类*/
-	/*
-	@Deprecated
 	private static boolean isXlsx(final File file)
 	{
 		if (!FileUtil.isFile(file))
@@ -399,11 +385,8 @@ public final class ExcelUtil
 		
 		return FileTypeUtil.getType(file).equalsIgnoreCase("xlsx");
 	}
-	*/
 	
 	/**请使用cn.hutool.poi包里面相关Excel工具类*/
-	/*
-	@Deprecated
 	private static ExcelData readExcelCommonHandler(final Sheet sheet, 
 			    								   final int startRow, 
 			    								   final int endRow,
@@ -444,5 +427,4 @@ public final class ExcelUtil
 
 		return null;
 	}
-	*/
 }

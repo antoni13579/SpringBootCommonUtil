@@ -27,14 +27,14 @@
 		
 		<!-- <jsch.version>0.1.54</jsch.version> -->
 		<pagehelper.version>5.1.4</pagehelper.version>
-		<!-- <opencsv.version>4.2</opencsv.version> -->
-		<!-- <tomcat.databasepool.version>6.0.36</tomcat.databasepool.version> -->
-		<!-- <poi.ooxml.version>3.17</poi.ooxml.version> -->
+		<opencsv.version>4.2</opencsv.version>
+		<tomcat.databasepool.version>6.0.36</tomcat.databasepool.version>
+		<poi.ooxml.version>3.17</poi.ooxml.version>
 		<!-- <xerces.version>2.12.0</xerces.version> -->
 		<kettle.version>7.1.0.0-12</kettle.version>
 		<jython.version>2.7.0</jython.version>
 		<!-- <commons-compress.version>1.18</commons-compress.version> -->
-		<!-- <curator-framework.version>4.2.0</curator-framework.version> -->
+		<curator-framework.version>4.2.0</curator-framework.version>
 		<!-- <fastjson.version>1.2.49</fastjson.version> -->
 		<!-- <commons-lang3.version>3.8.1</commons-lang3.version> -->
 		<commons-collections4.version>4.1</commons-collections4.version>
@@ -51,10 +51,10 @@
 		<webjars-sockjs-client.version>1.3.0</webjars-sockjs-client.version>
 		<webjars-stomp-websocket.version>2.3.4</webjars-stomp-websocket.version>
 		<!-- <jackson-databind.version>2.9.10</jackson-databind.version> -->
-		<!-- <jasypt.version>1.9.2</jasypt.version> -->
+		<jasypt.version>1.9.2</jasypt.version>
 		<hutool.version>4.6.8</hutool.version>
 		<!-- <google.zxing.core.version>3.3.3</google.zxing.core.version> -->
-		<!-- <ikanalyzer.version>2012_u6</ikanalyzer.version> -->
+		<ikanalyzer.version>2012_u6</ikanalyzer.version>
 		<swagger.version>2.9.2</swagger.version>
 		<guava.version>28.0-jre</guava.version>
 		<dingding.api.version>20190716</dingding.api.version>
@@ -326,32 +326,26 @@
 		</dependency>
 		
 		<!-- OpenCSV -->
-		<!--  
 		<dependency>
     		<groupId>com.opencsv</groupId>
     		<artifactId>opencsv</artifactId>
     		<version>${opencsv.version}</version>
 		</dependency>
-		-->
 		
 		<!-- Tomcat的数据库连接池，基于老版本 -->
-		<!--  
 		<dependency>
     		<groupId>org.apache.tomcat</groupId>
     		<artifactId>dbcp</artifactId>
     		<version>${tomcat.databasepool.version}</version>
     		<scope>provided</scope>
 		</dependency>
-		-->
 		
 		<!-- Excel组件 -->
-		<!--  
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
 			<version>${poi.ooxml.version}</version>
 		</dependency>
-		-->
 		
 		<!-- Excel组件其中一部分，主要是hutool使用sax读取，需要用到这个组件 -->
 		<!--  
@@ -402,13 +396,11 @@
 		-->
 		
 		<!-- Zookeeper操作工具 -->
-		<!--  
 		<dependency>
     		<groupId>org.apache.curator</groupId>
     		<artifactId>curator-framework</artifactId>
-    		<version>${curator-framework.version}</version> 
+    		<version>${curator-framework.version}</version> <!--$NO-MVN-MAN-VER$-->
 		</dependency>
-		-->
 		
 		<!-- 阿里的Json工具 -->
 		<!--  
@@ -524,13 +516,11 @@
 		-->
 		
 		<!-- Jasypt加解密功能 -->
-		<!--  
 		<dependency>
     		<groupId>org.jasypt</groupId>
     		<artifactId>jasypt</artifactId>
     		<version>${jasypt.version}</version>
 		</dependency>
-		-->
 		
 		<!-- 国产Java工具包（Hutool） -->
 		<dependency>
@@ -549,13 +539,11 @@
 		-->
 		
 		<!-- 实现分词功能  -->
-		<!--  
 		<dependency>
     		<groupId>com.janeluo</groupId>
     		<artifactId>ikanalyzer</artifactId>
     		<version>${ikanalyzer.version}</version>
 		</dependency>
-		-->
 		
 		<!-- swagger用于定义API文档 -->
 		<dependency>

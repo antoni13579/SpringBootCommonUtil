@@ -8,6 +8,7 @@ import lombok.ToString;
 import lombok.experimental.Accessors;
 import lombok.AllArgsConstructor;
 
+@Deprecated
 @Getter
 @Setter
 @Accessors(chain = true)

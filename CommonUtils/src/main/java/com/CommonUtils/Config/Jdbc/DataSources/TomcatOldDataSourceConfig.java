@@ -1,5 +1,13 @@
 package com.CommonUtils.Config.Jdbc.DataSources;
 
+import java.util.Properties;
+
+import javax.sql.DataSource;
+
+import org.apache.tomcat.dbcp.dbcp.BasicDataSourceFactory;
+
+import com.CommonUtils.Utils.DBUtils.Bean.DBBaseInfo.DBInfo;
+
 /**
  * 已过时，最新的Tomcat已经不支持这个数据库连接池了
  * */
@@ -8,7 +16,6 @@ public final class TomcatOldDataSourceConfig
 {
 	private TomcatOldDataSourceConfig() {}
 	
-	/*
 	public static DataSource getDataSource(final DBInfo dbInfo, final String poolName) throws Exception
 	{
 		Properties properties = new Properties();
@@ -28,5 +35,4 @@ public final class TomcatOldDataSourceConfig
 		properties.put("logAbandoned", true);
 		return BasicDataSourceFactory.createDataSource(properties);
 	}
-	*/
 }

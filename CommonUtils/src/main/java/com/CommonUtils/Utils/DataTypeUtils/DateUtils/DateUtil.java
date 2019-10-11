@@ -127,7 +127,6 @@ public final class DateUtil
 	/**
 	 * 建议使用cn.hutool.core.date.DateUtil.range相关方法
 	 * */
-	/*
 	public static Collection<Date> getRangeCondition(final Date start, final Date end, final String timeType, final String ... params)
 	{
 		Collection<Date> dates = DateUtil.getRange(start, end);
@@ -149,7 +148,7 @@ public final class DateUtil
 				}
 				
 				//根据星期几生成
-				else if ("DAY_OF_WEEK".equalsIgnoreCase(timeType) && !ArrayUtil.isArrayEmpty(params))
+				else if ("DAY_OF_WEEK".equalsIgnoreCase(timeType) && !com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil.isArrayEmpty(params))
 				{
 					for (String param : params)
 					{
@@ -166,7 +165,6 @@ public final class DateUtil
 			return result;
 		}
 	}
-	*/
 	
 	/**
 	 * 根据开始日期与结束日期，获取其时间范围，建议使用cn.hutool.core.date.DateUtil.range相关方法

@@ -17,12 +17,12 @@ import cn.hutool.core.lang.TypeReference;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@Deprecated
 public final class ReflectUtil 
 {
 	private ReflectUtil() {}
 	
 	/**建议使用cn.hutool.core.util.ClassLoaderUtil.loadClass*/ 
-	@Deprecated
 	public static Class<?> getClass(final String classPath)
 	{
 		Class<?> clazz = null;
@@ -35,7 +35,6 @@ public final class ReflectUtil
 	 * 利用反射，获取BEAN中指定字段的值
 	 * */
 	/**建议使用cn.hutool.core.util.ReflectUtil.getFieldValue*/ 
-	@Deprecated
 	public static Object getBeanFieldValue(final Object obj, final String fieldName)
 	{
 		Object result = null;
@@ -72,7 +71,6 @@ public final class ReflectUtil
 	 * 利用反射，获取BEAN中所有字段的值
 	 * */
 	/**建议使用cn.hutool.core.util.ReflectUtil.getFieldValue*/ 
-	@Deprecated
 	public static Map<String, Object> getBeanFieldValue(final Object obj)
 	{
 		Map<String, Object> result = new HashMap<String, Object>();
@@ -101,15 +99,19 @@ public final class ReflectUtil
 		return result;
 	}
 	
+	/**建议使用cn.hutool.core.util.ClassUtil.isAllAssignableFrom*/
 	public static <T> boolean getTypeCompareResult(final Class<T> srcClazz, final String targetClassPath)
 	{ return getTypeCompareResult(srcClazz, getClass(targetClassPath)); }
 	
+	/**建议使用cn.hutool.core.util.ClassUtil.isAllAssignableFrom*/
 	public static <T> boolean getTypeCompareResult(final String srcClassPath, final Class<T> targetClazz)
 	{ return getTypeCompareResult(getClass(srcClassPath), targetClazz); }
 	
+	/**建议使用cn.hutool.core.util.ClassUtil.isAllAssignableFrom*/
 	public static boolean getTypeCompareResult(final String srcClassPath, final String targetClassPath)
 	{ return getTypeCompareResult(getClass(srcClassPath), getClass(targetClassPath)); }
 	
+	/**建议使用cn.hutool.core.util.ClassUtil.isAllAssignableFrom*/
 	public static <T1, T2> boolean getTypeCompareResult(final Class<T1> srcClazz, final Class<T2> targetClazz)
 	{
 		if (null == srcClazz || null == targetClazz)

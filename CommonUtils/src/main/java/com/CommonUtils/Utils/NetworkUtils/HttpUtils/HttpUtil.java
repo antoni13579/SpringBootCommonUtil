@@ -28,8 +28,6 @@ import org.springframework.web.util.UriUtils;
 import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.CustomCollections.HashMap;
 import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
 
-import com.CommonUtils.Utils.NetworkUtils.HttpUtils.Bean.DownloadFileInfo;
-
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.http.ContentType;
 import cn.hutool.http.Header;
@@ -41,6 +39,8 @@ public final class HttpUtil
 {
 	private HttpUtil() {}
 	
+	/**建议cn.hutool.extra.servlet.ServletUtil.write*/
+	@Deprecated
 	private static Map<String, Object> downloadResponse(final long contentLength, final String paramFileName)
 	{
 		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
@@ -75,7 +75,9 @@ public final class HttpUtil
 	 * 
 	 * 由于一个奇葩的浏览器————IE的存在，响应的时候需要对它单独处理，同时响应给用户的文件名中有可能包含一些不是英文和数字的字符，如汉语，也需要进行处理
 	 * */
-	public static ResponseEntity<Resource> downloadResponse(final DownloadFileInfo fileInfo) throws UnsupportedEncodingException, MalformedURLException
+	/**建议cn.hutool.extra.servlet.ServletUtil.write*/
+	@Deprecated
+	public static ResponseEntity<Resource> downloadResponse(final com.CommonUtils.Utils.NetworkUtils.HttpUtils.Bean.DownloadFileInfo fileInfo) throws UnsupportedEncodingException, MalformedURLException
 	{
 		File file = fileInfo.getFile();
         //Resource body = new FileSystemResource(file);
@@ -84,6 +86,8 @@ public final class HttpUtil
         return new ResponseEntity<Resource>(body, (HttpHeaders)configResult.get("HEADERS"), (HttpStatus)configResult.get("STATUS"));
 	}
 	
+	/**建议cn.hutool.extra.servlet.ServletUtil.write*/
+	@Deprecated
 	public static ResponseEntity<byte[]> downloadResponse(final byte[] datas, final String paramFileName)
 	{        
         Map<String, Object> configResult = downloadResponse(datas.length, paramFileName);
@@ -116,6 +120,7 @@ public final class HttpUtil
 	/**
 	 * 当前的HTTP Session也可以通过原始Servlet API以编程方式获得：
 	 * */
+	@Deprecated
 	public static HttpSession getHttpSession(final boolean allowCreateSession)
 	{ return ((ServletRequestAttributes)RequestContextHolder.currentRequestAttributes()).getRequest().getSession(allowCreateSession); }
 	
