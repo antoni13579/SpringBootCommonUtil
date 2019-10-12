@@ -23,9 +23,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.transaction.HeuristicMixedException;
+import javax.transaction.HeuristicRollbackException;
+import javax.transaction.NotSupportedException;
+import javax.transaction.RollbackException;
+import javax.transaction.SystemException;
+
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.transaction.jta.JtaTransactionManager;
 
 import com.CommonUtils.Utils.DBUtils.DBContants;
 import com.CommonUtils.Utils.DBUtils.DBHandleUtil;
@@ -36,7 +43,7 @@ import com.CommonUtils.Utils.DBUtils.Bean.DBBaseInfo.DBInfoForDataSource;
 
 import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
 import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.CustomCollections.HashSet;
-
+import com.CommonUtils.Utils.DynaticUtils.Services.Impls.BeanUtilServiceImpl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -243,6 +250,100 @@ public final class DBBatchFlowUtil
 		catch (Exception ex)
 		{
 			log.error("批量数据流处理执行失败，异常原因为：", ex);			
+			result = false;
+		}
+		finally
+		{ DbUtil.close(sourceResultSet, sourcePreparedStatement, sourceConnection); }
+		
+		return result;
+	}
+	
+	@SafeVarargs
+	public static boolean dbToDbs(final AbstractDBInfo sourceDBInfo, 
+			 					  final Collection<DBInfoForDataSource> targetDBinfoForDataSources, 
+			 					  final Replacer<Map<String, Object>> ... itemProcessors)
+	{
+		Connection sourceConnection = null;
+		PreparedStatement sourcePreparedStatement = null;
+		ResultSet sourceResultSet = null;
+		boolean result = false;
+		try
+		{
+			List<Map<String, Object>> records = new ArrayList<Map<String, Object>>();
+			
+			//源数据库初始化
+			sourceConnection = DBHandleUtil.getConnection(sourceDBInfo);
+			sourcePreparedStatement = DBHandleUtil.getPreparedStatement(PreparedStatementOperationType.READ, sourceConnection, sourceDBInfo.getSql());
+			DBHandleUtil.setPreparedStatement(PreparedStatementOperationType.READ, sourcePreparedStatement, sourceDBInfo.getBindingParams());
+			sourceResultSet = sourcePreparedStatement.executeQuery();
+			ResultSetMetaData sourceResultSetMetaData = sourcePreparedStatement.getMetaData();
+			
+			JtaTransactionManager jtaTransactionManager = BeanUtilServiceImpl.getBean(JtaTransactionManager.class).orElseThrow(() -> { return new Exception("找不到指定的分布式事务管理器！！"); });
+			
+			//开始处理数据
+			while (sourceResultSet.next())
+			{
+				Map<String, Object> record = new LinkedHashMap<String, Object>();
+				for (int i = 1; i <= sourceResultSetMetaData.getColumnCount(); i++) 
+				{
+					String columnName = null;
+					if (sourceDBInfo.isUseColumnName())
+					{ columnName = sourceResultSetMetaData.getColumnName(i); }
+					else
+					{ columnName = sourceResultSetMetaData.getColumnLabel(i); }
+					
+					Object columnValue = sourceResultSet.getObject(columnName);
+					
+					record.put(columnName, columnValue);
+				}
+				
+				records.add(record);
+				
+				if (records.size() % DBContants.fetchSize == 0 || sourceResultSet.isLast())
+				{
+					List<Map<String, Object>> newRecords = batchProcess(records, itemProcessors);
+					
+					jtaTransactionManager.getUserTransaction().begin();
+					for (DBInfoForDataSource targetDBinfoForDataSource : targetDBinfoForDataSources)
+					{
+						targetDBinfoForDataSource.getJdbcTemplate().batchUpdate
+						(
+								targetDBinfoForDataSource.getSql(), 
+								new BatchPreparedStatementSetter() 
+								{
+									@Override
+									public void setValues(PreparedStatement ps, int indx) throws SQLException 
+									{
+										Map<String, Object> finalRecord = newRecords.get(indx);
+										for (int i = 1; i <= sourceResultSetMetaData.getColumnCount(); i++) 
+										{
+											String columnName = null;
+											if (sourceDBInfo.isUseColumnName())
+											{ columnName = sourceResultSetMetaData.getColumnName(i); }
+											else
+											{ columnName = sourceResultSetMetaData.getColumnLabel(i); }
+											
+											Object columnValue = finalRecord.get(columnName);
+											ps.setObject(i, columnValue);
+										}
+									}
+
+									@Override
+									public int getBatchSize() 
+									{ return newRecords.size(); }
+								}
+						);
+					}
+					jtaTransactionManager.getUserTransaction().commit();
+					records.clear();
+				}
+			}
+			
+			result = true;
+		}
+		catch (Exception ex)
+		{
+			log.error("批量数据流处理执行失败，异常原因为：", ex);
 			result = false;
 		}
 		finally
@@ -530,6 +631,57 @@ public final class DBBatchFlowUtil
 	}
 	
 	@SafeVarargs
+	public static boolean textFileToDbs(final File srcFile, 
+										final Collection<DBInfoForDataSource> targetDBinfoForDataSources, 
+										final String delimiter, 
+										final Charset encode, 
+										final long skipRow, 
+										final Replacer<String[]> ... itemProcessors)
+	{
+		InputStream fis = null;
+		Reader isr = null;
+		BufferedReader br = null;
+		
+		boolean result = false;
+		try
+		{
+			fis = new FileInputStream(srcFile);
+			isr = new InputStreamReader(fis, encode);
+			br = new BufferedReader(isr);
+			
+			JtaTransactionManager jtaTransactionManager = BeanUtilServiceImpl.getBean(JtaTransactionManager.class).orElseThrow(() -> { return new Exception("找不到指定的分布式事务管理器！！"); });
+			
+			String line;
+			List<String[]> records = new ArrayList<>();
+			long rows = 0;
+			while (null != (line = br.readLine()))
+			{
+				++rows;
+				if (rows == skipRow)
+				{ continue; }
+				
+				//String[] record = StringUtils.splitPreserveAllTokens(line, delimiter);
+				List<String> record = StrSpliter.split(line, delimiter, false, false);
+				records.add(record.toArray(new String[record.size()]));
+				if (records.size() % DBContants.fetchSize == 0)
+				{ processAndWrite(itemProcessors, records, jtaTransactionManager, targetDBinfoForDataSources); }
+			}
+			
+			processAndWrite(itemProcessors, records, jtaTransactionManager, targetDBinfoForDataSources);
+			result = true;
+		}
+		catch (Exception ex)
+		{
+			log.error("读取文件文件数据后，对其进去入库出现异常，异常原因为：", ex);
+			result = false;
+		}
+		finally
+		{ DbUtil.close(br, isr, fis); }
+		
+		return result;
+	}
+	
+	@SafeVarargs
 	public static boolean textFileToDb(final File srcFile, 
 									   final AbstractDBInfo targetDBInfo, 
 									   final String delimiter, 
@@ -610,6 +762,43 @@ public final class DBBatchFlowUtil
 	
 	/**读取EXCEL文件，并写入到数据库*/
 	@SafeVarargs
+	public static boolean excelToDbs(final File srcFile, 
+									 final Collection<DBInfoForDataSource> targetDBinfoForDataSources, 
+									 final int sheetIndx,
+									 final int skipRow,
+									 final Replacer<Object[]> ... itemProcessors)
+	{
+		boolean result = false;
+		try
+		{
+			JtaTransactionManager jtaTransactionManager = BeanUtilServiceImpl.getBean(JtaTransactionManager.class).orElseThrow(() -> { return new Exception("找不到指定的分布式事务管理器！！"); });
+			List<Object[]> records = new ArrayList<>();
+			ExcelUtil.readBySax
+			(
+					srcFile, 
+					sheetIndx, 
+					new RowHandlerImplByJta()
+						.setItemProcessors(itemProcessors)
+						.setJtaTransactionManager(jtaTransactionManager)
+						.setRecords(records)
+						.setSkipRow(skipRow)
+						.setTargetDBinfoForDataSources(targetDBinfoForDataSources)
+			);
+			
+			processAndWrite(itemProcessors, records, jtaTransactionManager, targetDBinfoForDataSources);
+			result = true;
+		}
+		catch (Exception ex)
+		{
+			log.error("读取Excel文件数据后，对其进去入库出现异常，异常原因为：", ex);
+			result = false;
+		}
+		
+		return result;
+	}
+	
+	/**读取EXCEL文件，并写入到数据库*/
+	@SafeVarargs
 	public static boolean excelToDb(final File srcFile, 
 									final AbstractDBInfo targetDBInfo, 
 									final int sheetIndx,
@@ -642,7 +831,7 @@ public final class DBBatchFlowUtil
 			(
 					srcFile, 
 					sheetIndx, 
-					new RowHandlerImpl()
+					new RowHandlerImplByDefault()
 						.setAbstractDBInfo(targetDBInfo)
 						.setConnection(targetConnection)
 						.setItemProcessors(itemProcessors)
@@ -676,7 +865,67 @@ public final class DBBatchFlowUtil
 	
 	/**读取CSV文件，并写入到数据库*/
 	@SafeVarargs
-	public static boolean csvToDb(final File srcFile, final AbstractDBInfo targetDBInfo, final Charset encode, final long skipRow, final CsvReadConfig csvReadConfig, final Replacer<String[]> ... itemProcessors)
+	public static boolean csvToDbs(final File srcFile, 
+								   final Collection<DBInfoForDataSource> targetDBinfoForDataSources, 
+								   final Charset encode, 
+								   final long skipRow, 
+								   final CsvReadConfig csvReadConfig, 
+								   final Replacer<String[]> ... itemProcessors)
+	{
+		FileInputStream fos = null;
+    	BufferedInputStream bis = null;
+    	InputStreamReader isr = null;
+    	BufferedReader br = null;
+    	CsvParser csvParser = null;
+    	
+		boolean result = false;
+		try
+		{
+			fos = new FileInputStream(srcFile);
+    		bis = new BufferedInputStream(fos);
+    		isr = new InputStreamReader(bis, encode);
+    		br = new BufferedReader(isr);
+    		csvParser = new CsvParser(br, csvReadConfig);
+    		
+    		JtaTransactionManager jtaTransactionManager = BeanUtilServiceImpl.getBean(JtaTransactionManager.class).orElseThrow(() -> { return new Exception("找不到指定的分布式事务管理器！！"); });
+    		
+    		List<String[]> records = new ArrayList<>();
+    		long rows = 0;
+    		CsvRow csvRow;
+    		while ((csvRow = csvParser.nextRow()) != null)
+    		{
+    			++rows;
+    			if (rows == skipRow)
+    			{ continue; }
+
+    			String[] record = csvRow.toArray(new String[csvRow.size()]);
+    			records.add(record);
+    			if (records.size() % DBContants.fetchSize == 0)
+    			{ processAndWrite(itemProcessors, records, jtaTransactionManager, targetDBinfoForDataSources); }
+    		}
+    		
+    		processAndWrite(itemProcessors, records, jtaTransactionManager, targetDBinfoForDataSources);
+			result = true;
+		}
+		catch (Exception ex)
+		{
+			log.error("读取文件文件数据后，对其进去入库出现异常，异常原因为：", ex);
+			result = false;
+		}
+		finally
+		{ DbUtil.close(csvParser, br, isr, bis, fos); }
+		
+		return result;
+	}
+	
+	/**读取CSV文件，并写入到数据库*/
+	@SafeVarargs
+	public static boolean csvToDb(final File srcFile, 
+								  final AbstractDBInfo targetDBInfo, 
+								  final Charset encode, 
+								  final long skipRow, 
+								  final CsvReadConfig csvReadConfig, 
+								  final Replacer<String[]> ... itemProcessors)
 	{
 		FileInputStream fos = null;
     	BufferedInputStream bis = null;
@@ -766,6 +1015,39 @@ public final class DBBatchFlowUtil
 	
 	private static <T> void processAndWrite(final Replacer<T[]>[] itemProcessors,
 											final List<T[]> records,
+											final JtaTransactionManager jtaTransactionManager,
+											final Collection<DBInfoForDataSource> targetDBinfoForDataSources) 
+	throws NotSupportedException, SystemException, SecurityException, IllegalStateException, RollbackException, HeuristicMixedException, HeuristicRollbackException
+	{
+		List<T[]> newRecords = batchProcess(records, itemProcessors);
+		jtaTransactionManager.getUserTransaction().begin();
+		for (DBInfoForDataSource targetDBinfoForDataSource : targetDBinfoForDataSources)
+		{
+			targetDBinfoForDataSource.getJdbcTemplate().batchUpdate
+			(
+					targetDBinfoForDataSource.getSql(), 
+					new BatchPreparedStatementSetter() 
+					{
+						@Override
+						public void setValues(PreparedStatement ps, int indx) throws SQLException 
+						{
+							T[] finalRecord = newRecords.get(indx);
+							for (int i = 1; i <= finalRecord.length; i++)
+							{ ps.setObject(i, finalRecord[i - 1]); }
+						}
+
+						@Override
+						public int getBatchSize() 
+						{ return newRecords.size(); }
+					}
+			);
+		}
+		jtaTransactionManager.getUserTransaction().commit();
+		records.clear();
+	}
+	
+	private static <T> void processAndWrite(final Replacer<T[]>[] itemProcessors,
+											final List<T[]> records,
 											final JdbcTemplate targetJdbcTemplate, 
 											final String sql)
 	{
@@ -833,7 +1115,34 @@ public final class DBBatchFlowUtil
 	
 	@Accessors(chain = true)
 	@Setter
-	private static class RowHandlerImpl implements RowHandler
+	private static class RowHandlerImplByJta implements RowHandler
+	{
+		private int skipRow;
+		private List<Object[]> records;
+		private Replacer<Object[]>[] itemProcessors;
+		private Collection<DBInfoForDataSource> targetDBinfoForDataSources;
+		private JtaTransactionManager jtaTransactionManager;
+		
+		@Override
+		public void handle(int sheetIndex, int rowIndex, List<Object> rowList) 
+		{
+			if (rowIndex != this.skipRow)
+			{
+				this.records.add(rowList.toArray());
+				if (this.records.size() % DBContants.fetchSize == 0)
+				{
+					try 
+					{ processAndWrite(this.itemProcessors, this.records, this.jtaTransactionManager, this.targetDBinfoForDataSources); } 
+					catch (Exception e) 
+					{ log.error("读取Excel文件数据后，利用分布式事务写入到数据库出现异常，请注意处理，异常原因为：", e); }
+				}
+			}
+		}
+	}
+	
+	@Accessors(chain = true)
+	@Setter
+	private static class RowHandlerImplByDefault implements RowHandler
 	{
 		private int skipRow;
 		private List<Object[]> records;

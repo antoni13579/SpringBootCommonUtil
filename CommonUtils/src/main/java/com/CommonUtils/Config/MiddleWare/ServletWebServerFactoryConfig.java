@@ -1,6 +1,5 @@
 package com.CommonUtils.Config.MiddleWare;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
@@ -29,7 +28,7 @@ public final class ServletWebServerFactoryConfig
 		return tomcat;
 	}
 	
-	/**配置http与https，同时配置http跳转到https功能*/
+	/**配置http与https，同时配置http跳转到https功能，如果httpsPort传入serverPort，则serverPort就是https端口*/
 	public static TomcatServletWebServerFactory getTomcatInstance(final int httpPort, final int httpsPort)
 	{
 		TomcatServletWebServerFactory tomcat = new TomcatServletWebServerFactory()
@@ -50,6 +49,7 @@ public final class ServletWebServerFactoryConfig
 		return tomcat;
 	}
 	
+	/**注意，httpsPort不能传入serverPort*/
 	public static TomcatServletWebServerFactory getTomcatInstance(final int httpsPort, 
 			  													  final String sslFilePath, 
 			  													  final String keyStorePassword, 
@@ -58,7 +58,7 @@ public final class ServletWebServerFactoryConfig
 	{
 		TomcatServletWebServerFactory tomcat = new TomcatServletWebServerFactory();
 		addConnectorCustomizers(tomcat);
-        tomcat.addAdditionalTomcatConnectors(getConnector(httpsPort, sslFilePath, keyStorePassword, keyPassword, goToHttps));
+        tomcat.addAdditionalTomcatConnectors(getConnector(httpsPort, sslFilePath, keyStorePassword, keyPassword));
 		return tomcat;
 	}
 	
@@ -102,7 +102,7 @@ public final class ServletWebServerFactoryConfig
 		connector.setScheme("http");
 				
 		//需要重定向的http端口
-		connector.setSecure(false);
+		//connector.setSecure(false);
 		        
 		//设置重定向到https端口
 		connector.setRedirectPort(httpsPort);
@@ -115,29 +115,20 @@ public final class ServletWebServerFactoryConfig
 	private static Connector getConnector(final int httpsPort, 
 										  final String sslFilePath, 
 										  final String keyStorePassword, 
-										  final String keyPassword,
-										  final boolean goToHttps) throws IOException
+										  final String keyPassword) throws IOException
 	{
-		Connector connector = new Connector("org.apache.coyote.http11.Http11NioProtocol");
+		Connector connector = getConnector(httpsPort);
 		connector.setScheme("https");
-        connector.setSecure(true);
-        connector.setPort(httpsPort);
+        //connector.setSecure(true);
         
         Http11NioProtocol protocol = (Http11NioProtocol) connector.getProtocolHandler();
         protocol.setSSLEnabled(true);
-        
-        ClassPathResource resource = new ClassPathResource(sslFilePath);
-        File file = resource.getFile();
-        protocol.setKeystoreFile(file.getAbsolutePath());
+        protocol.setKeystoreFile(new ClassPathResource(sslFilePath).getFile().getAbsolutePath());
         protocol.setKeystorePass(keyStorePassword);
         protocol.setKeyPass(keyPassword);
         
-        if (goToHttps)
-        {
-        	//设置重定向到https端口
-    		connector.setRedirectPort(httpsPort);
-        }
-        
+        //设置重定向到https端口
+		//connector.setRedirectPort(httpPort);
         return connector;
 	}
 }

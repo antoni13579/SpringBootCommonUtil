@@ -8,10 +8,10 @@ import javax.transaction.TransactionManager;
 import javax.transaction.UserTransaction;
 
 import org.apache.ibatis.session.SqlSessionFactory;
-
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.jta.JtaTransactionManager;
 
@@ -72,6 +72,14 @@ public class MyBatisPlusConfiguration
 	@Bean(name = "mySqlSessionFactory")
     public SqlSessionFactory mySqlSessionFactory(@Qualifier("dynamicRoutingDataSource")DynamicRoutingDataSource dynamicRoutingDataSource) throws Exception
     { return SqlSessionFactoryConfig.getInstance(dynamicRoutingDataSource, MybatisBaseConfig.getConfigurationForMyBatisPlus(IdType.NONE), "com.CommonUtils.ConfigTemplate.MyBatis.**.xml"); }
+	
+	@Bean
+	public JdbcTemplate myJdbcTemplate(@Qualifier("myDataSource")DataSource myDataSource)
+	{ return new JdbcTemplate(myDataSource); }
+	
+	@Bean
+	public JdbcTemplate lukabootJdbcTemplate(@Qualifier("lukabootDataSource")DataSource lukabootDataSource)
+	{ return new JdbcTemplate(lukabootDataSource); }
 	
 	@Bean(name = "myDataSource", destroyMethod = "destroy")
 	@DependsOn({"txManager"})

@@ -8,6 +8,8 @@ import com.CommonUtils.Utils.DBUtils.Bean.DBBaseInfo.DBInfo;
 import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.pool.xa.DruidXADataSource;
 
+/**我相对害怕阿里的框架，都是为了KPI而诞生的产物，说不定啥时候又不维护*/
+@Deprecated
 public final class DruidDataSourceConfig 
 {
 	private DruidDataSourceConfig() {}
@@ -15,7 +17,6 @@ public final class DruidDataSourceConfig
 	/**
 	 * 已过时，Druid与Atomikos集成有问题
 	 * */
-	@Deprecated
 	public static XADataSource getXADataSource(final DBInfo dbInfo, final String validationQuery)
 	{
 		DruidXADataSource dataSource = new DruidXADataSource();
