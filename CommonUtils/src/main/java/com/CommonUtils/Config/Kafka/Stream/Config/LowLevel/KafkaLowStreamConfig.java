@@ -1,5 +1,7 @@
 package com.CommonUtils.Config.Kafka.Stream.Config.LowLevel;
 
+import java.time.Duration;
+
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KafkaStreams;
@@ -165,7 +167,7 @@ public final class KafkaLowStreamConfig
 				JobProcessor.this.processorContext = context;
 				JobProcessor.this.processorContext.schedule
 				(
-						JobProcessor.this.intervalMs, 
+						Duration.ofMillis(JobProcessor.this.intervalMs), 
 						JobProcessor.this.punctuationType, 
 						new Punctuator() 
 						{

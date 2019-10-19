@@ -106,7 +106,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter
 			    						.setStatus(HttpStatus.OK.value())
 			    						.setStatusDesc("登录成功")
 			    						.toJson(),
-		    					    MediaType.APPLICATION_JSON_UTF8.toString()
+		    					    MediaType.APPLICATION_JSON.toString()
 		    				);
 			    			
 			    			UserDetails user = SpringSecurityUtil.getUser(authentication);
@@ -140,7 +140,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter
 			    						.setStatus(HttpStatus.UNAUTHORIZED.value())
 			    						.setStatusDesc("找不到对应的用户，是用户名不正确？还是密码不正确？还是说。。。。没有注册？")
 			    						.toJson(),
-			    					MediaType.APPLICATION_PROBLEM_JSON_UTF8.toString()
+			    					MediaType.APPLICATION_JSON.toString()
 		    				);
 			    		}
 			    ).permitAll()

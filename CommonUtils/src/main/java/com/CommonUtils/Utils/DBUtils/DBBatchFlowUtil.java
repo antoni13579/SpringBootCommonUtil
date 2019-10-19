@@ -22,6 +22,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.transaction.HeuristicMixedException;
 import javax.transaction.HeuristicRollbackException;
@@ -29,11 +30,36 @@ import javax.transaction.NotSupportedException;
 import javax.transaction.RollbackException;
 import javax.transaction.SystemException;
 
+import org.springframework.batch.core.JobParameter;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
+import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.item.ItemStream;
+import org.springframework.batch.item.ItemStreamException;
+import org.springframework.batch.item.ItemStreamWriter;
+import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider;
+import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
+import org.springframework.batch.item.database.builder.JdbcCursorItemReaderBuilder;
+import org.springframework.batch.item.database.support.ColumnMapItemPreparedStatementSetter;
+import org.springframework.batch.item.support.builder.CompositeItemProcessorBuilder;
+
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
+import org.springframework.jdbc.core.ColumnMapRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
+
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.transaction.jta.JtaTransactionManager;
 
+import com.CommonUtils.Config.SpringBatch.Config.Core.JobLauncherConfig;
+import com.CommonUtils.Config.SpringBatch.Config.Core.JobRepositoryConfig;
+import com.CommonUtils.Config.ThreadPool.ThreadPoolTaskExecutorConfig;
 import com.CommonUtils.Utils.DBUtils.DBContants;
 import com.CommonUtils.Utils.DBUtils.DBHandleUtil;
 import com.CommonUtils.Utils.DBUtils.DBHandleUtil.PreparedStatementOperationType;
@@ -259,6 +285,127 @@ public final class DBBatchFlowUtil
 	}
 	
 	@SafeVarargs
+	public static boolean dbToDbs(final DBInfoForDataSource sourceDBinfoForDataSource,
+								  final Collection<DBInfoForDataSource> targetDBinfoForDataSources,
+								  final Map<String,JobParameter> jobParameters,
+								  final ItemProcessor<Map<String, Object>, Map<String, Object>> ... processors)
+	{
+		boolean result = false;
+		ThreadPoolTaskExecutor threadPoolTaskExecutor = null;
+		try
+		{
+			//设置读取流程中，SQL语句的绑定变量参数
+			List<Object> readerParameters = new ArrayList<>();			
+			sourceDBinfoForDataSource.getBindingParams()
+									 .stream()
+									 .map(bindingParam -> { return CollUtil.newArrayList(bindingParam); })
+									 .collect(Collectors.toList())
+									 .forEach(x -> { readerParameters.addAll(x); });
+
+			//运行作业
+			JtaTransactionManager jtaTransactionManager = BeanUtilServiceImpl.getBean(JtaTransactionManager.class).orElseThrow(() -> { return new Exception("找不到指定的分布式事务管理器！！"); });
+			JobRepository jobRepository = JobRepositoryConfig.getMapJobRepositoryInstance(jtaTransactionManager);
+			threadPoolTaskExecutor = ThreadPoolTaskExecutorConfig.getThreadPoolTaskExecutor(true, 1, 1);
+			JobLauncherConfig.getInstance(threadPoolTaskExecutor, jobRepository)
+							 .run
+							 (
+									 new JobBuilderFactory(jobRepository)
+									 	.get("dbToDbsJob")
+									 	.repository(jobRepository)
+									    .start
+									  	(
+									  			new StepBuilderFactory(jobRepository, jtaTransactionManager)
+									  				.get("dbToDbsStep")
+									  				.allowStartIfComplete(true)
+									  				.repository(jobRepository)
+									  				.startLimit(1)
+									  				.transactionManager(jtaTransactionManager)
+									  				.<Map<String, Object>, Map<String, Object>>chunk(DBContants.fetchSize)
+
+									  				//设置读取流程
+									  				.reader
+									  				(
+									  						new JdbcCursorItemReaderBuilder<Map<String, Object>>()
+									  							.dataSource(sourceDBinfoForDataSource.getDataSource())
+									  							.fetchSize(DBContants.fetchSize)
+									  							.ignoreWarnings(false)
+									  							.name("dbToDbsReader")
+									  							.queryArguments(readerParameters)
+									  							.sql(sourceDBinfoForDataSource.getSql())
+									  							.rowMapper(new ColumnMapRowMapper())
+									  							.build()
+									  				)
+									  				
+									  				//设置处理流程
+									  				.processor
+									  				(
+									  						new CompositeItemProcessorBuilder<Map<String, Object>, Map<String, Object>>()
+									  							.delegates
+									  							(
+									  									CollUtil.isEmpty(CollUtil.newArrayList(processors)) ? 
+									  											new com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.CustomCollections.ArrayList<ItemProcessor<Map<String, Object>, Map<String, Object>>>()
+									  												.add(map -> { return map; })
+									  												.getList() :
+									  											CollUtil.newArrayList(processors)
+									  							)
+									  							.build()
+									  				)
+									  				
+									  				//设置写流程
+									  				.writer
+									  				(
+									  						new ItemStreamWriterImpl()
+									  							.setIgnoreItemStream(false)
+									  							.setJtaTransactionManager(jtaTransactionManager)
+									  							.setDelegates
+									  							(
+									  									BeanUtilServiceImpl.transfer
+											  							(
+											  									targetDBinfoForDataSource -> 
+											  									{
+											  										return new JdbcBatchItemWriterBuilder<Map<String, Object>>()
+											  													.assertUpdates(false)
+											  													.dataSource(targetDBinfoForDataSource.getDataSource())
+											  													.itemPreparedStatementSetter(new ColumnMapItemPreparedStatementSetter())
+											  													.itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<Map<String, Object>>())
+											  													.namedParametersJdbcTemplate(new NamedParameterJdbcTemplate(targetDBinfoForDataSource.getJdbcTemplate()))
+											  													.sql(targetDBinfoForDataSource.getSql())
+											  													.build();
+											  									}, 
+											  									targetDBinfoForDataSources
+											  							)
+									  							)
+									  				)
+									  				
+									  				.repository(jobRepository)
+									  				.startLimit(1)
+									  				
+									  				//这里别设置线程池了，因为JobLauncher已经配置了，要求是JobLauncher带动step执行，如果这里设置了线程池，会导致JobLauncher与step并发执行，导致程序出错
+									  				//.taskExecutor(taskExecutor)
+									  				.transactionManager(jtaTransactionManager)
+									  				.build()
+									  	)
+									  	.build(), 
+									  				 
+									 new JobParametersBuilder(new JobParameters(jobParameters)).toJobParameters()
+							 );
+			result = true;
+		}
+		catch (Exception ex)
+		{
+			log.error("批量数据流处理执行失败，异常原因为：", ex);
+			result = false;
+		}
+		finally
+		{
+			if (null != threadPoolTaskExecutor)
+			{ threadPoolTaskExecutor.destroy(); }
+		}
+		
+		return result;
+	}
+	
+	@SafeVarargs
 	public static boolean dbToDbs(final AbstractDBInfo sourceDBInfo, 
 			 					  final Collection<DBInfoForDataSource> targetDBinfoForDataSources, 
 			 					  final Replacer<Map<String, Object>> ... itemProcessors)
@@ -293,7 +440,6 @@ public final class DBBatchFlowUtil
 					{ columnName = sourceResultSetMetaData.getColumnLabel(i); }
 					
 					Object columnValue = sourceResultSet.getObject(columnName);
-					
 					record.put(columnName, columnValue);
 				}
 				
@@ -302,38 +448,9 @@ public final class DBBatchFlowUtil
 				if (records.size() % DBContants.fetchSize == 0 || sourceResultSet.isLast())
 				{
 					List<Map<String, Object>> newRecords = batchProcess(records, itemProcessors);
-					
 					jtaTransactionManager.getUserTransaction().begin();
 					for (DBInfoForDataSource targetDBinfoForDataSource : targetDBinfoForDataSources)
-					{
-						targetDBinfoForDataSource.getJdbcTemplate().batchUpdate
-						(
-								targetDBinfoForDataSource.getSql(), 
-								new BatchPreparedStatementSetter() 
-								{
-									@Override
-									public void setValues(PreparedStatement ps, int indx) throws SQLException 
-									{
-										Map<String, Object> finalRecord = newRecords.get(indx);
-										for (int i = 1; i <= sourceResultSetMetaData.getColumnCount(); i++) 
-										{
-											String columnName = null;
-											if (sourceDBInfo.isUseColumnName())
-											{ columnName = sourceResultSetMetaData.getColumnName(i); }
-											else
-											{ columnName = sourceResultSetMetaData.getColumnLabel(i); }
-											
-											Object columnValue = finalRecord.get(columnName);
-											ps.setObject(i, columnValue);
-										}
-									}
-
-									@Override
-									public int getBatchSize() 
-									{ return newRecords.size(); }
-								}
-						);
-					}
+					{ targetDBinfoForDataSource.getJdbcTemplate().batchUpdate(targetDBinfoForDataSource.getSql(), new BatchPreparedStatementSetterImplForMap().setAbstractDBInfo(sourceDBInfo).setRecords(newRecords).setResultSetMetaData(sourceResultSetMetaData)); }
 					jtaTransactionManager.getUserTransaction().commit();
 					records.clear();
 				}
@@ -418,33 +535,7 @@ public final class DBBatchFlowUtil
 					if (usePool)
 					{
 						List<Map<String, Object>> newRecords = batchProcess(records, itemProcessors);
-						targetJdbcTemplate.batchUpdate
-						(
-								targetDBinfoForDataSource.getSql(), 
-								new BatchPreparedStatementSetter() 
-								{
-									@Override
-									public void setValues(PreparedStatement ps, int indx) throws SQLException 
-									{
-										Map<String, Object> finalRecord = newRecords.get(indx);
-										for (int i = 1; i <= sourceResultSetMetaData.getColumnCount(); i++) 
-										{
-											String columnName = null;
-											if (sourceDBInfo.isUseColumnName())
-											{ columnName = sourceResultSetMetaData.getColumnName(i); }
-											else
-											{ columnName = sourceResultSetMetaData.getColumnLabel(i); }
-											
-											Object columnValue = finalRecord.get(columnName);
-											ps.setObject(i, columnValue);
-										}
-									}
-
-									@Override
-									public int getBatchSize() 
-									{ return newRecords.size(); }
-								}
-						);
+						targetJdbcTemplate.batchUpdate(targetDBinfoForDataSource.getSql(), new BatchPreparedStatementSetterImplForMap().setAbstractDBInfo(sourceDBInfo).setRecords(newRecords).setResultSetMetaData(sourceResultSetMetaData));
 						records.clear();
 					}
 					else
@@ -1022,26 +1113,7 @@ public final class DBBatchFlowUtil
 		List<T[]> newRecords = batchProcess(records, itemProcessors);
 		jtaTransactionManager.getUserTransaction().begin();
 		for (DBInfoForDataSource targetDBinfoForDataSource : targetDBinfoForDataSources)
-		{
-			targetDBinfoForDataSource.getJdbcTemplate().batchUpdate
-			(
-					targetDBinfoForDataSource.getSql(), 
-					new BatchPreparedStatementSetter() 
-					{
-						@Override
-						public void setValues(PreparedStatement ps, int indx) throws SQLException 
-						{
-							T[] finalRecord = newRecords.get(indx);
-							for (int i = 1; i <= finalRecord.length; i++)
-							{ ps.setObject(i, finalRecord[i - 1]); }
-						}
-
-						@Override
-						public int getBatchSize() 
-						{ return newRecords.size(); }
-					}
-			);
-		}
+		{ targetDBinfoForDataSource.getJdbcTemplate().batchUpdate(targetDBinfoForDataSource.getSql(), new BatchPreparedStatementSetterImplForArray<T>().setRecords(newRecords)); }
 		jtaTransactionManager.getUserTransaction().commit();
 		records.clear();
 	}
@@ -1052,24 +1124,7 @@ public final class DBBatchFlowUtil
 											final String sql)
 	{
 		List<T[]> newRecords = batchProcess(records, itemProcessors);
-		targetJdbcTemplate.batchUpdate
-		(
-				sql, 
-				new BatchPreparedStatementSetter() 
-				{					
-					@Override
-					public void setValues(PreparedStatement ps, int indx) throws SQLException 
-					{
-						T[] finalRecord = newRecords.get(indx);
-						for (int i = 1; i <= finalRecord.length; i++)
-						{ ps.setObject(i, finalRecord[i - 1]); }
-					}
-
-					@Override
-					public int getBatchSize() 
-					{ return newRecords.size(); }
-				}
-	    );
+		targetJdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetterImplForArray<T>().setRecords(newRecords));
 		records.clear();
 	}
 	
@@ -1140,6 +1195,64 @@ public final class DBBatchFlowUtil
 		}
 	}
 	
+	//此代码是参考org.springframework.batch.item.support.CompositeItemWriter重写编写，主要是为了支持分布式事务
+	@Accessors(chain = true)
+	@Setter
+	private static class ItemStreamWriterImpl implements ItemStreamWriter<Map<String, Object>>
+	{
+		private List<ItemWriter<Map<String, Object>>> delegates;
+		private boolean ignoreItemStream = false;
+		private JtaTransactionManager jtaTransactionManager;
+					
+		@Override
+		public void open(ExecutionContext executionContext) throws ItemStreamException 
+		{
+			this.delegates.forEach
+			(
+					writer -> 
+					{
+						if (!this.ignoreItemStream && (writer instanceof ItemStream)) 
+						{ ((ItemStream) writer).open(executionContext); }
+					}
+			);
+		}
+
+		@Override
+		public void update(ExecutionContext executionContext) throws ItemStreamException 
+		{
+			this.delegates.forEach
+			(
+					writer -> 
+					{
+						if (!this.ignoreItemStream && (writer instanceof ItemStream)) 
+						{ ((ItemStream) writer).update(executionContext); }
+					}
+			);
+		}
+
+		@Override
+		public void close() throws ItemStreamException 
+		{
+			this.delegates.forEach
+			(
+					writer -> 
+					{
+						if (!this.ignoreItemStream && (writer instanceof ItemStream)) 
+						{ ((ItemStream) writer).close(); }
+					}
+			);
+		}
+
+		@Override
+		public void write(List<? extends Map<String, Object>> items) throws Exception 
+		{
+			this.jtaTransactionManager.getUserTransaction().begin();
+			for (ItemWriter<Map<String, Object>> writer : this.delegates) 
+			{ writer.write(items); }
+			this.jtaTransactionManager.getUserTransaction().commit();
+		}
+	}
+	
 	@Accessors(chain = true)
 	@Setter
 	private static class RowHandlerImplByDefault implements RowHandler
@@ -1173,6 +1286,56 @@ public final class DBBatchFlowUtil
 				}
 			}
 		}
+	}
+	
+	@Accessors(chain = true)
+	@Setter
+	private static class BatchPreparedStatementSetterImplForArray<T> implements BatchPreparedStatementSetter
+	{
+		private List<T[]> records;
+		
+		@Override
+		public void setValues(PreparedStatement ps, int indx) throws SQLException 
+		{
+			T[] finalRecord = this.records.get(indx);
+			for (int i = 1; i <= finalRecord.length; i++)
+			{ ps.setObject(i, finalRecord[i - 1]); }
+		}
+
+		@Override
+		public int getBatchSize() 
+		{ return this.records.size(); }
+		
+	}
+	
+	@Accessors(chain = true)
+	@Setter
+	private static class BatchPreparedStatementSetterImplForMap implements BatchPreparedStatementSetter
+	{
+		private List<Map<String, Object>> records;
+		private ResultSetMetaData resultSetMetaData;
+		private AbstractDBInfo abstractDBInfo;
+		
+		@Override
+		public void setValues(PreparedStatement ps, int indx) throws SQLException 
+		{
+			Map<String, Object> finalRecord = this.records.get(indx);
+			for (int i = 1; i <= this.resultSetMetaData.getColumnCount(); i++) 
+			{
+				String columnName = null;
+				if (this.abstractDBInfo.isUseColumnName())
+				{ columnName = this.resultSetMetaData.getColumnName(i); }
+				else
+				{ columnName = this.resultSetMetaData.getColumnLabel(i); }
+				
+				Object columnValue = finalRecord.get(columnName);
+				ps.setObject(i, columnValue);
+			}
+		}
+
+		@Override
+		public int getBatchSize() 
+		{ return this.records.size(); }
 	}
 	
 	@SafeVarargs

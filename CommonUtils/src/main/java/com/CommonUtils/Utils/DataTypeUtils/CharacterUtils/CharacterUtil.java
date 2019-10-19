@@ -43,7 +43,7 @@ public final class CharacterUtil
 	}
 	
 	/**建议使用cn.hutool.core.convert.Convert.toChar*/ 
-	public static <T> char getChar(final T obj) throws Exception
+	public static char getChar(final Object obj) throws Exception
 	{
 		if (obj instanceof Character)
 		{ return (char)obj; }

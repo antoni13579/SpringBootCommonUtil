@@ -2,18 +2,22 @@
 <configuration scan="true">
     <property resource="application.properties"/>
 	
-    <appender name="app"  class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <appender name="FILE_TEXT"  class="ch.qos.logback.core.rolling.RollingFileAppender">
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+        	<!--  
             <level>${logLevel}</level>
+            -->
+            <level>INFO</level>
         </filter>
-        <file>${logRoot}/CommonUtils.log</file>
+        <file>${logRoot}/${logProjectName}.log</file>
         
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">  
         	<pattern>[%date{yyyy-MM-dd HH:mm:ss}][%-4level][%file:%line][%thread] dstTraceId:[]dstTraceId:[] %msg%n</pattern>  
     	</encoder>  
+    	
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">  
         	<!-- rollover daily -->  
-        	<fileNamePattern>${logRoot}/CommonUtils-%d{yyyyMMdd}-%i.log</fileNamePattern>  
+        	<fileNamePattern>${logRoot}/%d{yyyyMMdd}/${logProjectName}-%d{yyyyMMdd}-%i.log</fileNamePattern>  
         	<!-- each file should be at most 100MB, keep 60 days worth of history, but at most 20GB -->  
         	<maxFileSize>3MB</maxFileSize>  
         	<maxHistory>30</maxHistory>  
@@ -26,9 +30,42 @@
             <pattern>%date %level [%thread] %logger{10} [%file] %msg%n</pattern>
         </encoder>
     </appender>
+    
+    <appender name="FILE_HTML"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+        	<!--  
+            <level>${logLevel}</level>
+            -->
+            <level>INFO</level>
+        </filter>
+        <file>${logRoot}/${logProjectName}.html</file>
+		
+		<encoder
+			class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+			<layout class="ch.qos.logback.classic.html.HTMLLayout">
+				<pattern>%p%d%msg%M%F{32}%L</pattern>
+			</layout>
+		</encoder>
+		
+		<rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">  
+        	<!-- rollover daily -->  
+        	<fileNamePattern>${logRoot}/%d{yyyyMMdd}/${logProjectName}-%d{yyyyMMdd}-%i.html</fileNamePattern>  
+        	<!-- each file should be at most 100MB, keep 60 days worth of history, but at most 20GB -->  
+        	<maxFileSize>3MB</maxFileSize>  
+        	<maxHistory>30</maxHistory>  
+    	</rollingPolicy>  
+	</appender>
 	
-    <root>
+    <root level="INFO">
+    	<!--  
         <level value="${logLevel}" />
         <appender-ref ref="${logDirection}" />
+        -->
+        
+        <appender-ref ref="FILE_TEXT" />
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="FILE_HTML" />
     </root>
 </configuration>

@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.XADataSourceAutoConfiguration;
+import org.springframework.boot.autoconfigure.r2dbc.ConnectionFactoryAutoConfiguration;
 import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.integration.annotation.IntegrationComponentScan;
@@ -34,7 +35,9 @@ import lombok.extern.slf4j.Slf4j;
 				ThymeleafAutoConfiguration.class,
 				
 				ShiroAutoConfiguration.class,
-				ShiroAnnotationProcessorAutoConfiguration.class
+				ShiroAnnotationProcessorAutoConfiguration.class,
+				
+				ConnectionFactoryAutoConfiguration.class
 		}
 )
 @ComponentScan(basePackages= { "com.CommonUtils" })

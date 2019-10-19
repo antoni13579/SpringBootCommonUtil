@@ -8,6 +8,7 @@ import javax.transaction.TransactionManager;
 import javax.transaction.UserTransaction;
 
 import org.apache.ibatis.session.SqlSessionFactory;
+
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.DependsOn;
@@ -47,9 +48,15 @@ public class MyBatisPlusConfiguration
     }
 
     @Bean(name = "txManager")
-    @DependsOn({ "userTransaction", "atomikosTransactionManager" })
-    public PlatformTransactionManager transactionManager() throws SystemException
-    { return new JtaTransactionManager(userTransaction(), atomikosTransactionManager()); }
+    public PlatformTransactionManager transactionManager(@Qualifier("userTransaction")UserTransaction userTransaction, 
+    													 @Qualifier("atomikosTransactionManager")TransactionManager atomikosTransactionManager) throws SystemException
+    {
+    	JtaTransactionManager result = new JtaTransactionManager(userTransaction, atomikosTransactionManager);
+    	
+    	//设置这里，是因为使用Spring Batch提示JtaTransactionManager does not support custom isolation levels by default - switch 'allowCustomIsolationLevels' to 'true'
+    	result.setAllowCustomIsolationLevels(true);
+    	return result;
+    }
 
     @Bean(name = "userTransaction")
     public UserTransaction userTransaction() throws SystemException

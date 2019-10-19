@@ -318,11 +318,32 @@ public final class JavaCollectionsUtil
 		);
 	}
 	
-	@SuppressWarnings("deprecation")
+	/*
 	@SafeVarargs
-	@Deprecated
-	public static <T> boolean collectionProcessor(final Collection<T[]> records, final com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil.ItemProcessor<T> ... itemProcessors)
-	{ return collectionProcessor(records, (final T[] values, final int indx, final int length) -> { com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil.arrayProcessor(values, itemProcessors); }); }
+	public static <T> boolean collectionProcessorForArray(final Collection<T[]> records, final ItemProcessorForCollection<T> ... itemProcessorForCollections)
+	{
+		return collectionProcessor
+		(
+				records, 
+				(final T[] values, final int indx, final int length) -> 
+				{
+					collectionProcessor
+					(
+							CollUtil.newArrayList(values),
+							(final T tempValue, final int inx, final int len) -> 
+							{								
+								collectionProcessor
+								(
+										CollUtil.newArrayList(itemProcessorForCollections),
+										(final ItemProcessorForCollection<T> itemProcessorForCollection, final int ix, final int le) -> 
+										{ itemProcessorForCollection.process(tempValue, inx, len); }
+								);
+							}
+					);
+				}
+		);
+	}
+	*/
 	
 	public static <T> Collection<T> collectionOperation(final Set<T> a, final Set<T> b, final OperationType operationType)
 	{		

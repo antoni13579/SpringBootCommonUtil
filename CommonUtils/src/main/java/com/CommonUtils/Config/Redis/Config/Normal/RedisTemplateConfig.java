@@ -6,6 +6,7 @@ import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -41,12 +42,10 @@ public final class RedisTemplateConfig
 			case JSON:
 				// 设置序列化
 				Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer<>(Object.class);
-				jackson2JsonRedisSerializer.setObjectMapper
-				(
-						new ObjectMapper()
-							.setVisibility(PropertyAccessor.ALL, Visibility.ANY)
-							.enableDefaultTyping(DefaultTyping.NON_FINAL)
-				);
+				
+				ObjectMapper objectMapper = new ObjectMapper().setVisibility(PropertyAccessor.ALL, Visibility.ANY);
+				objectMapper.activateDefaultTyping(objectMapper.getPolymorphicTypeValidator(), DefaultTyping.NON_FINAL, JsonTypeInfo.As.WRAPPER_ARRAY);
+				jackson2JsonRedisSerializer.setObjectMapper(objectMapper);
 				
 				// 配置redisTemplate
 				template.setValueSerializer(jackson2JsonRedisSerializer);// value序列化

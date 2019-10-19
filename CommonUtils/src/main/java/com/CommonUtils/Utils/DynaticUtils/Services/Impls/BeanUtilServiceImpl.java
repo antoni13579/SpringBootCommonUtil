@@ -116,7 +116,7 @@ public final class BeanUtilServiceImpl implements ApplicationContextAware
 		return result;
 	}
 	
-	public static <T, R> List<R> getFields(final Function<? super T, ? extends R> mapper, final Collection<T> beans)
+	public static <T, R> List<R> transfer(final Function<? super T, ? extends R> mapper, final Collection<T> beans)
 	{
 		if (!CollUtil.isEmpty(beans))
 		{ return beans.stream().map(mapper).collect(Collectors.toList()); }
@@ -125,10 +125,10 @@ public final class BeanUtilServiceImpl implements ApplicationContextAware
 	}
 	
 	@SafeVarargs
-	public static <T, R> List<R> getFields(final Function<? super T, ? extends R> mapper, final T ... beans)
+	public static <T, R> List<R> transfer(final Function<? super T, ? extends R> mapper, final T ... beans)
 	{
 		if (!ArrayUtil.isEmpty(beans))
-		{ return getFields(mapper, CollUtil.newArrayList(beans)); }
+		{ return transfer(mapper, CollUtil.newArrayList(beans)); }
 		else
 		{ return Collections.emptyList(); }
 	}

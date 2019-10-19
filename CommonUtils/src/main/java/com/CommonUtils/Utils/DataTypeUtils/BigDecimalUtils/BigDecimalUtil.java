@@ -87,22 +87,22 @@ public final class BigDecimalUtil
 	
 	/**建议使用cn.hutool.core.util.ObjectUtil.defaultIfNull*/ 
 	@Deprecated
-	public static <T> BigDecimal ifNull(final T t)
+	public static BigDecimal ifNull(final Object t)
 	{ return ifNull(t, 0); }
 	
 	/**建议使用cn.hutool.core.util.ObjectUtil.defaultIfNull*/ 
 	@Deprecated
-	public static <T> BigDecimal ifNull(final T t, final int defaultValue)
+	public static BigDecimal ifNull(final Object t, final int defaultValue)
 	{ return nvl(t, defaultValue); }
 	
 	/**建议使用cn.hutool.core.util.ObjectUtil.defaultIfNull*/ 
 	@Deprecated
-	public static <T> BigDecimal nvl(final T t)
+	public static BigDecimal nvl(final Object t)
 	{ return nvl(t, 0); }
 	
 	/**建议使用cn.hutool.core.util.ObjectUtil.defaultIfNull*/ 
 	@Deprecated
-	public static <T> BigDecimal nvl(final T t, final int defaultValue)
+	public static BigDecimal nvl(final Object t, final int defaultValue)
 	{
 		BigDecimal result = null;
 		try
@@ -143,7 +143,7 @@ public final class BigDecimalUtil
 	
 	/**建议使用cn.hutool.core.convert.Convert.toBigDecimal*/ 
 	@Deprecated
-	public static <T> BigDecimal getBigDecimal(final T obj) throws Exception
+	public static BigDecimal getBigDecimal(final Object obj) throws Exception
 	{
 		if (obj instanceof BigDecimal)
 		{ return new BigDecimal(obj.toString()); }

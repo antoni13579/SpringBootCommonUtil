@@ -53,8 +53,7 @@ public final class ServletWebServerFactoryConfig
 	public static TomcatServletWebServerFactory getTomcatInstance(final int httpsPort, 
 			  													  final String sslFilePath, 
 			  													  final String keyStorePassword, 
-			  													  final String keyPassword,
-			  													  final boolean goToHttps) throws IOException
+			  													  final String keyPassword) throws IOException
 	{
 		TomcatServletWebServerFactory tomcat = new TomcatServletWebServerFactory();
 		addConnectorCustomizers(tomcat);

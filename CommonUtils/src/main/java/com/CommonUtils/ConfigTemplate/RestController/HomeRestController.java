@@ -200,7 +200,7 @@ public class HomeRestController
 						{ e.printStackTrace(); }
 						
 						try 
-						{ emitter.send(i, MediaType.APPLICATION_JSON_UTF8); } 
+						{ emitter.send(i, MediaType.APPLICATION_JSON); } 
 						catch (IOException e) 
 						{ e.printStackTrace(); }
 					}

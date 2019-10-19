@@ -6,7 +6,7 @@ public final class BooleanUtil
 	private BooleanUtil() {}
 	
 	/**建议使用cn.hutool.core.convert.Convert.toBool*/ 
-	public static <T> boolean getBoolean(final T obj) throws Exception
+	public static boolean getBoolean(final Object obj) throws Exception
 	{
 		if (obj instanceof Boolean)
 		{ return (boolean)obj; }
