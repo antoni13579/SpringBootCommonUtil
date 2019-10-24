@@ -9,6 +9,6 @@ public final class ReactiveRedisTemplateConfig
 {
 	private ReactiveRedisTemplateConfig() {}
 	
-	public static ReactiveRedisTemplate<byte[], byte[]> getReactiveRedisTemplate(final ReactiveRedisConnectionFactory reactiveRedisConnectionFactory)
-	{ return new ReactiveRedisTemplate<byte[], byte[]>(reactiveRedisConnectionFactory, RedisSerializationContext.byteArray()); }
+	public static ReactiveRedisTemplate<Object, Object> getReactiveRedisTemplate(final ReactiveRedisConnectionFactory reactiveRedisConnectionFactory)
+	{ return new ReactiveRedisTemplate<Object, Object>(reactiveRedisConnectionFactory, RedisSerializationContext.java()); }
 }

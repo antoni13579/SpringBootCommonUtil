@@ -11,6 +11,11 @@ import com.CommonUtils.Utils.DBUtils.DBContants;
 import com.CommonUtils.Utils.DBUtils.Bean.DBBaseInfo.DBInfo;
 import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.CustomCollections.Properties;
 
+/**
+ * Atomikos的分布式事务仅仅适用于单个JAVA应用连接不同的数据库，也有缺点的，具体是XA协议两阶段提交方案锁定资源时间长，对性能影响很大，基本不适合解决微服务事务问题。架构不复杂可以用
+ * 但是不适用如下场景：
+ * 订单服务调用订单数据库，库存服务调用库存数据库，业务应用要调用【订单服务】与【库存服务】完成业务操作
+ * */
 public final class AtomikosDataSourceConfig 
 {
 	private AtomikosDataSourceConfig() {}
@@ -63,6 +68,14 @@ public final class AtomikosDataSourceConfig
 		//result.setReapTimeout(reapTimeout);
 		result.setTestQuery(validationQuery);
 		result.setUniqueResourceName(dataSourceName);
+		
+
+		//result.close();
+		//result.destroy();
+		//result.init();
+		//result.setXaDataSource(xaDataSource);
+		//result.setXaDataSourceClassName(xaDataSourceClassName);
+		//result.setXaProperties(xaProperties);
 		return result;
 	}
 }

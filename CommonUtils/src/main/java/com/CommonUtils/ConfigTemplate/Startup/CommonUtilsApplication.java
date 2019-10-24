@@ -87,5 +87,33 @@ Copy
 为了避免 ShutdownHook 线程被长时间阻塞，我们可以引入超时进制。如果等待一定时间之后，ShutdownHook 还未完成，由脚本直接调用 kill -9 强制退出或者 ShutdownHook 代码中引入超时进制。
 		 * */
 		RuntimeUtil.addShutdownHook(() -> { log.info("关闭应用，释放资源"); });
+		
+		/*
+		IterUtil.toList
+		(
+				BeanUtilServiceImpl
+					.getBean(DatabaseClient.class)
+					.get()
+					.execute("SELECT id, soid from ipos_dianyuan_view where id in (?, ?, ?)")
+					.bind(0, "000d9fc57b6da24476f4368567536591")
+					.bind(1, "0013a46f19c58bed036e32004a82db3c")
+					.bind(2, "001c5a117898477f4670d448649f4fce")
+
+					.map
+					(
+							(row, rowMetaData) -> 
+							{
+								Map<String, Object> result = new LinkedHashMap<>();
+								rowMetaData.getColumnNames().forEach(columnName -> { result.put(columnName, row.get(columnName)); });
+								return result;
+							}
+					)
+					
+					.fetch()
+					.all()
+					.toIterable()
+		)
+		.forEach(x -> { System.out.println(x); });
+		*/
 	}
 }

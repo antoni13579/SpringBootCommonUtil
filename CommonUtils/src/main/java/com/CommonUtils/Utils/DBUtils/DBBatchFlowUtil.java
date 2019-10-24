@@ -30,6 +30,9 @@ import javax.transaction.NotSupportedException;
 import javax.transaction.RollbackException;
 import javax.transaction.SystemException;
 
+import org.springframework.batch.core.ItemProcessListener;
+import org.springframework.batch.core.ItemReadListener;
+import org.springframework.batch.core.ItemWriteListener;
 import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
@@ -91,6 +94,7 @@ import cn.hutool.core.util.CharUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.db.DbUtil;
+import cn.hutool.json.JSONUtil;
 import cn.hutool.poi.excel.BigExcelWriter;
 import cn.hutool.poi.excel.ExcelUtil;
 import cn.hutool.poi.excel.sax.handler.RowHandler;
@@ -228,7 +232,6 @@ public final class DBBatchFlowUtil
 	public static boolean dbToKafka(final AbstractDBInfo sourceDBInfo, 
 								    final KafkaTemplate<Object, Object> kafkaTemplate, 
 									final String topic,
-									final String key,
 									final Replacer<Map<String, Object>> ... itemProcessors)
 	{
 		Connection sourceConnection = null;
@@ -266,7 +269,7 @@ public final class DBBatchFlowUtil
 				
 				if (records.size() % DBContants.fetchSize == 0 || sourceResultSet.isLast())
 				{
-					kafkaTemplate.send(topic, key, ObjectUtil.serialize(batchProcess(records, itemProcessors)));
+					kafkaTemplate.send(topic, ObjectUtil.serialize(batchProcess(records, itemProcessors)));
 					records.clear();
 				}
 			}
@@ -335,6 +338,23 @@ public final class DBBatchFlowUtil
 									  							.rowMapper(new ColumnMapRowMapper())
 									  							.build()
 									  				)
+									  				.listener
+									  				(
+									  						new ItemReadListener<Map<String, Object>>()
+									  						{
+									  							private Map<String, Object> item;
+									  							
+																@Override
+																public void beforeRead() {}
+
+																@Override
+																public void afterRead(Map<String, Object> item) { this.item = item; }
+
+																@Override
+																public void onReadError(Exception ex) 
+																{ log.error("Spring Batch读取单条数据出现异常，出现异常的数据为：【{}】，异常原因为：", JSONUtil.toJsonStr(this.item), ex); }
+									  						}
+									  				)
 									  				
 									  				//设置处理流程
 									  				.processor
@@ -349,6 +369,24 @@ public final class DBBatchFlowUtil
 									  											CollUtil.newArrayList(processors)
 									  							)
 									  							.build()
+									  				)
+									  				.listener
+									  				(
+									  						new ItemProcessListener<Map<String, Object>, Map<String, Object>>()
+									  						{
+									  							private Map<String, Object> beforeItem;
+									  							private Map<String, Object> afterItem;
+									  							
+																@Override
+																public void beforeProcess(Map<String, Object> item) { this.beforeItem = item; }
+
+																@Override
+																public void afterProcess(Map<String, Object> item, Map<String, Object> result) { this.afterItem = result; }
+
+																@Override
+																public void onProcessError(Map<String, Object> item, Exception e) 
+																{ log.error("Spring Batch处理单条数据出现异常，处理前的数据为：【{}】，处理后的数据为：【{}】，异常原因为：", JSONUtil.toJsonStr(this.beforeItem), JSONUtil.toJsonStr(this.afterItem), e); }
+									  						}
 									  				)
 									  				
 									  				//设置写流程
@@ -375,6 +413,24 @@ public final class DBBatchFlowUtil
 											  									targetDBinfoForDataSources
 											  							)
 									  							)
+									  				)
+									  				.listener
+									  				(
+									  						new ItemWriteListener<Map<String, Object>>()
+									  						{
+									  							private List<? extends Map<String, Object>> beforeItems;
+									  							private List<? extends Map<String, Object>> afterItems;
+									  							
+																@Override
+																public void beforeWrite(List<? extends Map<String, Object>> items) { this.beforeItems = items; }
+
+																@Override
+																public void afterWrite(List<? extends Map<String, Object>> items) { this.afterItems = items; }
+
+																@Override
+																public void onWriteError(Exception exception, List<? extends Map<String, Object>> items) 
+																{ log.error("Spring Batch写入多条数据出现异常，写入前的数据为：【{}】，写入后的数据为：【{}】，异常原因为：", JSONUtil.toJsonStr(this.beforeItems), JSONUtil.toJsonStr(this.afterItems), exception); }
+									  						}
 									  				)
 									  				
 									  				.repository(jobRepository)
@@ -1407,4 +1463,29 @@ public final class DBBatchFlowUtil
 			);
 		}
 	}
+	
+	/** 
+	 * MyBatis事务处理代码
+	 * SqlSession session = sqlSessionFactory.openSession();
+        try {
+            long startTime = System.currentTimeMillis();
+            FielAnalysisMapper fielAnalysisMapper = session.getMapper(FielAnalysisMapper.class);
+            FileOrderMapper fileOrderMapper = session.getMapper(FileOrderMapper.class);
+            fileOrderMapper.batchInsert(orderList);
+
+            // 更新上次解析到的位置，同时指定更新时间
+            fileAnalysis.setPosition(endPosition + 1);
+            fileAnalysis.setStatus("3");
+            fileAnalysis.setUpdTime(new Date());
+            fielAnalysisMapper.updateFileAnalysis(fileAnalysis);
+            session.commit();
+            long endTime = System.currentTimeMillis();
+            System.out.println("===插入数据花费:" + (endTime - startTime) + "ms===");
+        } catch (Exception e) {
+            session.rollback();
+        } finally {
+            session.close();
+        }
+	 * 
+	 * */
 }

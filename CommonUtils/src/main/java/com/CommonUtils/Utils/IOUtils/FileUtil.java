@@ -199,13 +199,13 @@ public final class FileUtil
 			while (readChannel.read(byteBuffer) != -1)
 			{
 				
-				byteBuffer.flip();					//缓冲区游标置为0
+				byteBuffer.flip();					//缓冲区游标置为0或切换读模式
 				
 				//写数据
 				while (byteBuffer.hasRemaining())
 				{ writeChannel.write(byteBuffer); }
 				
-				byteBuffer.clear();					//清空缓冲区
+				byteBuffer.clear();					//清空缓冲区或重置缓存块指针
 			}
 			*/
 			

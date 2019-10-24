@@ -21,5 +21,7 @@ public final class MySqlUrl
 	private boolean useSSL;
 	private boolean autoReconnect;
 	private boolean allowPublicKeyRetrieval;
+	
+	/**可以通过java.time.ZoneId.SHORT_IDS获取相关时区*/
 	private String serverTimezone;
 }
