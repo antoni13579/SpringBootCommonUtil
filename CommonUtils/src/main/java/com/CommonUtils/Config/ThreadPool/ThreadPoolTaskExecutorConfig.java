@@ -29,4 +29,28 @@ public final class ThreadPoolTaskExecutorConfig
 		
 		return threadPoolTaskExecutor;
 	}
+	
+	/**
+	 * @Service
+@Slf4j
+public class AsyncTask {
+
+    @Async
+    public Future<String> task1() throws InterruptedException {
+        log.info("task1 start");
+        Thread.sleep(5000L);
+        log.info("task1 end");
+        return new AsyncResult<>("task1 result");
+    }
+
+    @Async
+    public Future<Integer> task2() throws InterruptedException {
+        Integer abc = 1;
+        log.info("task2 start");
+        Thread.sleep(10000L);
+        log.info("task2 end");
+        return new AsyncResult<>(abc);
+    }
+}
+	 * */
 }

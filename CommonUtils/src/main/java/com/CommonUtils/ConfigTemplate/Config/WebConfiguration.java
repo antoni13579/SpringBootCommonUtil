@@ -13,6 +13,7 @@ import javax.servlet.FilterConfig;
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.ServletRegistration;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.Cookie;
@@ -34,10 +35,12 @@ import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.util.unit.DataSize;
 import org.springframework.web.WebApplicationInitializer;
+import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.servlet.AsyncHandlerInterceptor;
+import org.springframework.web.servlet.DispatcherServlet;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.config.annotation.AsyncSupportConfigurer;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -212,7 +215,18 @@ public class WebConfiguration implements WebMvcConfigurer, WebApplicationInitial
 	public void onStartup(ServletContext servletContext) throws ServletException 
 	{
 		servletContext.getSessionCookieConfig().setHttpOnly(true);        
-		servletContext.getSessionCookieConfig().setSecure(false); 
+		servletContext.getSessionCookieConfig().setSecure(false);
+		
+		//因为webflux是响应式调用，所以最后需要配置servlet.setAsyncSupported(true)。如果不使用该特性可以不需要这句话。
+		AnnotationConfigWebApplicationContext context = new AnnotationConfigWebApplicationContext();
+        //context.register(BeanConfig.class);
+        context.setServletContext(servletContext);
+ 
+        ServletRegistration.Dynamic servlet = servletContext.addServlet("dispatcher", new DispatcherServlet(context));
+ 
+        servlet.setLoadOnStartup(1);
+        servlet.addMapping("/");
+        servlet.setAsyncSupported(true);
 	}
 	
 	/**

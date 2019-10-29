@@ -8,6 +8,7 @@ import org.springframework.data.r2dbc.core.DatabaseClient;
 
 import dev.miku.r2dbc.mysql.MySqlConnectionConfiguration;
 import dev.miku.r2dbc.mysql.MySqlConnectionFactory;
+import dev.miku.r2dbc.mysql.constant.ZeroDateOption;
 import io.r2dbc.pool.ConnectionPool;
 
 /**R2DBC为实验中的功能，暂不推荐使用*/
@@ -30,6 +31,7 @@ public class R2DBCConfig
 							.password("root")
 							.port(3306)
 							.username("root")
+							.zeroDateOption(ZeroDateOption.EXCEPTION)
 							.build()
 				), 
 				"CTT", 
