@@ -63,6 +63,7 @@ public final class RedisTemplateConfig
 				break;
 		}
 		
+		template.setEnableTransactionSupport(true);
 		template.afterPropertiesSet();
         return template;
 	}

@@ -10,6 +10,7 @@ import com.CommonUtils.Utils.DBUtils.RedisUtil;
 import com.CommonUtils.Utils.DBUtils.Bean.RedisEntry;
 
 import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Mono;
 
 @Slf4j
 public final class DistributedLockRedis 
@@ -37,10 +38,10 @@ public final class DistributedLockRedis
 	
 	public synchronized static <K, V> boolean lock(final ReactiveRedisTemplate<K, V> reactiveRedisTemplate, final RedisEntry<K, V> redisEntry)
 	{
-		V val = RedisUtil.getForValue(reactiveRedisTemplate, redisEntry.getKey());
+		Mono<V> val = RedisUtil.getForValue(reactiveRedisTemplate, redisEntry.getKey());
 		
 		//如果value不为空，说明Redis还存在记录，无法上锁
-		if (null != val)
+		if (null != val && null != val.block())
 		{
 			log.warn("无法获取对应分布式锁记录，程序还在占用着分布式锁，程序结束"); 
 			return false;
@@ -64,6 +65,6 @@ public final class DistributedLockRedis
 	public synchronized <K, V> boolean renewal(final RedisTemplate<K, V> redisTemplate, final RedisEntry<K, V> redisEntry)
 	{ return RedisUtil.setExpireForValue(redisTemplate, redisEntry, 30, TimeUnit.MINUTES); }
 	
-	public synchronized <K, V> boolean renewal(final ReactiveRedisTemplate<K, V> reactiveRedisTemplate, final RedisEntry<K, V> redisEntry)
+	public synchronized <K, V> Mono<Boolean> renewal(final ReactiveRedisTemplate<K, V> reactiveRedisTemplate, final RedisEntry<K, V> redisEntry)
 	{ return RedisUtil.setExpireForValue(reactiveRedisTemplate, redisEntry, Duration.ofMinutes(30)); }
 }

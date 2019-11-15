@@ -228,6 +228,9 @@ public final class DBBatchFlowUtil
 		return result;
 	}
 	
+	/**
+	 * 发送kafka的时候，没有指定key，意味着数据会放在不同的partition，若对数据没顺序要求可以使用，否则请自行实现，发送kafka的时候指定key，确保同一key分发到同一partition上面，保证顺序
+	 * */
 	@SafeVarargs
 	public static boolean dbToKafka(final AbstractDBInfo sourceDBInfo, 
 								    final KafkaTemplate<Object, Object> kafkaTemplate, 

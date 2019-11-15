@@ -10,7 +10,6 @@ import javax.transaction.UserTransaction;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.DependsOn;
-import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.jta.JtaTransactionManager;
 
 import com.CommonUtils.Config.Jdbc.DataSources.AtomikosDataSourceConfig;
@@ -33,7 +32,7 @@ public class AtomikosConfig
     }
 
     @Bean(name = "txManager")
-    public PlatformTransactionManager transactionManager(@Qualifier("userTransaction")UserTransaction userTransaction, 
+    public JtaTransactionManager transactionManager(@Qualifier("userTransaction")UserTransaction userTransaction, 
     													 @Qualifier("atomikosTransactionManager")TransactionManager atomikosTransactionManager) throws SystemException
     {
     	JtaTransactionManager result = new JtaTransactionManager(userTransaction, atomikosTransactionManager);

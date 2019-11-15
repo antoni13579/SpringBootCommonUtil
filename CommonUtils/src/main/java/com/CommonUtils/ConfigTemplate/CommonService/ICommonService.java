@@ -2,5 +2,9 @@ package com.CommonUtils.ConfigTemplate.CommonService;
 
 public interface ICommonService
 {
-	void test();
+	void jtaTransactionForDB();
+	void localTransactionByAnnotation() throws Exception;
+	void localTransactionForDB();
+	void localTransactionForRedis();
+	void localTransactionForKafka();
 }

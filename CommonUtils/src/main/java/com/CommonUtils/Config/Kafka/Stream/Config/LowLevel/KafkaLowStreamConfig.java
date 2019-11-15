@@ -3,6 +3,7 @@ package com.CommonUtils.Config.Kafka.Stream.Config.LowLevel;
 import java.time.Duration;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.KeyValue;
@@ -26,30 +27,34 @@ import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.util.ObjectUtil;
 import lombok.extern.slf4j.Slf4j;
 
+/**这个是模板，推荐自主实现*/
+@Deprecated
 @Slf4j
 public final class KafkaLowStreamConfig 
 {
 	private KafkaLowStreamConfig() {}
 	
-	public static KafkaStreams getInstance(final String kafkaStreamJobName, 
-										   final String kafkaBroker, 
-										   final String kafkaTopicName, 
-										   final EStoreBuilderType eStoreBuilderType,
-										   final EKeyValueStoreType eKeyValueStoreType,
+	public static <T> KafkaStreams getInstance(final String kafkaStreamJobName, 
+										       final String kafkaBroker, 
+										       final String kafkaTopicName, 
+										       final EStoreBuilderType eStoreBuilderType,
+										       final EKeyValueStoreType eKeyValueStoreType,
 									
-										   //可以设置为1000
-										   final long jobProcessorScheduleOfIntervalMs,
+										       //可以设置为1000
+										       final long jobProcessorScheduleOfIntervalMs,
 									
-										   //可以设置为PunctuationType.STREAM_TIME
-										   final PunctuationType punctuationType,
-										   final ItemProcessor ... itemProcessors)
+										       //可以设置为PunctuationType.STREAM_TIME
+										       final PunctuationType punctuationType,
+										   
+										       final Serde<T> valueSerde,
+										       final ItemProcessor ... itemProcessors)
 	{
 		Properties props = new Properties()
 				.put(StreamsConfig.APPLICATION_ID_CONFIG, kafkaStreamJobName)
 				.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaBroker)
         		.put(StreamsConfig.CACHE_MAX_BYTES_BUFFERING_CONFIG, 2048)
         		.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass())
-        		.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.ByteArray().getClass())
+        		.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, valueSerde.getClass())
         		// setting offset reset to earliest so that we can re-run the demo code with the same pre-loaded data
         		.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
@@ -74,7 +79,7 @@ public final class KafkaLowStreamConfig
         						(
         								Stores.persistentKeyValueStore("Counts"), 
                 						Serdes.String(), 
-                						Serdes.ByteArray()
+                						valueSerde
         						), 
         						"Process"
         				);
@@ -87,7 +92,7 @@ public final class KafkaLowStreamConfig
         						(
         								Stores.inMemoryKeyValueStore("Counts"), 
                 						Serdes.String(), 
-                						Serdes.ByteArray()
+                						valueSerde
         						), 
         						"Process"
         				);
@@ -100,7 +105,7 @@ public final class KafkaLowStreamConfig
         						(
         								Stores.lruMap("Counts", 1024), 
                 						Serdes.String(), 
-                						Serdes.ByteArray()
+                						valueSerde
         						), 
         						"Process"
         				);
