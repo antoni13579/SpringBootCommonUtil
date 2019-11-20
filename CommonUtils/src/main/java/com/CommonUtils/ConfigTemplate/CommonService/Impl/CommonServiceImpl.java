@@ -2,7 +2,6 @@ package com.CommonUtils.ConfigTemplate.CommonService.Impl;
 
 import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 
 import javax.annotation.Resource;
 
@@ -108,12 +107,12 @@ public class CommonServiceImpl implements ICommonService
 	{
 		this.redisTemplate.execute
 		(
-				new SessionCallback<List<Object>>()
+				new SessionCallback<Object>()
 				{
 					@Override
-					public List<Object> execute(RedisOperations operations) throws DataAccessException 
+					public Object execute(RedisOperations operations) throws DataAccessException 
 					{
-						List<Object> result = null;
+						Object result = null;
 						try
 						{
 							operations.multi();

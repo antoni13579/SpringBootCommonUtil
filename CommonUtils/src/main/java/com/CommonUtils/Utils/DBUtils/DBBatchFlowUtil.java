@@ -1415,7 +1415,7 @@ public final class DBBatchFlowUtil
 		double totalPage = Math.ceil((totalDataCount + pageSize - 1) / pageSize);
 		for (long pageNo = 1; pageNo < totalPage; pageNo++)
 		{
-			List<T> records = baseMapper.selectPage(new Page<T>(pageNo, new Double(pageSize).longValue()), queryWrapper).getRecords();
+			List<T> records = baseMapper.selectPage(new Page<T>(pageNo, Double.valueOf(pageSize).longValue()), queryWrapper).getRecords();
 			JavaCollectionsUtil.collectionProcessor
 			(
 					records, 
@@ -1450,7 +1450,7 @@ public final class DBBatchFlowUtil
 		double totalPage = Math.ceil((totalDataCount + pageSize - 1) / pageSize);
 		for (long pageNo = 1; pageNo < totalPage; pageNo++)
 		{
-			List<Map<String, Object>> records = baseMapper.selectMapsPage(new Page<T>(pageNo, new Double(pageSize).longValue()), queryWrapper).getRecords();
+			List<Map<String, Object>> records = baseMapper.selectMapsPage(new Page<T>(pageNo, Double.valueOf(pageSize).longValue()), queryWrapper).getRecords();
 			JavaCollectionsUtil.collectionProcessor
 			(
 					records, 

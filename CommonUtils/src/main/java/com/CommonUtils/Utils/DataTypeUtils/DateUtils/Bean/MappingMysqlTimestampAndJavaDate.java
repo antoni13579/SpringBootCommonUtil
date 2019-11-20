@@ -1,6 +1,7 @@
 package com.CommonUtils.Utils.DataTypeUtils.DateUtils.Bean;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Date;
 
 import lombok.Getter;
@@ -28,7 +29,7 @@ public final class MappingMysqlTimestampAndJavaDate
 		this.mysqlTimestamp = mysqlTimestamp;
 		
 		String[] arr = new BigDecimal(this.mysqlTimestamp)
-				.setScale(4, BigDecimal.ROUND_HALF_UP)
+				.setScale(4, RoundingMode.HALF_UP)
 				.toPlainString()
 				.split("\\.");
 		
