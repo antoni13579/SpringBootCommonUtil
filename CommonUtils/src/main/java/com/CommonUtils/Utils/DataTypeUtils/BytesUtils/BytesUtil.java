@@ -63,7 +63,7 @@ public final class BytesUtil
         {
         	bos = new ByteArrayOutputStream();
             oos = new ObjectOutputStream(bos);
-            oos.writeObject(obj);
+            oos.writeObject(obj);            
             oos.flush();
             bytes = bos.toByteArray();
         } 

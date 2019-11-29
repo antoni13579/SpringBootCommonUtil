@@ -11,9 +11,13 @@ import org.springframework.boot.autoconfigure.jdbc.XADataSourceAutoConfiguration
 import org.springframework.boot.autoconfigure.r2dbc.ConnectionFactoryAutoConfiguration;
 import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.integration.annotation.IntegrationComponentScan;
 import org.springframework.integration.config.EnableIntegration;
 
+import com.CommonUtils.ConfigTemplate.CommonService.ICommonService;
+import com.CommonUtils.Utils.DBUtils.RedisUtil;
+import com.CommonUtils.Utils.DynaticUtils.Services.Impls.BeanUtilServiceImpl;
 import com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure;
 import com.baomidou.dynamic.datasource.spring.boot.autoconfigure.DynamicDataSourceAutoConfiguration;
 
@@ -88,32 +92,20 @@ Copy
 		 * */
 		RuntimeUtil.addShutdownHook(() -> { log.info("关闭应用，释放资源"); });
 		
-		/*
-		IterUtil.toList
-		(
-				BeanUtilServiceImpl
-					.getBean(DatabaseClient.class)
-					.get()
-					.execute("SELECT id, soid from ipos_dianyuan_view where id in (?, ?, ?)")
-					.bind(0, "000d9fc57b6da24476f4368567536591")
-					.bind(1, "0013a46f19c58bed036e32004a82db3c")
-					.bind(2, "001c5a117898477f4670d448649f4fce")
-
-					.map
-					(
-							(row, rowMetaData) -> 
-							{
-								Map<String, Object> result = new LinkedHashMap<>();
-								rowMetaData.getColumnNames().forEach(columnName -> { result.put(columnName, row.get(columnName)); });
-								return result;
-							}
-					)
-					
-					.fetch()
-					.all()
-					.toIterable()
-		)
-		.forEach(x -> { System.out.println(x); });
-		*/
+		ICommonService commonService = BeanUtilServiceImpl.getBean("commonService", ICommonService.class).get();
+		try 
+		{
+			commonService.localTransactionByAnnotationWithKafka();
+			commonService.localTransactionByAnnotation();
+			log.info("测试注解形式的Redis事务，存放在Redis的值为{}", RedisUtil.getForValue(BeanUtilServiceImpl.getBean("redisTemplate", RedisTemplate.class).get(), "123"));
+		} 
+		catch (Exception e) 
+		{
+			e.printStackTrace();
+		}
+		
+		commonService.localTransactionForKafka();
+		commonService.localTransactionForRedis();
+		commonService.localTransactionForDB();
 	}
 }

@@ -11,8 +11,6 @@ public final class DBContants
 	
 	public static final int inSqlStatementForMySql = 100;
 	
-	public static final int fetchSize = 10000;
-	
 	public static final String TERADATA_JDBC_DRIVER = "com.teradata.jdbc.TeraDriver";
 	
 	@ToString

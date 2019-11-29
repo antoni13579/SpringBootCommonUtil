@@ -63,7 +63,6 @@ import org.springframework.transaction.jta.JtaTransactionManager;
 import com.CommonUtils.Config.SpringBatch.Config.Core.JobLauncherConfig;
 import com.CommonUtils.Config.SpringBatch.Config.Core.JobRepositoryConfig;
 import com.CommonUtils.Config.ThreadPool.ThreadPoolTaskExecutorConfig;
-import com.CommonUtils.Utils.DBUtils.DBContants;
 import com.CommonUtils.Utils.DBUtils.DBHandleUtil;
 import com.CommonUtils.Utils.DBUtils.DBHandleUtil.PreparedStatementOperationType;
 import com.CommonUtils.Utils.DBUtils.Bean.DBBaseInfo.AbstractDBInfo;
@@ -117,6 +116,7 @@ public final class DBBatchFlowUtil
 								 	   final Charset encode, 
 								 	   final boolean append, 
 								 	   final FastDateFormat dateFomat,
+								 	   final int fetchSize,
 								 	   final Replacer<Map<String, Object>> ... itemProcessors)
 	{
 		Connection sourceConnection = null;
@@ -132,7 +132,7 @@ public final class DBBatchFlowUtil
 			char[] lineDelimiter = {CharUtil.CR, CharUtil.LF};
 			List<Map<String, Object>> records = new ArrayList<Map<String, Object>>();
 			sourceConnection = DBHandleUtil.getConnection(sourceDBInfo);
-			sourcePreparedStatement = DBHandleUtil.getPreparedStatement(PreparedStatementOperationType.READ, sourceConnection, sourceDBInfo.getSql());
+			sourcePreparedStatement = DBHandleUtil.getPreparedStatement(PreparedStatementOperationType.READ, sourceConnection, sourceDBInfo.getSql(), fetchSize);
 			DBHandleUtil.setPreparedStatement(PreparedStatementOperationType.READ, sourcePreparedStatement, sourceDBInfo.getBindingParams());
 			
 			sourceResultSet = sourcePreparedStatement.executeQuery();
@@ -159,7 +159,7 @@ public final class DBBatchFlowUtil
 				
 				records.add(record);
 				
-				if (records.size() % DBContants.fetchSize == 0 || sourceResultSet.isLast())
+				if (records.size() % fetchSize == 0 || sourceResultSet.isLast())
 				{
 					Collection<String> lines = new ArrayList<>();
 					List<Map<String, Object>> newRecords = batchProcess(records, itemProcessors);
@@ -235,6 +235,7 @@ public final class DBBatchFlowUtil
 	public static boolean dbToKafka(final AbstractDBInfo sourceDBInfo, 
 								    final KafkaTemplate<Object, Object> kafkaTemplate, 
 									final String topic,
+									final int fetchSize,
 									final Replacer<Map<String, Object>> ... itemProcessors)
 	{
 		Connection sourceConnection = null;
@@ -247,7 +248,7 @@ public final class DBBatchFlowUtil
 			
 			//源数据库初始化
 			sourceConnection = DBHandleUtil.getConnection(sourceDBInfo);
-			sourcePreparedStatement = DBHandleUtil.getPreparedStatement(PreparedStatementOperationType.READ, sourceConnection, sourceDBInfo.getSql());
+			sourcePreparedStatement = DBHandleUtil.getPreparedStatement(PreparedStatementOperationType.READ, sourceConnection, sourceDBInfo.getSql(), fetchSize);
 			DBHandleUtil.setPreparedStatement(PreparedStatementOperationType.READ, sourcePreparedStatement, sourceDBInfo.getBindingParams());
 			sourceResultSet = sourcePreparedStatement.executeQuery();
 			ResultSetMetaData sourceResultSetMetaData = sourcePreparedStatement.getMetaData();
@@ -270,7 +271,7 @@ public final class DBBatchFlowUtil
 				
 				records.add(record);
 				
-				if (records.size() % DBContants.fetchSize == 0 || sourceResultSet.isLast())
+				if (records.size() % fetchSize == 0 || sourceResultSet.isLast())
 				{
 					kafkaTemplate.send(topic, ObjectUtil.serialize(batchProcess(records, itemProcessors)));
 					records.clear();
@@ -294,6 +295,7 @@ public final class DBBatchFlowUtil
 	public static boolean dbToDbs(final DBInfoForDataSource sourceDBinfoForDataSource,
 								  final Collection<DBInfoForDataSource> targetDBinfoForDataSources,
 								  final Map<String,JobParameter> jobParameters,
+								  final int fetchSize,
 								  final ItemProcessor<Map<String, Object>, Map<String, Object>> ... processors)
 	{
 		boolean result = false;
@@ -326,14 +328,14 @@ public final class DBBatchFlowUtil
 									  				.repository(jobRepository)
 									  				.startLimit(1)
 									  				.transactionManager(jtaTransactionManager)
-									  				.<Map<String, Object>, Map<String, Object>>chunk(DBContants.fetchSize)
+									  				.<Map<String, Object>, Map<String, Object>>chunk(fetchSize)
 
 									  				//设置读取流程
 									  				.reader
 									  				(
 									  						new JdbcCursorItemReaderBuilder<Map<String, Object>>()
 									  							.dataSource(sourceDBinfoForDataSource.getDataSource())
-									  							.fetchSize(DBContants.fetchSize)
+									  							.fetchSize(fetchSize)
 									  							.ignoreWarnings(false)
 									  							.name("dbToDbsReader")
 									  							.queryArguments(readerParameters)
@@ -467,6 +469,7 @@ public final class DBBatchFlowUtil
 	@SafeVarargs
 	public static boolean dbToDbs(final AbstractDBInfo sourceDBInfo, 
 			 					  final Collection<DBInfoForDataSource> targetDBinfoForDataSources, 
+			 					  final int fetchSize,
 			 					  final Replacer<Map<String, Object>> ... itemProcessors)
 	{
 		Connection sourceConnection = null;
@@ -479,7 +482,7 @@ public final class DBBatchFlowUtil
 			
 			//源数据库初始化
 			sourceConnection = DBHandleUtil.getConnection(sourceDBInfo);
-			sourcePreparedStatement = DBHandleUtil.getPreparedStatement(PreparedStatementOperationType.READ, sourceConnection, sourceDBInfo.getSql());
+			sourcePreparedStatement = DBHandleUtil.getPreparedStatement(PreparedStatementOperationType.READ, sourceConnection, sourceDBInfo.getSql(), fetchSize);
 			DBHandleUtil.setPreparedStatement(PreparedStatementOperationType.READ, sourcePreparedStatement, sourceDBInfo.getBindingParams());
 			sourceResultSet = sourcePreparedStatement.executeQuery();
 			ResultSetMetaData sourceResultSetMetaData = sourcePreparedStatement.getMetaData();
@@ -504,7 +507,7 @@ public final class DBBatchFlowUtil
 				
 				records.add(record);
 				
-				if (records.size() % DBContants.fetchSize == 0 || sourceResultSet.isLast())
+				if (records.size() % fetchSize == 0 || sourceResultSet.isLast())
 				{
 					List<Map<String, Object>> newRecords = batchProcess(records, itemProcessors);
 					jtaTransactionManager.getUserTransaction().begin();
@@ -531,6 +534,7 @@ public final class DBBatchFlowUtil
 	@SafeVarargs
 	public static boolean dbToDb(final AbstractDBInfo sourceDBInfo, 
 								 final AbstractDBInfo targetDBInfo, 
+								 final int fetchSize,
 								 final Replacer<Map<String, Object>> ... itemProcessors)
 	{
 		Connection sourceConnection = null;
@@ -549,7 +553,7 @@ public final class DBBatchFlowUtil
 			
 			//源数据库初始化
 			sourceConnection = DBHandleUtil.getConnection(sourceDBInfo);
-			sourcePreparedStatement = DBHandleUtil.getPreparedStatement(PreparedStatementOperationType.READ, sourceConnection, sourceDBInfo.getSql());
+			sourcePreparedStatement = DBHandleUtil.getPreparedStatement(PreparedStatementOperationType.READ, sourceConnection, sourceDBInfo.getSql(), fetchSize);
 			DBHandleUtil.setPreparedStatement(PreparedStatementOperationType.READ, sourcePreparedStatement, sourceDBInfo.getBindingParams());
 			sourceResultSet = sourcePreparedStatement.executeQuery();
 			ResultSetMetaData sourceResultSetMetaData = sourcePreparedStatement.getMetaData();
@@ -559,7 +563,7 @@ public final class DBBatchFlowUtil
 			if (targetDBInfo instanceof DBInfo)
 			{
 				targetConnection = DBHandleUtil.getConnection(targetDBInfo);
-				targetPreparedStatement = DBHandleUtil.getPreparedStatement(PreparedStatementOperationType.WRITE, targetConnection, targetDBInfo.getSql());
+				targetPreparedStatement = DBHandleUtil.getPreparedStatement(PreparedStatementOperationType.WRITE, targetConnection, targetDBInfo.getSql(), fetchSize);
 			}
 			else if (targetDBInfo instanceof DBInfoForDataSource)
 			{
@@ -589,7 +593,7 @@ public final class DBBatchFlowUtil
 				
 				records.add(record);
 				
-				if (records.size() % DBContants.fetchSize == 0 || sourceResultSet.isLast())
+				if (records.size() % fetchSize == 0 || sourceResultSet.isLast())
 				{
 					if (usePool)
 					{
@@ -627,6 +631,7 @@ public final class DBBatchFlowUtil
 	public static boolean dbToExcel(final AbstractDBInfo sourceDBInfo, 
 		 							final File targetFile,
 		 							final String sheetName,
+		 							final int fetchSize,
 		 							final Replacer<Map<String, Object>> ... itemProcessors)
 	{
 		Connection sourceConnection = null;
@@ -638,7 +643,7 @@ public final class DBBatchFlowUtil
 		{
 			List<Map<String, Object>> records = new ArrayList<>();
 			sourceConnection = DBHandleUtil.getConnection(sourceDBInfo);
-			sourcePreparedStatement = DBHandleUtil.getPreparedStatement(PreparedStatementOperationType.READ, sourceConnection, sourceDBInfo.getSql());
+			sourcePreparedStatement = DBHandleUtil.getPreparedStatement(PreparedStatementOperationType.READ, sourceConnection, sourceDBInfo.getSql(), fetchSize);
 			DBHandleUtil.setPreparedStatement(PreparedStatementOperationType.READ, sourcePreparedStatement, sourceDBInfo.getBindingParams());
 			
 			sourceResultSet = sourcePreparedStatement.executeQuery();
@@ -663,7 +668,7 @@ public final class DBBatchFlowUtil
 				
 				records.add(record);
 				
-				if (records.size() % DBContants.fetchSize == 0 || sourceResultSet.isLast())
+				if (records.size() % fetchSize == 0 || sourceResultSet.isLast())
 				{
 					bigExcelWriter.write(batchProcess(records, itemProcessors), true).flush();
 					records.clear();
@@ -691,6 +696,7 @@ public final class DBBatchFlowUtil
 								  final boolean isAppend,
 								  final FastDateFormat dateFomat,
 								  final CsvWriteConfig csvWriteConfig,
+								  final int fetchSize,
 								  final Replacer<Map<String, Object>> ... itemProcessors)
 	{
 		Connection sourceConnection = null;
@@ -703,7 +709,7 @@ public final class DBBatchFlowUtil
 		{
 			List<Map<String, Object>> records = new ArrayList<Map<String, Object>>();
 			sourceConnection = DBHandleUtil.getConnection(sourceDBInfo);
-			sourcePreparedStatement = DBHandleUtil.getPreparedStatement(PreparedStatementOperationType.READ, sourceConnection, sourceDBInfo.getSql());
+			sourcePreparedStatement = DBHandleUtil.getPreparedStatement(PreparedStatementOperationType.READ, sourceConnection, sourceDBInfo.getSql(), fetchSize);
 			DBHandleUtil.setPreparedStatement(PreparedStatementOperationType.READ, sourcePreparedStatement, sourceDBInfo.getBindingParams());
 			
 			sourceResultSet = sourcePreparedStatement.executeQuery();
@@ -728,7 +734,7 @@ public final class DBBatchFlowUtil
 				
 				records.add(record);
 				
-				if (records.size() % DBContants.fetchSize == 0 || sourceResultSet.isLast())
+				if (records.size() % fetchSize == 0 || sourceResultSet.isLast())
 				{					
 					Collection<String[]> lines = new ArrayList<>();
 					List<Map<String, Object>> newRecords = batchProcess(records, itemProcessors);
@@ -786,6 +792,7 @@ public final class DBBatchFlowUtil
 										final String delimiter, 
 										final Charset encode, 
 										final long skipRow, 
+										final int fetchSize,
 										final Replacer<String[]> ... itemProcessors)
 	{
 		InputStream fis = null;
@@ -813,7 +820,7 @@ public final class DBBatchFlowUtil
 				//String[] record = StringUtils.splitPreserveAllTokens(line, delimiter);
 				List<String> record = StrSpliter.split(line, delimiter, false, false);
 				records.add(record.toArray(new String[record.size()]));
-				if (records.size() % DBContants.fetchSize == 0)
+				if (records.size() % fetchSize == 0)
 				{ processAndWrite(itemProcessors, records, jtaTransactionManager, targetDBinfoForDataSources); }
 			}
 			
@@ -837,6 +844,7 @@ public final class DBBatchFlowUtil
 									   final String delimiter, 
 									   final Charset encode, 
 									   final long skipRow, 
+									   final int fetchSize,
 									   final Replacer<String[]> ... itemProcessors)
 	{
 		InputStream fis = null;
@@ -857,7 +865,7 @@ public final class DBBatchFlowUtil
 			if (targetDBInfo instanceof DBInfo)
 			{
 				targetConnection = DBHandleUtil.getConnection(targetDBInfo);
-				targetPreparedStatement = DBHandleUtil.getPreparedStatement(PreparedStatementOperationType.WRITE, targetConnection, targetDBInfo.getSql());
+				targetPreparedStatement = DBHandleUtil.getPreparedStatement(PreparedStatementOperationType.WRITE, targetConnection, targetDBInfo.getSql(), fetchSize);
 			}
 			else if (targetDBInfo instanceof DBInfoForDataSource)
 			{
@@ -880,7 +888,7 @@ public final class DBBatchFlowUtil
 				//String[] record = StringUtils.splitPreserveAllTokens(line, delimiter);
 				List<String> record = StrSpliter.split(line, delimiter, false, false);
 				records.add(record.toArray(new String[record.size()]));
-				if (records.size() % DBContants.fetchSize == 0)
+				if (records.size() % fetchSize == 0)
 				{
 					if (usePool)
 					{ processAndWrite(itemProcessors, records, targetJdbcTemplate, targetDBInfo.getSql()); }
@@ -916,6 +924,7 @@ public final class DBBatchFlowUtil
 									 final Collection<DBInfoForDataSource> targetDBinfoForDataSources, 
 									 final int sheetIndx,
 									 final int skipRow,
+									 final int fetchSize,
 									 final Replacer<Object[]> ... itemProcessors)
 	{
 		boolean result = false;
@@ -933,6 +942,7 @@ public final class DBBatchFlowUtil
 						.setRecords(records)
 						.setSkipRow(skipRow)
 						.setTargetDBinfoForDataSources(targetDBinfoForDataSources)
+						.setFetchSize(fetchSize)
 			);
 			
 			processAndWrite(itemProcessors, records, jtaTransactionManager, targetDBinfoForDataSources);
@@ -953,6 +963,7 @@ public final class DBBatchFlowUtil
 									final AbstractDBInfo targetDBInfo, 
 									final int sheetIndx,
 									final int skipRow,
+									final int fetchSize,
 									final Replacer<Object[]> ... itemProcessors)
 	{
 		Connection targetConnection = null;
@@ -965,7 +976,7 @@ public final class DBBatchFlowUtil
 			if (targetDBInfo instanceof DBInfo)
 			{
 				targetConnection = DBHandleUtil.getConnection(targetDBInfo);
-				targetPreparedStatement = DBHandleUtil.getPreparedStatement(PreparedStatementOperationType.WRITE, targetConnection, targetDBInfo.getSql());
+				targetPreparedStatement = DBHandleUtil.getPreparedStatement(PreparedStatementOperationType.WRITE, targetConnection, targetDBInfo.getSql(), fetchSize);
 			}
 			else if (targetDBInfo instanceof DBInfoForDataSource)
 			{
@@ -990,6 +1001,7 @@ public final class DBBatchFlowUtil
 						.setRecords(records)
 						.setSkipRow(skipRow)
 						.setUsePools(usePools)
+						.setFetchSize(fetchSize)
 			);
 			
 			if (JavaCollectionsUtil.getOperationFlowResult(usePools))
@@ -1020,6 +1032,7 @@ public final class DBBatchFlowUtil
 								   final Charset encode, 
 								   final long skipRow, 
 								   final CsvReadConfig csvReadConfig, 
+								   final int fetchSize,
 								   final Replacer<String[]> ... itemProcessors)
 	{
 		FileInputStream fos = null;
@@ -1050,7 +1063,7 @@ public final class DBBatchFlowUtil
 
     			String[] record = csvRow.toArray(new String[csvRow.size()]);
     			records.add(record);
-    			if (records.size() % DBContants.fetchSize == 0)
+    			if (records.size() % fetchSize == 0)
     			{ processAndWrite(itemProcessors, records, jtaTransactionManager, targetDBinfoForDataSources); }
     		}
     		
@@ -1075,6 +1088,7 @@ public final class DBBatchFlowUtil
 								  final Charset encode, 
 								  final long skipRow, 
 								  final CsvReadConfig csvReadConfig, 
+								  final int fetchSize,
 								  final Replacer<String[]> ... itemProcessors)
 	{
 		FileInputStream fos = null;
@@ -1101,7 +1115,7 @@ public final class DBBatchFlowUtil
     		if (targetDBInfo instanceof DBInfo)
 			{
 				targetConnection = DBHandleUtil.getConnection(targetDBInfo);
-				targetPreparedStatement = DBHandleUtil.getPreparedStatement(PreparedStatementOperationType.WRITE, targetConnection, targetDBInfo.getSql());
+				targetPreparedStatement = DBHandleUtil.getPreparedStatement(PreparedStatementOperationType.WRITE, targetConnection, targetDBInfo.getSql(), fetchSize);
 			}
 			else if (targetDBInfo instanceof DBInfoForDataSource)
 			{
@@ -1123,7 +1137,7 @@ public final class DBBatchFlowUtil
 
     			String[] record = csvRow.toArray(new String[csvRow.size()]);
     			records.add(record);
-    			if (records.size() % DBContants.fetchSize == 0)
+    			if (records.size() % fetchSize == 0)
     			{
     				if (usePool)
 					{ processAndWrite(itemProcessors, records, targetJdbcTemplate, targetDBInfo.getSql()); }
@@ -1236,6 +1250,7 @@ public final class DBBatchFlowUtil
 		private Replacer<Object[]>[] itemProcessors;
 		private Collection<DBInfoForDataSource> targetDBinfoForDataSources;
 		private JtaTransactionManager jtaTransactionManager;
+		private int fetchSize;
 		
 		@Override
 		public void handle(int sheetIndex, int rowIndex, List<Object> rowList) 
@@ -1243,7 +1258,7 @@ public final class DBBatchFlowUtil
 			if (rowIndex != this.skipRow)
 			{
 				this.records.add(rowList.toArray());
-				if (this.records.size() % DBContants.fetchSize == 0)
+				if (this.records.size() % this.fetchSize == 0)
 				{
 					try 
 					{ processAndWrite(this.itemProcessors, this.records, this.jtaTransactionManager, this.targetDBinfoForDataSources); } 
@@ -1324,6 +1339,7 @@ public final class DBBatchFlowUtil
 		private PreparedStatement preparedStatement;
 		private JdbcTemplate jdbcTemplate;
 		private AbstractDBInfo abstractDBInfo;
+		private int fetchSize;
 		
 		@Override
 		public void handle(int sheetIndex, int rowIndex, List<Object> rowList) 
@@ -1331,7 +1347,7 @@ public final class DBBatchFlowUtil
 			if (rowIndex != this.skipRow)
 			{
 				this.records.add(rowList.toArray());
-				if (this.records.size() % DBContants.fetchSize == 0)
+				if (this.records.size() % this.fetchSize == 0)
 				{
 					if (JavaCollectionsUtil.getOperationFlowResult(this.usePools))
 					{ processAndWrite(this.itemProcessors, this.records, this.jdbcTemplate, this.abstractDBInfo.getSql()); }

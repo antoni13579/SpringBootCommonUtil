@@ -45,7 +45,7 @@
 		<webjars-sockjs-client.version>1.3.0</webjars-sockjs-client.version>
 		<webjars-stomp-websocket.version>2.3.4</webjars-stomp-websocket.version>
 		<jasypt.version>1.9.2</jasypt.version>
-		<hutool.version>4.6.8</hutool.version>
+		<hutool.version>5.0.6</hutool.version>
 		<ikanalyzer.version>2012_u6</ikanalyzer.version>
 		<swagger.version>2.9.2</swagger.version>
 		<guava.version>28.0-jre</guava.version>
@@ -54,6 +54,7 @@
 		<shiro.version>1.4.0</shiro.version>
 		<mybatisplus.version>3.2.0</mybatisplus.version>
 		<mybatisplus.dynamic-datasource.version>2.5.6</mybatisplus.dynamic-datasource.version>
+		<mybatisplus.code-generator.version>3.2.0</mybatisplus.code-generator.version>
 		<druid.version>1.1.21</druid.version>
 		<jwt.version>3.8.2</jwt.version>
 		<eclipse-collections.version>10.0.0</eclipse-collections.version>
@@ -113,6 +114,10 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-thymeleaf</artifactId>
 		</dependency>
+		<dependency>
+      		<groupId>org.springframework.boot</groupId>
+      		<artifactId>spring-boot-starter-freemarker</artifactId>
+    	</dependency>
 		
 		<!-- Spring Boot Security模块 -->
 		<dependency>
@@ -137,7 +142,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-webflux</artifactId>
 		</dependency>
-		<!-- 这两个组件，需要有redis或数据库的支持
 		<dependency>
 			<groupId>org.springframework.session</groupId>
 			<artifactId>spring-session-data-redis</artifactId>
@@ -146,7 +150,6 @@
 			<groupId>org.springframework.session</groupId>
 			<artifactId>spring-session-jdbc</artifactId>
 		</dependency>
-		-->
 		
 		<!-- Spring Boot SQL模块 -->
     	<dependency>
@@ -567,6 +570,13 @@
     		<groupId>com.baomidou</groupId>
     		<artifactId>dynamic-datasource-spring-boot-starter</artifactId>
     		<version>${mybatisplus.dynamic-datasource.version}</version>
+		</dependency>
+		
+		<!-- MyBatis Plus之代码生成器  -->
+		<dependency>
+    		<groupId>com.baomidou</groupId>
+    		<artifactId>mybatis-plus-generator</artifactId>
+    		<version>${mybatisplus.code-generator.version}</version>
 		</dependency>
 		
 		<!-- Druid数据库连接池 -->

@@ -113,7 +113,6 @@ Consumer：消费者类，使用该类我们可以手动提交偏移量、控制
 	 * */
 	public static <V> KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, V>> getKafkaListenerContainerFactory(final String kafkaBrokers, 
 																																    final int concurrency,
-																																    final boolean batchListener,
 																																    final String kafkaGroup,
 																																    final boolean useAutoCommit,
 																																    final Deserializer<V> valueDeserializer)
@@ -161,9 +160,9 @@ Consumer：消费者类，使用该类我们可以手动提交偏移量、控制
         
 
         /**
-         * 开启批量消费
+         * 开启批量消费，但别设置为true，亲测有问题
          * */
-        factory.setBatchListener(batchListener);
+        factory.setBatchListener(false);
         
         //通过开启并发消费与批量消费，可以有效提高消费性能
         return factory;
@@ -186,10 +185,18 @@ Consumer：消费者类，使用该类我们可以手动提交偏移量、控制
         (
         		new HashMap<String, Object>().put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaBrokers)
         									 .put(ProducerConfig.RECEIVE_BUFFER_CONFIG, 1000)
-        									 .put(ProducerConfig.RETRIES_CONFIG, 0)
+        									 
         									 .put(ProducerConfig.BATCH_SIZE_CONFIG, 4096)
         									 .put(ProducerConfig.LINGER_MS_CONFIG, 1)
         									 .put(ProducerConfig.BUFFER_MEMORY_CONFIG, 40960)
+        									 
+        									 /**
+        									  * 设置这里，主要是提示了Must set retries to non-zero when using the idempotent producer的报错
+        									  * 百度了一下，需要设置幂等发送
+        									  * */
+        									 .put(ProducerConfig.RETRIES_CONFIG, 1)
+        									 .put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, true)
+        									 
         									 //.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class)
         									 //.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, ByteArraySerializer.class)
         									 .getMap(),

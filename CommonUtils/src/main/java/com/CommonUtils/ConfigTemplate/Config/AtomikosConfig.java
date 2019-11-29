@@ -1,6 +1,7 @@
 package com.CommonUtils.ConfigTemplate.Config;
 
 import java.sql.SQLException;
+import java.time.ZoneId;
 
 import javax.sql.DataSource;
 import javax.transaction.SystemException;
@@ -9,17 +10,19 @@ import javax.transaction.UserTransaction;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.transaction.jta.JtaTransactionManager;
 
 import com.CommonUtils.Config.Jdbc.DataSources.AtomikosDataSourceConfig;
+import com.CommonUtils.Utils.DBUtils.DBContants;
 import com.CommonUtils.Utils.DBUtils.DBUrlUtil;
 import com.CommonUtils.Utils.DBUtils.Bean.DBBaseInfo.DBInfo;
 import com.CommonUtils.Utils.DBUtils.Bean.Url.MySqlUrl;
 import com.atomikos.icatch.jta.UserTransactionImp;
 import com.atomikos.icatch.jta.UserTransactionManager;
 
-//@Configuration
+@Configuration
 public class AtomikosConfig 
 {
 	//分布式事务管理器
@@ -33,7 +36,7 @@ public class AtomikosConfig
 
     @Bean(name = "txManager")
     public JtaTransactionManager transactionManager(@Qualifier("userTransaction")UserTransaction userTransaction, 
-    													 @Qualifier("atomikosTransactionManager")TransactionManager atomikosTransactionManager) throws SystemException
+    												@Qualifier("atomikosTransactionManager")TransactionManager atomikosTransactionManager) throws SystemException
     {
     	JtaTransactionManager result = new JtaTransactionManager(userTransaction, atomikosTransactionManager);
     	
@@ -50,13 +53,13 @@ public class AtomikosConfig
         return userTransactionImp;
     }
     
-	@Bean(name = "lukabootDataSource", destroyMethod = "destroy")
+	@Bean(name = "mydb3DataSource", destroyMethod = "destroy")
 	@DependsOn({"txManager"})
-	public DataSource lukabootDataSource() throws SQLException
+	public DataSource mydb3DataSource() throws SQLException
 	{
 		return AtomikosDataSourceConfig.getDataSourceForMySql
 		(
-				"lukabootDataSource", 
+				"mydb3DataSource", 
 				"select 1", 
 				new DBInfo
 				(
@@ -66,11 +69,11 @@ public class AtomikosConfig
 									.setAllowPublicKeyRetrieval(true)
 									.setAutoReconnect(true)
 									.setCharacterEncoding("utf8")
-									.setDataBase("lukaboot")
-									.setDefaultFetchSize(10000)
-									.setHostIp("192.168.30.19")
+									.setDataBase("mydb3")
+									.setDefaultFetchSize(DBContants.inSqlStatementForMySql)
+									.setHostIp("localhost")
 									.setPort(3306)
-									.setServerTimezone("Asia/Shanghai")
+									.setServerTimezone(ZoneId.SHORT_IDS.get("CTT"))
 									.setUseCursorFetch(true)
 									.setUseSSL(true)
 									.setUseUnicode(true)
@@ -82,13 +85,13 @@ public class AtomikosConfig
 		);
 	}
 	
-	@Bean(name = "myDataSource", destroyMethod = "destroy")
+	@Bean(name = "mydb4DataSource", destroyMethod = "destroy")
 	@DependsOn({"txManager"})
-	public DataSource myDataSource() throws SQLException
+	public DataSource mydb4DataSource() throws SQLException
 	{
 		return AtomikosDataSourceConfig.getDataSourceForMySql
 		(
-				"myDataSource", 
+				"mydb4DataSource", 
 				"select 1", 
 				new DBInfo
 				(
@@ -98,17 +101,17 @@ public class AtomikosConfig
 									.setAllowPublicKeyRetrieval(true)
 									.setAutoReconnect(true)
 									.setCharacterEncoding("utf8")
-									.setDataBase("jeesite")
-									.setDefaultFetchSize(10000)
+									.setDataBase("mydb4")
+									.setDefaultFetchSize(DBContants.inSqlStatementForMySql)
 									.setHostIp("127.0.0.1")
 									.setPort(3306)
-									.setServerTimezone("Asia/Shanghai")
+									.setServerTimezone(ZoneId.SHORT_IDS.get("CTT"))
 									.setUseCursorFetch(true)
 									.setUseSSL(true)
 									.setUseUnicode(true)
 						),
 						"root",
-						"123456",
+						"root",
 						true
 				)
 		);

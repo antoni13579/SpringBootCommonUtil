@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.springframework.data.redis.connection.ReactiveRedisConnection;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.RedisOperations;
 
 import com.CommonUtils.Utils.DBUtils.Bean.RedisEntry;
 
@@ -26,10 +26,10 @@ public final class RedisUtil
 {
 	private RedisUtil() {}
 	
-	public static <K, V> boolean setExpireForValue(final RedisTemplate<K, V> redisTemplate, final RedisEntry<K, V> redisEntry, final long timeout, final TimeUnit unit)
+	public static <K, V> boolean setExpireForValue(final RedisOperations<K, V> redisOperations, final RedisEntry<K, V> redisEntry, final long timeout, final TimeUnit unit)
 	{
 		try
-		{ return redisTemplate.expire(redisEntry.getKey(), timeout, unit); }
+		{ return redisOperations.expire(redisEntry.getKey(), timeout, unit); }
 		catch (Exception ex)
 		{
 			log.error("通过RedisTemplate设置超时时间出现异常，异常原因为：", ex);
@@ -38,14 +38,14 @@ public final class RedisUtil
 	}
 	
 	@SafeVarargs
-	public static <K, V> boolean setExpireForValues(final RedisTemplate<K, V> redisTemplate, final long timeout, final TimeUnit unit, final RedisEntry<K, V> ... redisEntrys)
+	public static <K, V> boolean setExpireForValues(final RedisOperations<K, V> redisOperations, final long timeout, final TimeUnit unit, final RedisEntry<K, V> ... redisEntrys)
 	{
 		Set<Boolean> records = new HashSet<>();
 		if (!ArrayUtil.isEmpty(redisEntrys))
 		{
 			for (RedisEntry<K, V> redisEntry : redisEntrys)
 			{
-				boolean executeResult = setExpireForValue(redisTemplate, redisEntry, timeout, unit);
+				boolean executeResult = setExpireForValue(redisOperations, redisEntry, timeout, unit);
 				records.add(executeResult);
 			}
 		}
@@ -87,45 +87,45 @@ public final class RedisUtil
 	}
 	
 	@Synchronized
-	public static <K, V> void setForValue(final RedisTemplate<K, V> redisTemplate, final RedisEntry<K, V> redisEntry, final long timeout, final TimeUnit unit)
+	public static <K, V> void setForValue(final RedisOperations<K, V> redisOperations, final RedisEntry<K, V> redisEntry, final long timeout, final TimeUnit unit)
 	{
 		try
 		{
-			redisTemplate.opsForValue()
-			 			 .set(redisEntry.getKey(), redisEntry.getValue(), timeout, unit);
+			redisOperations.opsForValue()
+						   .set(redisEntry.getKey(), redisEntry.getValue(), timeout, unit);
 		}
 		catch (Exception ex)
 		{ log.error("通过RedisTemplate设置值出现异常，异常原因为：", ex); }
 	}
 	
 	@SafeVarargs
-	public static <K, V> void setForValues(final RedisTemplate<K, V> redisTemplate, final long timeout, final TimeUnit unit, final RedisEntry<K, V> ... redisEntrys)
+	public static <K, V> void setForValues(final RedisOperations<K, V> redisOperations, final long timeout, final TimeUnit unit, final RedisEntry<K, V> ... redisEntrys)
 	{
 		if (!ArrayUtil.isEmpty(redisEntrys))
 		{
 			for (RedisEntry<K, V> redisEntry : redisEntrys)
-			{ setForValue(redisTemplate, redisEntry, timeout, unit); }
+			{ setForValue(redisOperations, redisEntry, timeout, unit); }
 		}
 	}
 	
-	public static <K, V> void setForValue(final RedisTemplate<K, V> redisTemplate, final RedisEntry<K, V> redisEntry)
+	public static <K, V> void setForValue(final RedisOperations<K, V> redisOperations, final RedisEntry<K, V> redisEntry)
 	{
 		try
 		{
-			redisTemplate.opsForValue()
-			 			 .set(redisEntry.getKey(), redisEntry.getValue());
+			redisOperations.opsForValue()
+			 			   .set(redisEntry.getKey(), redisEntry.getValue());
 		}
 		catch (Exception ex)
 		{ log.error("通过RedisTemplate设置值出现异常，异常原因为：", ex); }
 	}
 	
 	@SafeVarargs
-	public static <K, V> void setForValues(final RedisTemplate<K, V> redisTemplate, final RedisEntry<K, V> ... redisEntrys)
+	public static <K, V> void setForValues(final RedisOperations<K, V> redisOperations, final RedisEntry<K, V> ... redisEntrys)
 	{
 		if (!ArrayUtil.isEmpty(redisEntrys))
 		{
 			for (RedisEntry<K, V> redisEntry : redisEntrys)
-			{ setForValue(redisTemplate, redisEntry); }
+			{ setForValue(redisOperations, redisEntry); }
 		}
 	}
 	
@@ -241,14 +241,14 @@ public final class RedisUtil
 		{ return false; }
 	}
 	
-	public static <K, V> V getForValue(final RedisTemplate<K, V> redisTemplate, final K key)
+	public static <K, V> V getForValue(final RedisOperations<K, V> redisOperations, final K key)
 	{
 		V result = null;
 		
 		try
 		{
-			result = redisTemplate.opsForValue()
-								  .get(key);
+			result = redisOperations.opsForValue()
+								    .get(key);
 		}
 		catch (Exception ex)
 		{ log.error("通过RedisTemplate获取值出现异常，异常原因为：", ex); }
@@ -257,13 +257,13 @@ public final class RedisUtil
 	}
 	
 	@SafeVarargs
-	public static <K, V> Collection<V> getForValues(final RedisTemplate<K, V> redisTemplate, final K ... keys)
+	public static <K, V> Collection<V> getForValues(final RedisOperations<K, V> redisOperations, final K ... keys)
 	{
 		Collection<V> result = new ArrayList<>();
 		if (!ArrayUtil.isEmpty(keys))
 		{
 			for (K key : keys)
-			{ result.add(getForValue(redisTemplate, key)); }
+			{ result.add(getForValue(redisOperations, key)); }
 		}
 		return result;
 	}
@@ -327,12 +327,12 @@ public final class RedisUtil
 	}
 	
 	@SafeVarargs
-	public static <K, V> long deleteForValues(final RedisTemplate<K, V> redisTemplate, final K ... keys)
+	public static <K, V> long deleteForValues(final RedisOperations<K, V> redisOperations, final K ... keys)
 	{
 		long result = 0;
 		
 		try
-		{ result = redisTemplate.delete(CollUtil.newArrayList(keys)); }
+		{ result = redisOperations.delete(CollUtil.newArrayList(keys)); }
 		catch (Exception ex)
 		{ log.error("通过RedisTemplate删除信息出现异常，异常原因为：", ex); }
 		

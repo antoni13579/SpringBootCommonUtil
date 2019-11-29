@@ -95,7 +95,7 @@ public final class DBHandleUtil
 		}
 	}
 	
-	public static Table getColumnBaseInfo(final AbstractDBInfo sourceDBInfo, final String targetTableName)
+	public static Table getColumnBaseInfo(final AbstractDBInfo sourceDBInfo, final String targetTableName, final int fetchSize)
 	{
 		Connection connection = null;
 		PreparedStatement preparedStatement = null;
@@ -104,7 +104,7 @@ public final class DBHandleUtil
 		try
 		{
 			connection = DBHandleUtil.getConnection(sourceDBInfo);
-			preparedStatement = DBHandleUtil.getPreparedStatement(PreparedStatementOperationType.READ, connection, sourceDBInfo.getSql());
+			preparedStatement = DBHandleUtil.getPreparedStatement(PreparedStatementOperationType.READ, connection, sourceDBInfo.getSql(), fetchSize);
 			DBHandleUtil.setPreparedStatement(PreparedStatementOperationType.READ, preparedStatement, sourceDBInfo.getBindingParams());
 			ResultSetMetaData resultSetMetaData = preparedStatement.getMetaData();
 			
@@ -218,7 +218,10 @@ public final class DBHandleUtil
 		{ return null; }
 	}
 	
-	public static PreparedStatement getPreparedStatement(final PreparedStatementOperationType preparedStatementOperationType, final Connection connection, final String sql) throws SQLException
+	public static PreparedStatement getPreparedStatement(final PreparedStatementOperationType preparedStatementOperationType, 
+														 final Connection connection, 
+														 final String sql,
+														 final int fetchSize) throws SQLException
 	{
 		PreparedStatement preparedStatement = null;
 		
@@ -226,7 +229,7 @@ public final class DBHandleUtil
 		{
 			case READ:
 				preparedStatement = connection.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
-				preparedStatement.setFetchSize(DBContants.fetchSize);
+				preparedStatement.setFetchSize(fetchSize);
 				preparedStatement.setFetchDirection(ResultSet.FETCH_FORWARD);
 				break;
 				
@@ -390,7 +393,7 @@ public final class DBHandleUtil
 				);
 	}
 	
-	public static void batchWrite(final AbstractDBInfo abstractDBInfo)
+	public static void batchWrite(final AbstractDBInfo abstractDBInfo, final int fetchSize)
 	{		
 		Connection connection = null;
 		PreparedStatement preparedStatement = null;
@@ -400,7 +403,7 @@ public final class DBHandleUtil
 			if (abstractDBInfo instanceof DBInfo)
 			{
 				connection = DBHandleUtil.getConnection(abstractDBInfo);			
-				preparedStatement = DBHandleUtil.getPreparedStatement(PreparedStatementOperationType.WRITE, connection, abstractDBInfo.getSql());
+				preparedStatement = DBHandleUtil.getPreparedStatement(PreparedStatementOperationType.WRITE, connection, abstractDBInfo.getSql(), fetchSize);
 				DBHandleUtil.setPreparedStatement(PreparedStatementOperationType.WRITE, preparedStatement, abstractDBInfo.getBindingParams());
 				DBHandleUtil.commit(new PreparedStatement[] {preparedStatement}, new Connection[] {connection}, true);
 			}
@@ -445,7 +448,7 @@ public final class DBHandleUtil
 		{ DBHandleUtil.releaseRelatedResourcesNoDataSource(new Connection[] {connection}, null, new PreparedStatement[] {preparedStatement}); }
 	}
 	
-	public static List<Map<String, Object>> getRecords(final AbstractDBInfo abstractDBInfo)
+	public static List<Map<String, Object>> getRecords(final AbstractDBInfo abstractDBInfo, final int fetchSize)
 	{
 		Connection connection = null;
 		PreparedStatement preparedStatement = null;
@@ -457,7 +460,7 @@ public final class DBHandleUtil
 			{
 				result = new ArrayList<>();
 				connection = DBHandleUtil.getConnection(abstractDBInfo);
-				preparedStatement = DBHandleUtil.getPreparedStatement(PreparedStatementOperationType.READ, connection, abstractDBInfo.getSql());
+				preparedStatement = DBHandleUtil.getPreparedStatement(PreparedStatementOperationType.READ, connection, abstractDBInfo.getSql(), fetchSize);
 				DBHandleUtil.setPreparedStatement(PreparedStatementOperationType.READ, preparedStatement, abstractDBInfo.getBindingParams());
 				
 				resultSet = preparedStatement.executeQuery();
