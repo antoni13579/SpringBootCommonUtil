@@ -8,4 +8,6 @@ public interface ICommonService
 	void localTransactionForDB();
 	void localTransactionForRedis();
 	void localTransactionForKafka();
+	void elasticSearchByTransportClient();
+	void r2dbc();
 }
