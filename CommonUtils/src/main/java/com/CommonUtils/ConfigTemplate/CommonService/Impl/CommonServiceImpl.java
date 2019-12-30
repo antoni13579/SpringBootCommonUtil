@@ -3,11 +3,14 @@ package com.CommonUtils.ConfigTemplate.CommonService.Impl;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
 import org.apache.kafka.clients.consumer.Consumer;
+import org.elasticsearch.client.transport.TransportClient;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.r2dbc.core.DatabaseClient;
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.SessionCallback;
@@ -25,7 +28,9 @@ import org.springframework.util.concurrent.ListenableFuture;
 import com.CommonUtils.ConfigTemplate.CommonService.ICommonService;
 import com.CommonUtils.Utils.DBUtils.RedisUtil;
 import com.CommonUtils.Utils.DBUtils.Bean.RedisEntry;
+import com.CommonUtils.Utils.SystemUtils.ElasticSearchUtils.TransportClientUtil;
 
+import cn.hutool.core.collection.IterUtil;
 import cn.hutool.core.util.ObjectUtil;
 import lombok.extern.slf4j.Slf4j;
 
@@ -47,6 +52,36 @@ public class CommonServiceImpl implements ICommonService
 	
 	@Resource
 	private KafkaTemplate<String, byte[]> kafkaTemplate;
+	
+	@Resource
+	private TransportClient transportClient;
+	
+	@Resource
+	private DatabaseClient mydb2DatabaseClient;
+	
+	@Override
+	public void r2dbc()
+	{
+		Iterable<Map<String, Object>> iterable = this.mydb2DatabaseClient.execute("select 1 + 1").fetch().all().toIterable();
+		log.info("测试r2dbc的结果为：{}", IterUtil.toList(iterable).toString());
+	}
+	
+	@Override
+	public void elasticSearchByTransportClient()
+	{
+		boolean createIndexResult = TransportClientUtil.createIndex(this.transportClient, "my_elasticsearch_db1");
+		if (createIndexResult)
+		{ log.info("ElasticSearch测试（基于TransportClient）-----创建索引--------------已完成"); }
+		else
+		{ log.warn("ElasticSearch测试（基于TransportClient）-----创建索引--------------索引已存在，无需创建"); }
+		
+		
+		boolean deleteIndexResult = TransportClientUtil.deleteIndex(this.transportClient, "my_elasticsearch_db1");
+		if (deleteIndexResult)
+		{ log.info("ElasticSearch测试（基于TransportClient）-----删除索引--------------已完成"); }
+		else
+		{ log.warn("ElasticSearch测试（基于TransportClient）------删除索引--------------索引已删除，无需重复处理"); }
+	}
 	
 	@Override
 	public void jtaTransactionForDB()
@@ -123,7 +158,7 @@ public class CommonServiceImpl implements ICommonService
 						{
 							log.info("开始测试编程形式的Redis事务");
 							operations.multi();
-							RedisUtil.setForValue(operations, new RedisEntry("key1", "value1"));
+							RedisUtil.setForValue(operations, new RedisEntry<String, String>("key1", "value1"));
 						    //int i = 1/0;
 							operations.convertAndSend("channel1", "我是需要Redis监听的消息");
 						    result = operations.exec();

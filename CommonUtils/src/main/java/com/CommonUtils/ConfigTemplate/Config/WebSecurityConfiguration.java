@@ -10,6 +10,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.config.annotation.ObjectPostProcessor;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -25,8 +26,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
 
-import com.CommonUtils.Config.SpringSecurity.Config.Encoder.BCryptPasswordEncoderConfig;
-import com.CommonUtils.Config.SpringSecurity.Config.Role.RoleHierarchyConfig;
+import com.CommonUtils.Config.Security.SpringSecurity.Config.Encoder.BCryptPasswordEncoderConfig;
 import com.CommonUtils.Utils.FrameworkUtils.SecurityUtils.SpringSecurityUtil;
 import com.CommonUtils.Utils.NetworkUtils.HttpUtils.Bean.SimpleResponse;
 
@@ -231,7 +231,11 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter
 	 * */
 	@Bean
 	public RoleHierarchy roleHierarchy() 
-	{ return RoleHierarchyConfig.getInstance("ROLE_dba > ROLE_admin ROLE_admin > ROLE_user"); }
+	{
+		RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
+		roleHierarchy.setHierarchy("ROLE_dba > ROLE_admin ROLE_admin > ROLE_user");
+		return roleHierarchy;
+	}
 	
 	/**
 	 * 当已经过身份验证的用户尝试再次进行身份验证时，应用程序可以通过以下几种方式之一处理该事件。它可以使用户的活动会话无效，并使用新会话再次对用户进行身份验证，或者允许两个会话同时存在。

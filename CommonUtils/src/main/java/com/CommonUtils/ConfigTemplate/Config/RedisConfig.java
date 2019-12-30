@@ -20,10 +20,10 @@ import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.Topic;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 
-import com.CommonUtils.Config.Redis.Config.RedisMessageListenerContainerConfig;
-import com.CommonUtils.Config.Redis.Config.RedisValueType;
-import com.CommonUtils.Config.Redis.Config.Normal.RedisTemplateConfig;
-import com.CommonUtils.Config.Redis.Config.Reactive.ReactiveRedisTemplateConfig;
+import com.CommonUtils.Config.NoSQL.Redis.Config.RedisMessageListenerContainerConfig;
+import com.CommonUtils.Config.NoSQL.Redis.Config.RedisValueType;
+import com.CommonUtils.Config.NoSQL.Redis.Config.Normal.RedisTemplateConfig;
+import com.CommonUtils.Config.NoSQL.Redis.Config.Reactive.ReactiveRedisTemplateConfig;
 
 import lombok.extern.slf4j.Slf4j;
 

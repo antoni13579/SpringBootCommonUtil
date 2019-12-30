@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.transaction.jta.JtaTransactionManager;
 
-import com.CommonUtils.Config.Jdbc.DataSources.AtomikosDataSourceConfig;
+import com.CommonUtils.Config.SQL.Jdbc.Config.DataSources.AtomikosDataSourceConfig;
 import com.CommonUtils.Utils.DBUtils.DBContants;
 import com.CommonUtils.Utils.DBUtils.DBUrlUtil;
 import com.CommonUtils.Utils.DBUtils.Bean.DBBaseInfo.DBInfo;

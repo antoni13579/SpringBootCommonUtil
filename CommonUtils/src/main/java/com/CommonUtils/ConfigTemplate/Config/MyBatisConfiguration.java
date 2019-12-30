@@ -18,9 +18,9 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import com.CommonUtils.Config.Jdbc.TxAdviceAdvisorConfig;
-import com.CommonUtils.Config.Jdbc.DataSources.HikariDataSourceConfig;
-import com.CommonUtils.Config.Mybatis.Config.SqlSessionFactoryConfig;
+import com.CommonUtils.Config.SQL.Jdbc.Config.TxAdviceAdvisorConfig;
+import com.CommonUtils.Config.SQL.Jdbc.Config.DataSources.HikariDataSourceConfig;
+import com.CommonUtils.Config.SQL.Mybatis.Config.SqlSessionFactoryConfig;
 import com.CommonUtils.Utils.DBUtils.DBContants;
 import com.CommonUtils.Utils.DBUtils.DBUrlUtil;
 import com.CommonUtils.Utils.DBUtils.Bean.DBBaseInfo.DBInfo;

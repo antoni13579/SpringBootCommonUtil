@@ -60,9 +60,9 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.transaction.jta.JtaTransactionManager;
 
-import com.CommonUtils.Config.SpringBatch.Config.Core.JobLauncherConfig;
-import com.CommonUtils.Config.SpringBatch.Config.Core.JobRepositoryConfig;
-import com.CommonUtils.Config.ThreadPool.ThreadPoolTaskExecutorConfig;
+import com.CommonUtils.Config.IO.SpringBatch.Config.Core.JobLauncherConfig;
+import com.CommonUtils.Config.IO.SpringBatch.Config.Core.JobRepositoryConfig;
+import com.CommonUtils.Config.ThreadPool.Config.ThreadPoolTaskExecutorConfig;
 import com.CommonUtils.Utils.DBUtils.DBHandleUtil;
 import com.CommonUtils.Utils.DBUtils.DBHandleUtil.PreparedStatementOperationType;
 import com.CommonUtils.Utils.DBUtils.Bean.DBBaseInfo.AbstractDBInfo;
@@ -228,6 +228,14 @@ public final class DBBatchFlowUtil
 		return result;
 	}
 	
+	@SafeVarargs
+	public static boolean dbToKafka(final AbstractDBInfo sourceDBInfo, 
+		    						final KafkaTemplate<Object, Object> kafkaTemplate, 
+		    						final String topic,
+		    						final int fetchSize,
+		    						final Replacer<Map<String, Object>> ... itemProcessors)
+	{ return dbToKafka(sourceDBInfo, kafkaTemplate, topic, null, fetchSize, itemProcessors); }
+	
 	/**
 	 * 发送kafka的时候，没有指定key，意味着数据会放在不同的partition，若对数据没顺序要求可以使用，否则请自行实现，发送kafka的时候指定key，确保同一key分发到同一partition上面，保证顺序
 	 * */
@@ -235,6 +243,7 @@ public final class DBBatchFlowUtil
 	public static boolean dbToKafka(final AbstractDBInfo sourceDBInfo, 
 								    final KafkaTemplate<Object, Object> kafkaTemplate, 
 									final String topic,
+									final String key,
 									final int fetchSize,
 									final Replacer<Map<String, Object>> ... itemProcessors)
 	{
@@ -273,7 +282,11 @@ public final class DBBatchFlowUtil
 				
 				if (records.size() % fetchSize == 0 || sourceResultSet.isLast())
 				{
-					kafkaTemplate.send(topic, ObjectUtil.serialize(batchProcess(records, itemProcessors)));
+					if (StrUtil.isEmpty(key))
+					{ kafkaTemplate.send(topic, ObjectUtil.serialize(batchProcess(records, itemProcessors))); }
+					else
+					{ kafkaTemplate.send(topic, key, ObjectUtil.serialize(batchProcess(records, itemProcessors))); }
+					
 					records.clear();
 				}
 			}

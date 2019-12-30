@@ -8,8 +8,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.CommonUtils.Config.Mybatis.Config.MybatisBaseConfig;
-import com.CommonUtils.Config.Mybatis.Config.SqlSessionFactoryConfig;
+import com.CommonUtils.Config.SQL.Mybatis.Config.MybatisBaseConfig;
+import com.CommonUtils.Config.SQL.Mybatis.Config.SqlSessionFactoryConfig;
 import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.CustomCollections.HashMap;
 
 import com.baomidou.dynamic.datasource.DynamicRoutingDataSource;

@@ -14,7 +14,7 @@ public class SwaggerConfig
 	@Bean
 	public Docket docket()
 	{
-		return com.CommonUtils.Config.Swagger.SwaggerConfig.getDocket
+		return com.CommonUtils.Config.Swagger.Config.SwaggerConfig.getDocket
 		(
 				"Swagger接口文档", 
 				"Swagger接口文档", 

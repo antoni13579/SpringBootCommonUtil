@@ -1,0 +1,39 @@
+package com.CommonUtils.Utils;
+
+import lombok.Getter;
+
+@Getter
+public final class HashCodeAndEqualsExample 
+{
+	private String id;
+    private String name;
+    private String age;
+    
+    @Override
+    public boolean equals(Object obj)
+    {
+    	//instanceof 已经处理了obj = null的情况
+    	if(!(obj instanceof HashCodeAndEqualsExample)) 
+    	{ return false; }
+    	
+    	//地址相等
+    	if (this == obj)
+    	{ return true; }
+    	
+    	HashCodeAndEqualsExample hashCodeAndEqualsExample = (HashCodeAndEqualsExample)obj;
+    	if (this.name.equals(hashCodeAndEqualsExample.name) && 
+    		this.age.equals(hashCodeAndEqualsExample.age))
+    	{ return true; }
+    	else
+    	{ return false; }
+    }
+    
+    @Override
+    public int hashCode()
+    {
+    	int result = 17;
+        result = 31 * result + (name == null ? 0 : name.hashCode());
+        result = 31 * result + (age == null ? 0 : age.hashCode());
+        return result;
+    }
+}

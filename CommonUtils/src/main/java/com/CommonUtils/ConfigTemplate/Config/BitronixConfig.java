@@ -55,7 +55,7 @@ public class BitronixConfig
 	@DependsOn({"txManager"})
 	public DataSource lukabootDataSource() throws SQLException
 	{
-		return com.CommonUtils.Config.Jdbc.DataSources.BitronixDataSourceConfig.getDataSourceForMySql
+		return com.CommonUtils.Config.SQL.Jdbc.Config.DataSources.BitronixDataSourceConfig.getDataSourceForMySql
 		(
 				"lukabootDataSource", 
 				"select 1", 
@@ -87,7 +87,7 @@ public class BitronixConfig
 	@DependsOn({"txManager"})
 	public DataSource myDataSource() throws SQLException
 	{
-		return com.CommonUtils.Config.Jdbc.DataSources.BitronixDataSourceConfig.getDataSourceForMySql
+		return com.CommonUtils.Config.SQL.Jdbc.Config.DataSources.BitronixDataSourceConfig.getDataSourceForMySql
 		(
 				"myDataSource", 
 				"select 1", 

@@ -8,6 +8,8 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.XADataSourceAutoConfiguration;
+import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
+import org.springframework.boot.autoconfigure.mongo.MongoReactiveAutoConfiguration;
 import org.springframework.boot.autoconfigure.r2dbc.ConnectionFactoryAutoConfiguration;
 import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
@@ -21,6 +23,8 @@ import com.CommonUtils.Utils.DynaticUtils.Services.Impls.BeanUtilServiceImpl;
 import com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure;
 import com.baomidou.dynamic.datasource.spring.boot.autoconfigure.DynamicDataSourceAutoConfiguration;
 
+import cn.hutool.core.convert.Convert;
+import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.util.RuntimeUtil;
 import lombok.extern.slf4j.Slf4j;
 
@@ -41,7 +45,10 @@ import lombok.extern.slf4j.Slf4j;
 				ShiroAutoConfiguration.class,
 				ShiroAnnotationProcessorAutoConfiguration.class,
 				
-				ConnectionFactoryAutoConfiguration.class
+				ConnectionFactoryAutoConfiguration.class,
+				
+				MongoAutoConfiguration.class,
+				MongoReactiveAutoConfiguration.class
 		}
 )
 @ComponentScan(basePackages= { "com.CommonUtils" })
@@ -52,6 +59,12 @@ public class CommonUtilsApplication
 {
 	public static void main(String[] args) 
 	{
+		/**
+         * Springboot整合Elasticsearch 在项目启动前设置一下的属性，防止报错
+         * 解决netty冲突后初始化client时还会抛出异常
+         * java.lang.IllegalStateException: availableProcessors is already set to [4], rejecting [4]
+         */
+        System.setProperty("es.set.netty.runtime.available.processors", "false");
 		SpringApplication.run(CommonUtilsApplication.class, args);
 		
 		/**
@@ -97,7 +110,9 @@ Copy
 		{
 			commonService.localTransactionByAnnotationWithKafka();
 			commonService.localTransactionByAnnotation();
-			log.info("测试注解形式的Redis事务，存放在Redis的值为{}", RedisUtil.getForValue(BeanUtilServiceImpl.getBean("redisTemplate", RedisTemplate.class).get(), "123"));
+			
+			RedisTemplate<String, Object> redisTemplate = Convert.convert(new TypeReference<RedisTemplate<String, Object>>() {}, BeanUtilServiceImpl.getBean("redisTemplate").get());
+			log.info("测试注解形式的Redis事务，存放在Redis的值为{}", RedisUtil.getForValue(redisTemplate, "123"));
 		} 
 		catch (Exception e) 
 		{
@@ -107,5 +122,7 @@ Copy
 		commonService.localTransactionForKafka();
 		commonService.localTransactionForRedis();
 		commonService.localTransactionForDB();
+		commonService.elasticSearchByTransportClient();
+		commonService.r2dbc();
 	}
 }
