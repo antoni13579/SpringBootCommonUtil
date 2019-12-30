@@ -49,7 +49,7 @@ public final class QuartzConfig
         jobFactory.setApplicationContext(applicationContext);
         return jobFactory;
     }
-	 * */
+	 * */ 
 	public static JobFactory getJobFactoryInstance(final ApplicationContext context)
 	{
 		AutowiringSpringBeanJobFactory result = new AutowiringSpringBeanJobFactory();
