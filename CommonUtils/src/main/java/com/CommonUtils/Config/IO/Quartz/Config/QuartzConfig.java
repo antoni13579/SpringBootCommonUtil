@@ -34,7 +34,7 @@ QRTZ_SIMPLE_TRIGGERS	存储简单的 Trigger，包括重复次数，间隔，以
 QRTZ_BLOG_TRIGGERS Trigger	作为 Blob 类型存储(用于 Quartz 用户用 JDBC 创建他们自己定制的 Trigger 类型，JobStore 并不知道如何存储实例的时候)
 QRTZ_TRIGGER_LISTENERS	存储已配置的 TriggerListener 的信息
 QRTZ_TRIGGERS	存储已配置的 Trigger 的信息
- *  
+ * 
  * */
 public final class QuartzConfig 
 {
