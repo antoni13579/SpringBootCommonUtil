@@ -1,9 +1,9 @@
 package com.CommonUtils.Utils.SystemUtils.RemoteUtils;
 
 import java.io.Closeable;
+import java.util.Properties;
 
 import com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil;
-import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.CustomCollections.Properties;
 import com.CommonUtils.Utils.SystemUtils.RemoteUtils.Bean.RemoteInfo;
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelExec;
@@ -15,17 +15,21 @@ import com.jcraft.jsch.Session;
 import cn.hutool.core.io.IoUtil;
 import lombok.Getter;
 
-@Deprecated
+/**
+ * hutool已封装了对应的工具类
+ * @deprecated
+ * */
+@Deprecated(since="hutool已封装了对应的工具类")
 public final class RemoteUtil 
 {
-	@Getter(lazy = true)
+	@Getter(lazy = false)
 	private static final JSch JSCH = new JSch();
 	
 	private RemoteUtil() {}
 	
 	public static void releaseResource(final Channel[] channels, final Session[] sessions, final Closeable ... closeables)
 	{
-		ArrayUtil.arrayProcessor(closeables, (final Closeable value, final int indx, final int length) -> { IoUtil.close(value); });
+		ArrayUtil.arrayProcessor(closeables, (final Closeable value, final int indx, final int length) -> IoUtil.close(value));
 		
 		ArrayUtil.arrayProcessor
 		(
@@ -57,7 +61,10 @@ public final class RemoteUtil
 	{        
         Session session = getJSCH().getSession(remoteInfo.getUsername(), remoteInfo.getHost(), remoteInfo.getPort());
         session.setPassword(remoteInfo.getPassword());
-        session.setConfig(new Properties().setProperty("StrictHostKeyChecking", "no").getProperties());
+        
+        Properties properties = new Properties();
+        properties.setProperty("StrictHostKeyChecking", "no");
+        session.setConfig(properties);
         session.connect();
         return session;
 	}

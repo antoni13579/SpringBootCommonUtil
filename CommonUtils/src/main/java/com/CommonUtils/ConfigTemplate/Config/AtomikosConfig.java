@@ -36,7 +36,7 @@ public class AtomikosConfig
 
     @Bean(name = "txManager")
     public JtaTransactionManager transactionManager(@Qualifier("userTransaction")UserTransaction userTransaction, 
-    												@Qualifier("atomikosTransactionManager")TransactionManager atomikosTransactionManager) throws SystemException
+    												@Qualifier("atomikosTransactionManager")TransactionManager atomikosTransactionManager)
     {
     	JtaTransactionManager result = new JtaTransactionManager(userTransaction, atomikosTransactionManager);
     	
@@ -70,7 +70,7 @@ public class AtomikosConfig
 									.setAutoReconnect(true)
 									.setCharacterEncoding("utf8")
 									.setDataBase("mydb3")
-									.setDefaultFetchSize(DBContants.inSqlStatementForMySql)
+									.setDefaultFetchSize(DBContants.IN_SQL_STATEMENT_FOR_MYSQL)
 									.setHostIp("localhost")
 									.setPort(3306)
 									.setServerTimezone(ZoneId.SHORT_IDS.get("CTT"))
@@ -102,7 +102,7 @@ public class AtomikosConfig
 									.setAutoReconnect(true)
 									.setCharacterEncoding("utf8")
 									.setDataBase("mydb4")
-									.setDefaultFetchSize(DBContants.inSqlStatementForMySql)
+									.setDefaultFetchSize(DBContants.IN_SQL_STATEMENT_FOR_MYSQL)
 									.setHostIp("127.0.0.1")
 									.setPort(3306)
 									.setServerTimezone(ZoneId.SHORT_IDS.get("CTT"))

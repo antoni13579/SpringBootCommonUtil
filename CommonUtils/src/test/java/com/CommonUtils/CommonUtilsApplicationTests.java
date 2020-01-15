@@ -1,11 +1,24 @@
 package com.CommonUtils;
 
+import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.boot.SpringBootConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
 
-public class CommonUtilsApplicationTests extends BaseTest
+import com.CommonUtils.ConfigTemplate.Startup.CommonUtilsApplication;
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@SpringBootTest(classes = { CommonUtilsApplication.class })
+@SpringBootConfiguration
+@WebAppConfiguration
+public class CommonUtilsApplicationTests
 {
 	@Test
-	public void contextLoads() throws Exception
+	public void contextLoads()
 	{
+		Assert.assertNull(new String());
 	}
 }

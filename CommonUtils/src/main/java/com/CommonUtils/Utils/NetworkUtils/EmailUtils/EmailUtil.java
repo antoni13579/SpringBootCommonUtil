@@ -49,7 +49,7 @@ public final class EmailUtil
 	{
 		try
 		{
-			MimeMessageHelper helper = sendMimeMessage(javaMailSender, sendFrom, topic, sendTo);;
+			MimeMessageHelper helper = sendMimeMessage(javaMailSender, sendFrom, topic, sendTo);
             helper.setText(info, isHtml);
             javaMailSender.send(helper.getMimeMessage());
 		}

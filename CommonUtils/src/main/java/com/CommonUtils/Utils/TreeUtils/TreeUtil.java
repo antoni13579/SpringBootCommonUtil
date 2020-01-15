@@ -28,7 +28,11 @@ public final class TreeUtil
 		{ return Collections.emptyList(); }
 	}
 	
-	@Deprecated
+	/**
+	 * 没啥用
+	 * @deprecated
+	 * */
+	@Deprecated(since="没啥用")
 	public static Collection<TreeNode<Map<String, Object>>> excelDataToTreeNodes(final com.CommonUtils.Utils.OfficeUtils.ExcelUtils.Bean.ExcelData excelData)
 	{
 		if (null != excelData)
@@ -45,7 +49,7 @@ public final class TreeUtil
 	 * */
 	public static <K, V> Collection<TreeNode<Map<K, V>>> getTree(final Collection<TreeNode<Map<K, V>>> originNodeList, final K rootKey, final K leafKey)
 	{
-		Collection<TreeNode<Map<K, V>>> result = new ArrayList<TreeNode<Map<K, V>>>();
+		Collection<TreeNode<Map<K, V>>> result = new ArrayList<>();
 		for (TreeNode<Map<K, V>> node1 : originNodeList)
 		{
 			boolean mark = false;

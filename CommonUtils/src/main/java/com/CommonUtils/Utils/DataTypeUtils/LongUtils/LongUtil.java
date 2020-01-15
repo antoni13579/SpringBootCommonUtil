@@ -19,20 +19,22 @@ public final class LongUtil
 {
 	private LongUtil() {}
 	
+	private static final String AGGREGATION_KEY = "ALL_AGGREGATION";
+	
 	public static LongSummaryStatistics aggregation(final Long ... params)
 	{
-		Map<String, LongSummaryStatistics> map = groupBy((x) -> { return "ALL_AGGREGATION"; }, (x) -> { return x; }, params);
+		Map<String, LongSummaryStatistics> map = groupBy(x -> AGGREGATION_KEY, x -> x, params);
 		if (!CollUtil.isEmpty(map))
-		{ return map.get("ALL_AGGREGATION"); }
+		{ return map.get(AGGREGATION_KEY); }
 		else
 		{ return new LongSummaryStatistics(); }
 	}
 	
 	public static LongSummaryStatistics aggregation(final Collection<Long> coll)
 	{
-		Map<String, LongSummaryStatistics> map = groupBy((x) -> { return "ALL_AGGREGATION"; }, (x) -> { return x; }, coll);
+		Map<String, LongSummaryStatistics> map = groupBy(x -> AGGREGATION_KEY, x -> x, coll);
 		if (!CollUtil.isEmpty(map))
-		{ return map.get("ALL_AGGREGATION"); }
+		{ return map.get(AGGREGATION_KEY); }
 		else
 		{ return new LongSummaryStatistics(); }
 	}
@@ -66,26 +68,34 @@ public final class LongUtil
 				(final String groupByKey, final LongSummaryStatistics groupByResult, final int indx) -> 
 				{
 					List<String> tmp = StrSpliter.split(groupByKey, delimiter, false, false);
-					//String[] groupByFields = StringUtils.splitPreserveAllTokens(groupByKey, delimiter);
 					String[] groupByFields = tmp.toArray(new String[tmp.size()]);					
 					JavaCollectionsUtil.collectionProcessor
 					(
 							CollUtil.newArrayList(processors), 
-							(final ItemProcessorForProcessGroupByResult val, final int inx, final int length) -> 
-							{ val.process(groupByResult, groupByFields); }
+							(final ItemProcessorForProcessGroupByResult val, final int inx, final int length) -> val.process(groupByResult, groupByFields)
 					);
 				}
 		);
 	}
 	
-	/**建议使用cn.hutool.core.convert.Convert.toLong*/ 
-	@Deprecated
-	public static <T> long getLong(final T obj) throws Exception
+	/**建议使用cn.hutool.core.convert.Convert.toLong
+	 * @deprecated
+	 * */ 
+	@Deprecated(since="建议使用cn.hutool.core.convert.Convert.toLong")
+	public static <T> long getLong(final T obj) throws LongUtilException
 	{
 		if (obj instanceof Long)
 		{ return Long.parseLong(obj.toString()); }
 		else
-		{ throw new Exception("无法转换为long类型"); }
+		{ throw new LongUtilException("无法转换为long类型"); }
+	}
+	
+	private static class LongUtilException extends Exception
+	{
+		private static final long serialVersionUID = -4865248675526149971L;
+
+		private LongUtilException(final String message)
+		{ super(message); }
 	}
 	
 	@FunctionalInterface

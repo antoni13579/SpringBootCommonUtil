@@ -1,6 +1,10 @@
 package com.CommonUtils.Utils.DataTypeUtils.DateUtils;
 
-@Deprecated
+/**
+ * 过时
+ * @deprecated
+ * */
+@Deprecated(since="过时")
 public enum DateFormat 
 {
 	DATE,

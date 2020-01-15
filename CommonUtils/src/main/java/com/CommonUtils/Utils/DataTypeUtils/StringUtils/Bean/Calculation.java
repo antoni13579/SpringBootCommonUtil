@@ -8,11 +8,15 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
+/**
+ * 有其他工具类代替这个
+ * @deprecated
+ * */
 @Accessors(chain = true)
 @Getter
 @Setter
 @ToString
-@Deprecated
+@Deprecated(since="有其他工具类代替这个")
 public final class Calculation 
 {
 	private BigDecimal elementA = new BigDecimal(0);

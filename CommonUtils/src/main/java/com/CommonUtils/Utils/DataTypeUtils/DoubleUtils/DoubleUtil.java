@@ -22,8 +22,12 @@ public final class DoubleUtil
 {
 	private DoubleUtil() {}
 	
-	/**建议使用cn.hutool.core.util.NumberUtil.roundStr代替*/ 
-	@Deprecated
+	private static final String AGGREGATION_KEY = "ALL_AGGREGATION";
+	
+	/**建议使用cn.hutool.core.util.NumberUtil.roundStr代替
+	 * @deprecated
+	 * */ 
+	@Deprecated(since="建议使用cn.hutool.core.util.NumberUtil.roundStr代替")
 	public static String formatDoubleToStr(final double number, final String format)
 	{
 		if (StrUtil.isEmptyIfStr(format))
@@ -34,18 +38,18 @@ public final class DoubleUtil
 	
 	public static DoubleSummaryStatistics aggregation(final Double ... params)
 	{
-		Map<String, DoubleSummaryStatistics> map = groupBy((x) -> { return "ALL_AGGREGATION"; }, (x) -> { return x; }, params);
+		Map<String, DoubleSummaryStatistics> map = groupBy(x -> AGGREGATION_KEY, x -> x, params);
 		if (!CollUtil.isEmpty(map))
-		{ return map.get("ALL_AGGREGATION"); }
+		{ return map.get(AGGREGATION_KEY); }
 		else
 		{ return new DoubleSummaryStatistics(); }
 	}
 	
 	public static DoubleSummaryStatistics aggregation(final Collection<Double> coll)
 	{
-		Map<String, DoubleSummaryStatistics> map = groupBy((x) -> { return "ALL_AGGREGATION"; }, (x) -> { return x; }, coll);
+		Map<String, DoubleSummaryStatistics> map = groupBy(x -> AGGREGATION_KEY, x -> x, coll);
 		if (!CollUtil.isEmpty(map))
-		{ return map.get("ALL_AGGREGATION"); }
+		{ return map.get(AGGREGATION_KEY); }
 		else
 		{ return new DoubleSummaryStatistics(); }
 	}
@@ -79,29 +83,37 @@ public final class DoubleUtil
 				(final String groupByKey, final DoubleSummaryStatistics groupByResult, final int indx) -> 
 				{
 					List<String> tmp = StrSpliter.split(groupByKey, delimiter, false, false);
-					//String[] groupByFields = StringUtils.splitPreserveAllTokens(groupByKey, delimiter);
 					String[] groupByFields = tmp.toArray(new String[tmp.size()]);					
 					JavaCollectionsUtil.collectionProcessor
 					(
 							CollUtil.newArrayList(processors), 
-							(final ItemProcessorForProcessGroupByResult val, final int inx, final int length) -> 
-							{ val.process(groupByResult, groupByFields); }
+							(final ItemProcessorForProcessGroupByResult val, final int inx, final int length) -> val.process(groupByResult, groupByFields)
 					);
 				}
 		);
 	}
 	
-	/**建议使用cn.hutool.core.convert.Convert.toDouble*/ 
-	@Deprecated
-	public static <T> double getDouble(final T obj) throws Exception
+	/**建议使用cn.hutool.core.convert.Convert.toDouble
+	 * @deprecated
+	 * */ 
+	@Deprecated(since="建议使用cn.hutool.core.convert.Convert.toDouble")
+	public static <T> double getDouble(final T obj) throws DoubleUtilException
 	{
 		if (obj instanceof Double)
 		{ return Double.parseDouble(obj.toString()); }
 		else
-		{ throw new Exception("无法转换为double类型"); }
+		{ throw new DoubleUtilException("无法转换为double类型"); }
 	}
 	
 	@FunctionalInterface
 	public interface ItemProcessorForProcessGroupByResult
 	{ void process(final DoubleSummaryStatistics groupByResult, final String[] groupByFields); }
+	
+	private static class DoubleUtilException extends Exception
+	{
+		private static final long serialVersionUID = -1650220669054984536L;
+
+		private DoubleUtilException(final String message)
+		{ super(message); }
+	}
 }

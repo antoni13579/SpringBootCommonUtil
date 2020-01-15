@@ -45,6 +45,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter
 {
+	private static final String SPRING_SECURITY_LOGIN_URL = "/homeController/login";
+	
 	@Override
 	public void configure(WebSecurity web)
 	{
@@ -88,10 +90,10 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter
 			//表单配置
 			.formLogin()
 				//登录页面，SpringSecurity默认值为/login
-			    .loginPage("/homeController/login")
+			    .loginPage(SPRING_SECURITY_LOGIN_URL)
 			    
 			    //用于登录的Controller URL地址，SpringSecurity默认值为/login
-			    .loginProcessingUrl("/homeController/login")
+			    .loginProcessingUrl(SPRING_SECURITY_LOGIN_URL)
 			    
 			    //登录成功后，返回登录成功信息给页面
 			    .successHandler
@@ -115,9 +117,6 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter
 			    			//如果使用了默认用户登录，需要输出警告日志，因为SpringSecurityUtil的getUser如果有问题，会返回一个默认用户，这个需要排查一下问题
 			    			if ("defaultAdmin".equalsIgnoreCase(userName))
 			    			{ log.warn("使用了默认用户登录？请排查一下问题出现在哪"); }
-			    			
-			    			//正常登录
-			    			else {}
 			    		}
 			    )
 			    
@@ -131,7 +130,6 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter
 			    .failureHandler
 			    (
 			    		(request, response, exception) -> 
-			    		{
 			    			ServletUtil.write
 			    			(
 			    					response, 
@@ -141,8 +139,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter
 			    						.setStatusDesc("找不到对应的用户，是用户名不正确？还是密码不正确？还是说。。。。没有注册？")
 			    						.toJson(),
 			    					MediaType.APPLICATION_JSON.toString()
-		    				);
-			    		}
+		    				)
 			    ).permitAll()
 				
 		.and()
@@ -152,7 +149,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter
 				.logoutUrl("/logout")
 			
 				//注销成功后重定向到登录页面
-				.logoutSuccessUrl("/homeController/login")
+				.logoutSuccessUrl(SPRING_SECURITY_LOGIN_URL)
 				
 				//是否将session置为无效
 				.invalidateHttpSession(true)
@@ -164,7 +161,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter
 		.and()
 			.sessionManagement()
 				//无效session跳转页
-				.invalidSessionUrl("/homeController/login")
+				.invalidSessionUrl(SPRING_SECURITY_LOGIN_URL)
 				
 				/**
 				 * 我们可以准确控制会话何时创建以及Spring Security如何与之交互：

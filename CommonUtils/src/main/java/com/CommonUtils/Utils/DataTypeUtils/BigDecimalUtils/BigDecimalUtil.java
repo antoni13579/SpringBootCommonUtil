@@ -26,20 +26,22 @@ public final class BigDecimalUtil
 {
 	private BigDecimalUtil() {}
 	
+	private static final String AGGREGATION_KEY = "ALL_AGGREGATION";
+	
 	public static BigDecimalSummaryStatistics aggregation(final BigDecimal ... params)
 	{
-		Map<String, BigDecimalSummaryStatistics> map = groupBy((x) -> { return "ALL_AGGREGATION"; }, (x) -> { return x; }, params);
+		Map<String, BigDecimalSummaryStatistics> map = groupBy(x -> AGGREGATION_KEY, x -> x, params);
 		if (!CollUtil.isEmpty(map))
-		{ return map.get("ALL_AGGREGATION"); }
+		{ return map.get(AGGREGATION_KEY); }
 		else
 		{ return new BigDecimalSummaryStatistics(); }
 	}
 	
 	public static BigDecimalSummaryStatistics aggregation(final Collection<BigDecimal> coll)
 	{
-		Map<String, BigDecimalSummaryStatistics> map = groupBy((x) -> { return "ALL_AGGREGATION"; }, (x) -> { return x; }, coll);
+		Map<String, BigDecimalSummaryStatistics> map = groupBy(x -> AGGREGATION_KEY, x -> x, coll);
 		if (!CollUtil.isEmpty(map))
-		{ return map.get("ALL_AGGREGATION"); }
+		{ return map.get(AGGREGATION_KEY); }
 		else
 		{ return new BigDecimalSummaryStatistics(); }
 	}
@@ -78,30 +80,37 @@ public final class BigDecimalUtil
 					JavaCollectionsUtil.collectionProcessor
 					(
 							CollUtil.newArrayList(processors), 
-							(final ItemProcessorForProcessGroupByResult val, final int inx, final int length) -> 
-							{ val.process(groupByResult, groupByFields); }
+							(final ItemProcessorForProcessGroupByResult val, final int inx, final int length) -> val.process(groupByResult, groupByFields)
 					);
 				}
 		);
 	}
 	
-	/**建议使用cn.hutool.core.util.ObjectUtil.defaultIfNull*/ 
-	@Deprecated
+	/**建议使用cn.hutool.core.util.ObjectUtil.defaultIfNull
+	 * @deprecated
+	 * */ 
+	@Deprecated(since="建议使用cn.hutool.core.util.ObjectUtil.defaultIfNull")
 	public static BigDecimal ifNull(final Object t)
 	{ return ifNull(t, 0); }
 	
-	/**建议使用cn.hutool.core.util.ObjectUtil.defaultIfNull*/ 
-	@Deprecated
+	/**建议使用cn.hutool.core.util.ObjectUtil.defaultIfNull
+	 * @deprecated
+	 * */ 
+	@Deprecated(since="建议使用cn.hutool.core.util.ObjectUtil.defaultIfNull")
 	public static BigDecimal ifNull(final Object t, final int defaultValue)
 	{ return nvl(t, defaultValue); }
 	
-	/**建议使用cn.hutool.core.util.ObjectUtil.defaultIfNull*/ 
-	@Deprecated
+	/**建议使用cn.hutool.core.util.ObjectUtil.defaultIfNull
+	 * @deprecated
+	 * */ 
+	@Deprecated(since="建议使用cn.hutool.core.util.ObjectUtil.defaultIfNull")
 	public static BigDecimal nvl(final Object t)
 	{ return nvl(t, 0); }
 	
-	/**建议使用cn.hutool.core.util.ObjectUtil.defaultIfNull*/ 
-	@Deprecated
+	/**建议使用cn.hutool.core.util.ObjectUtil.defaultIfNull
+	 * @deprecated
+	 * */ 
+	@Deprecated(since="建议使用cn.hutool.core.util.ObjectUtil.defaultIfNull")
 	public static BigDecimal nvl(final Object t, final int defaultValue)
 	{
 		BigDecimal result = null;
@@ -119,7 +128,7 @@ public final class BigDecimalUtil
 				{ result = new BigDecimal((String)t); }
 				
 				else if (t instanceof Double)
-				{ result = new BigDecimal((double)t); }
+				{ result = BigDecimal.valueOf((double)t); }
 				
 				else if (t instanceof BigInteger)
 				{ result = new BigDecimal((BigInteger)t); }
@@ -131,7 +140,7 @@ public final class BigDecimalUtil
 				{ result = new BigDecimal((long)t); }
 				
 				else
-				{ throw new Exception("执行BigDecimal的NVL函数出现问题，主要是无法生成BigDecimal"); }
+				{ throw new BigDecimalUtilException("执行BigDecimal的NVL函数出现问题，主要是无法生成BigDecimal"); }
 			}
 			else
 			{ result = new BigDecimal(defaultValue); }
@@ -141,17 +150,27 @@ public final class BigDecimalUtil
 		return result;
 	}
 	
-	/**建议使用cn.hutool.core.convert.Convert.toBigDecimal*/ 
-	@Deprecated
-	public static BigDecimal getBigDecimal(final Object obj) throws Exception
+	/**建议使用cn.hutool.core.convert.Convert.toBigDecimal
+	 * @deprecated
+	 * */ 
+	@Deprecated(since="建议使用cn.hutool.core.convert.Convert.toBigDecimal")
+	public static BigDecimal getBigDecimal(final Object obj) throws BigDecimalUtilException
 	{
 		if (obj instanceof BigDecimal)
 		{ return new BigDecimal(obj.toString()); }
 		else
-		{ throw new Exception("无法转换为BigDecimal类型"); }
+		{ throw new BigDecimalUtilException("无法转换为BigDecimal类型"); }
 	}
 	
 	@FunctionalInterface
 	public interface ItemProcessorForProcessGroupByResult
 	{ void process(final BigDecimalSummaryStatistics groupByResult, final String[] groupByFields); }
+	
+	private static class BigDecimalUtilException extends Exception
+	{
+		private static final long serialVersionUID = -2298829856923638561L;
+
+		private BigDecimalUtilException(final String message)
+		{ super(message); }
+	}
 }

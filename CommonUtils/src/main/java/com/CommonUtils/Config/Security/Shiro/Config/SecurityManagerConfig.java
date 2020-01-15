@@ -17,17 +17,16 @@ public final class SecurityManagerConfig
 {
 	private SecurityManagerConfig() {}
 	
-	public static DefaultWebSecurityManager getInstance(final boolean closeSession, final RealmAndCredentialsMatcherDefinition ... realmAndCredentialsMatcherDefinitions) throws Exception
+	public static DefaultWebSecurityManager getInstance(final boolean closeSession, final RealmAndCredentialsMatcherDefinition ... realmAndCredentialsMatcherDefinitions) throws SecurityManagerConfigException
 	{
 		if (cn.hutool.core.util.ArrayUtil.isEmpty(realmAndCredentialsMatcherDefinitions))
-		{ throw new Exception("必须设置用户鉴权逻辑！！"); }
+		{ throw new SecurityManagerConfigException("必须设置用户鉴权逻辑！！"); }
 		
 		Collection<Realm> realms = new ArrayList<>();		
 		JavaCollectionsUtil.collectionProcessor
 		(
 				CollUtil.newArrayList(realmAndCredentialsMatcherDefinitions), 
-				(final RealmAndCredentialsMatcherDefinition value, final int indx, final int length) -> 
-				{ realms.add(value.getRealm()); }
+				(final RealmAndCredentialsMatcherDefinition value, final int indx, final int length) -> realms.add(value.getRealm())
 		);
 		
 		DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
@@ -48,5 +47,13 @@ public final class SecurityManagerConfig
 		}
 		
 		return securityManager;
+	}
+	
+	private static class SecurityManagerConfigException extends Exception
+	{
+		private static final long serialVersionUID = -993534126627917416L;
+
+		private SecurityManagerConfigException(final String message)
+		{ super(message); }
 	}
 }

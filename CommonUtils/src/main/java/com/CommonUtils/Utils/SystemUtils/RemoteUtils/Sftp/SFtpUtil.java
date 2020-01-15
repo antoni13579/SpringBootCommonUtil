@@ -22,13 +22,17 @@ import cn.hutool.core.lang.TypeReference;
 import cn.hutool.extra.ssh.JschUtil;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * hutool已封装了对应的工具类
+ * @deprecated
+ * */
+@Deprecated(since="hutool已封装了对应的工具类")
 @Slf4j
-@Deprecated
 public final class SFtpUtil 
 {
 	private SFtpUtil() {}
 	
-	private synchronized static boolean execute(final RemoteInfo remoteInfo, final Processor ... processors)
+	private static synchronized boolean execute(final RemoteInfo remoteInfo, final Processor ... processors)
 	{
 		Session session = null;
 		ChannelSftp channel = null;
@@ -48,10 +52,7 @@ public final class SFtpUtil
 			result = true;
 		}
 		catch (Exception ex)
-		{
-			log.error("SFTP操作出现异常，主机地址为{}，异常原因为：", remoteInfo.getHost(), ex);
-			result = false;
-		}
+		{ log.error("SFTP操作出现异常，主机地址为{}，异常原因为：", remoteInfo.getHost(), ex); }
 		finally
 		{
 			JschUtil.close(channel);
@@ -64,7 +65,7 @@ public final class SFtpUtil
 	}
 	
 	/**请使用cn.hutool.extra.ssh.Sftp.download或get相关方法*/
-	public synchronized static boolean downloadFile(final File localDirectory, final String remoteDirectory, final RemoteInfo remoteInfo)
+	public static synchronized boolean downloadFile(final File localDirectory, final String remoteDirectory, final RemoteInfo remoteInfo)
 	{
 		if (FileUtil.isDirectory(localDirectory))
 		{
@@ -92,18 +93,17 @@ public final class SFtpUtil
 	}
 	
 	/**请使用cn.hutool.extra.ssh.Sftp.download或get相关方法*/
-	public synchronized static boolean downloadFile(final String localFilePath, final String remoteFilePath, final RemoteInfo remoteInfo)
+	public static synchronized boolean downloadFile(final String localFilePath, final String remoteFilePath, final RemoteInfo remoteInfo)
 	{
 		return execute
 		(
 				remoteInfo, 
-				(ChannelSftp channel, InputStream is) -> 
-				{ channel.get(remoteFilePath, localFilePath, new SftpProgressMonitorImpl(), ChannelSftp.RESUME); }
+				(ChannelSftp channel, InputStream is) -> channel.get(remoteFilePath, localFilePath, new SftpProgressMonitorImpl(), ChannelSftp.RESUME)
 		);
 	}
 	
 	/**请使用cn.hutool.extra.ssh.Sftp.upload或put相关方法*/
-	public synchronized static boolean uploadFile(final RemoteInfo remoteInfo, final String remoteFileDirectory, final MultipartFile ... localFileMultipartFiles)
+	public static synchronized boolean uploadFile(final RemoteInfo remoteInfo, final String remoteFileDirectory, final MultipartFile ... localFileMultipartFiles)
 	{
 		if (!cn.hutool.core.util.ArrayUtil.isEmpty(localFileMultipartFiles))
 		{
@@ -113,7 +113,6 @@ public final class SFtpUtil
 			(
 					localFileMultipartFiles, 
 					(localFileMultipartFile, indx, length) -> 
-					{
 						executeResult.add
 						(
 								execute
@@ -129,8 +128,7 @@ public final class SFtpUtil
 											is = null;
 										}
 								)
-						);
-					}
+						)
 			);
 			
 			return JavaCollectionsUtil.getOperationFlowResult(executeResult);
@@ -140,7 +138,7 @@ public final class SFtpUtil
 	}
 	
 	/**请使用cn.hutool.extra.ssh.Sftp.upload或put相关方法*/
-	public synchronized static boolean uploadFile(final RemoteInfo remoteInfo, final String localFilePath, final String remoteFilePath)
+	public static synchronized boolean uploadFile(final RemoteInfo remoteInfo, final String localFilePath, final String remoteFilePath)
 	{
 		return execute
 		(
@@ -154,7 +152,7 @@ public final class SFtpUtil
 	}
 	
 	/**请使用cn.hutool.extra.ssh.Sftp.upload或put相关方法*/
-	public synchronized static boolean uploadFile(final RemoteInfo remoteInfo, final File localDirectory, final String remoteDirectory)
+	public static synchronized boolean uploadFile(final RemoteInfo remoteInfo, final File localDirectory, final String remoteDirectory)
 	{
 		if (FileUtil.isDirectory(localDirectory))
 		{
@@ -182,21 +180,20 @@ public final class SFtpUtil
 	}
 	
 	/**请使用cn.hutool.extra.ssh.Sftp.ls相关方法*/
-	public synchronized static Collection<ChannelSftp.LsEntry> getFiles(final RemoteInfo remoteInfo, final String remotePath)
+	public static synchronized Collection<ChannelSftp.LsEntry> getFiles(final RemoteInfo remoteInfo, final String remotePath)
 	{
 		Collection<ChannelSftp.LsEntry> result = new HashSet<>();
 		
 		execute
 		(
 				remoteInfo, 
-				(ChannelSftp channel, InputStream is) -> 
-				{ result.addAll(Convert.convert(new TypeReference<Collection<? extends ChannelSftp.LsEntry> >() {}, channel.ls(remotePath))); }
+				(ChannelSftp channel, InputStream is) -> result.addAll(Convert.convert(new TypeReference<Collection<? extends ChannelSftp.LsEntry> >() {}, channel.ls(remotePath)))
 		);
 		return result;
 	}
 	
 	/**请使用cn.hutool.extra.ssh.Sftp.del相关方法*/
-	public synchronized static void deleteFile(final RemoteInfo remoteInfo, final String directory, final String fileName)
+	public static synchronized void deleteFile(final RemoteInfo remoteInfo, final String directory, final String fileName)
 	{
 		execute
 		(

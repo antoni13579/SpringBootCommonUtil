@@ -8,7 +8,11 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
-@Deprecated
+/**
+ * 已过时
+ * @deprecated
+ * */
+@Deprecated(since="已过时")
 @Accessors(chain = true)
 @Getter
 @Setter

@@ -42,47 +42,31 @@ public final class MongoClientSettingsConfig
         
 								  .applyToConnectionPoolSettings
 								  (
-										  block -> 
-										  {
-											  block.minSize(10)
-											  	   .maxSize(40)
-											  	   .maxWaitQueueSize(40)
-											  	   .maxWaitTime(4, TimeUnit.MINUTES)
-											  	   .maxConnectionLifeTime(30, TimeUnit.MINUTES)
-											  	   .maxConnectionIdleTime(10, TimeUnit.MINUTES)
-											  	   .maintenanceFrequency(30, TimeUnit.MINUTES)
-											  	   .maintenanceInitialDelay(1, TimeUnit.HOURS)
-											  	   ;
-										  }
+										  block -> block.minSize(10)
+											  	   		.maxSize(40)
+											  	   		.maxWaitQueueSize(40)
+											  	   		.maxWaitTime(4, TimeUnit.MINUTES)
+											  	   		.maxConnectionLifeTime(30, TimeUnit.MINUTES)
+											  	   		.maxConnectionIdleTime(10, TimeUnit.MINUTES)
+											  	   		.maintenanceFrequency(30, TimeUnit.MINUTES)
+											  	   		.maintenanceInitialDelay(1, TimeUnit.HOURS)
 								  )
 								  
 								  .applyToServerSettings
 								  (
-										  block -> 
-										  {
-											  block.heartbeatFrequency(10, TimeUnit.SECONDS)
-											  	   .minHeartbeatFrequency(3, TimeUnit.SECONDS)
-											  	   ;
-										  }
+										  block -> block.heartbeatFrequency(10, TimeUnit.SECONDS)
+											  	   		.minHeartbeatFrequency(3, TimeUnit.SECONDS)
 								  )
 								  
 								  .applyToSocketSettings
 								  (
-										  block -> 
-										  {
-											  block.connectTimeout(2, TimeUnit.MINUTES)
-											       ;
-										  }
+										  block -> block.connectTimeout(2, TimeUnit.MINUTES)
 								  )
 								  
 								  .applyToSslSettings
 								  (
-										  block ->
-										  {
-											  block.enabled(false)
-											  	   .invalidHostNameAllowed(false)
-											  	   ;
-										  }
+										  block -> block.enabled(false)
+											  	   		.invalidHostNameAllowed(false)
 								  )
 								  
 								  //.autoEncryptionSettings(autoEncryptionSettings)

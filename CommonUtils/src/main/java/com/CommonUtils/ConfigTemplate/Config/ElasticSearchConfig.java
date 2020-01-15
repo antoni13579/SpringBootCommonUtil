@@ -1,6 +1,7 @@
 package com.CommonUtils.ConfigTemplate.Config;
 
 import java.net.UnknownHostException;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.elasticsearch.client.transport.TransportClient;
@@ -10,16 +11,15 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 
-import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.CustomCollections.HashMap;
-
 @Configuration
-//@EnableElasticsearchRepositories(basePackages = { ContantsConfig.SEARCH_ENGINES_ELASTIC_SEARCH_DAO })
+@EnableElasticsearchRepositories(basePackages = { "com.CommonUtils.ConfigTemplate.ElasticSearch.Dao" })
 public class ElasticSearchConfig 
 {
-	@Bean
+	@Bean(destroyMethod="close")
 	public TransportClient transportClient() throws UnknownHostException
 	{
-		Map<String, Integer> hostAndPorts = new HashMap<String, Integer>().put("127.0.0.1", 9300).getMap();
+		Map<String, Integer> hostAndPorts = new HashMap<>();
+		hostAndPorts.put("127.0.0.1", 9300);
 		return com.CommonUtils.Config.NoSQL.ElasticSearch.Config.BaseConfig.getTransportClient("my-application", hostAndPorts, 5);
 	}
 	

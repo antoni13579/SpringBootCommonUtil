@@ -5,8 +5,12 @@ import java.io.File;
 
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * 请使用hutool相关工具类
+ * @deprecated
+ * */
+@Deprecated(since="请使用hutool相关工具类")
 @Slf4j
-@Deprecated
 public final class IOUtil 
 {
 	private IOUtil() {}
@@ -34,10 +38,5 @@ public final class IOUtil
 	{ return System.getProperty("java.io.tmpdir"); }
 	
 	public static boolean isFileEmpty(final File file)
-	{
-		if (null == file)
-		{ return true; }
-		
-		return false;
-	}
+	{ return null == file; }
 }

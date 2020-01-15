@@ -54,13 +54,9 @@ public class RedisConfig
 				{
 					String key = "";
 					try 
-					{
-						key = new String(message.getBody(), "utf8");
-					} 
+					{ key = new String(message.getBody(), "utf8"); } 
 					catch (UnsupportedEncodingException e) 
-					{
-						e.printStackTrace();
-					}
+					{ log.error("配置Redis监听出现异常，异常原因为：", e); }
 					
 					String channel = new String(message.getChannel());
 					String patternStr = new String(pattern);

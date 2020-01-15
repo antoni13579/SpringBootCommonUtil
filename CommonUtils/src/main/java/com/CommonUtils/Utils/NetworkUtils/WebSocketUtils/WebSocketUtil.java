@@ -44,5 +44,5 @@ public final class WebSocketUtil
 	}
 	
 	public static void convertAndSendToUser(final SimpMessagingTemplate simpMessagingTemplate, final String user, final String destination, final Object msg)
-	{ Optional.ofNullable(simpMessagingTemplate).ifPresent(consumer -> { consumer.convertAndSendToUser(user, destination, msg); }); }
+	{ Optional.ofNullable(simpMessagingTemplate).ifPresent(consumer -> consumer.convertAndSendToUser(user, destination, msg)); }
 }

@@ -1,11 +1,14 @@
 package com.CommonUtils.Utils.DynaticUtils.Services.Impls;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -14,7 +17,6 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
@@ -33,6 +35,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.convert.Convert;
+import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -41,38 +45,47 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public final class BeanUtilServiceImpl implements ApplicationContextAware
 {
-	private static ApplicationContext APPLICATION_CONTEXT = null;
-	private static Binder BINDER = null;
-	private static ObjectMapper OBJECT_MAPPER = null;
+	private ApplicationContext applicationContext = null;
+	private Binder binder = null;
+	
+	private static final String GET_BEAN_ERROR_DESC = "获取Bean异常，异常原因为：";
 	
 	@Override
-	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException 
+	public void setApplicationContext(ApplicationContext applicationContext)
 	{
-		APPLICATION_CONTEXT = applicationContext;
-		BINDER = Binder.get(APPLICATION_CONTEXT.getEnvironment());
+		this.applicationContext = applicationContext;
+		this.binder = Binder.get(this.applicationContext.getEnvironment());
 	}
 	
 	/**
+	 * 
 	 * bean转map，请使用cn.hutool.core.bean.BeanUtil.beanToMap
+	 * @deprecated
 	 * */
-	@Deprecated
-	public static <T> Map<String, Object> beanToMap(final T bean, final boolean isGetAll) throws IllegalArgumentException, IllegalAccessException
+	@Deprecated(since="bean转map，请使用cn.hutool.core.bean.BeanUtil.beanToMap")
+	public static <T> Map<String, Object> beanToMap(final T bean, final boolean isGetAll)
 	{
 		if (isGetAll)
 		{ return com.CommonUtils.Utils.ReflectUtils.ReflectUtil.getBeanFieldValue(bean); }
 		
-		Map<String, Object> result = new HashMap<String, Object>();
+		Map<String, Object> result = new HashMap<>();
 		if (null != bean)
 		{
-			BeanMap beanMap = BeanMap.create(bean);
-			for (Object key : beanMap.keySet())
-			{ result.put(key + "", beanMap.get(key)); }
+			BeanMap beanMap = BeanMap.create(bean);			
+			Iterator<Map.Entry<String, Object>> iter = Convert.convert(new TypeReference<Iterator<Map.Entry<String, Object>>>() {}, beanMap.entrySet().iterator());
+			while (iter.hasNext())
+			{
+				Entry<String, Object> entry = iter.next();
+				result.put(entry.getKey() + "", entry.getValue());
+			}
 		}
 		return result;
 	}
 	
-	/**map转bean，请使用cn.hutool.core.bean.BeanUtil.mapToBean*/
-	@Deprecated
+	/**map转bean，请使用cn.hutool.core.bean.BeanUtil.mapToBean
+	 * @deprecated
+	 * */
+	@Deprecated(since="map转bean，请使用cn.hutool.core.bean.BeanUtil.mapToBean")
 	public static <T> T mapToBean(final Map<String, Object> map, final T bean)
 	{
 		BeanMap beanMap = BeanMap.create(bean);
@@ -82,11 +95,12 @@ public final class BeanUtilServiceImpl implements ApplicationContextAware
 	
 	/**
 	 * List<T>转换为List<Map<String, Object>> ，请使用cn.hutool.core.bean.BeanUtil.beanToMap
+	 * @deprecated
 	 * */
-	@Deprecated
-	public static <T> List<Map<String, Object>> beanListToMapList(final List<T> objectList, final boolean isGetAll) throws IllegalArgumentException, IllegalAccessException
+	@Deprecated(since="List<T>转换为List<Map<String, Object>> ，请使用cn.hutool.core.bean.BeanUtil.beanToMap")
+	public static <T> List<Map<String, Object>> beanListToMapList(final List<T> objectList, final boolean isGetAll)
 	{
-		List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
+		List<Map<String, Object>> result = new ArrayList<>();
 		if (null != objectList && !objectList.isEmpty())
 		{
 			for (T bean : objectList)
@@ -99,11 +113,12 @@ public final class BeanUtilServiceImpl implements ApplicationContextAware
 	}
 	
 	/**List<Map<String,Object>>转换为List<T> ，请使用cn.hutool.core.bean.BeanUtil.mapToBean
+	 * @deprecated
 	 * */
-	@Deprecated
+	@Deprecated(since="List<Map<String,Object>>转换为List<T> ，请使用cn.hutool.core.bean.BeanUtil.mapToBean")
 	public static <T> List<T> mapListToBeanList(final List<Map<String,Object>> mapList, final Class<T> clazz) throws InstantiationException, IllegalAccessException
 	{
-		List<T> result = new ArrayList<T>();
+		List<T> result = new ArrayList<>();
 		if (null != mapList && !mapList.isEmpty())
 		{
 			for (Map<String,Object> map : mapList)
@@ -162,7 +177,6 @@ public final class BeanUtilServiceImpl implements ApplicationContextAware
 			
 			//此代码把实体转换为json，但根据Include进行过滤
 			String srcJson = getInstanceForObjectMapper(Include.NON_DEFAULT).writeValueAsString(src);
-			//String srcJson = JSON.toJSONString(src);
 			
 			//将源实体的值赋值到目标实体
 			objectReader.readValue(srcJson);
@@ -175,42 +189,42 @@ public final class BeanUtilServiceImpl implements ApplicationContextAware
 		}
 	}
 	
-	private static ObjectMapper getInstanceForObjectMapper(final Include incl)
+	private static class ObjectMapperSingletonContainer
 	{
-		if (null == OBJECT_MAPPER)
+		private static ObjectMapper instance = new ObjectMapper();
+		
+		private static ObjectMapper setSerializationInclusion(final Include incl)
 		{
-			synchronized (BeanUtilServiceImpl.class)
-			{
-				if (null == OBJECT_MAPPER)
-				{
-					OBJECT_MAPPER = new ObjectMapper();
-					
-					/*
-					 * 配置该objectMapper在反序列化时，忽略目标对象没有的属性。
-					 * 凡是使用该objectMapper反序列化时，都会拥有该特性
-					 * */
-					OBJECT_MAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-					
-					/*
-					 * 通过该方法对mapper对象进行设置
-					 * 所有序列化的对象都将按照规则进行序列化
-					 * Include.ALWAYS 默认
-					 * Include.NON_DEFAULT 属性为默认值的不序列化
-					 * Include.NON_EMPTY 属性为空（""）或者为NULL都不序列化
-					 * Include.NON_NULL 属性为NULL不序列化
-					 * */
-					OBJECT_MAPPER.setSerializationInclusion(incl);
-				}
-			}
+			/*
+			 * 通过该方法对mapper对象进行设置
+			 * 所有序列化的对象都将按照规则进行序列化
+			 * Include.ALWAYS 默认
+			 * Include.NON_DEFAULT 属性为默认值的不序列化
+			 * Include.NON_EMPTY 属性为空（""）或者为NULL都不序列化
+			 * Include.NON_NULL 属性为NULL不序列化
+			 * */
+			instance.setSerializationInclusion(incl);
+			return instance;
 		}
 		
-		return OBJECT_MAPPER;
+		static
+		{
+			/*
+			 * 配置该objectMapper在反序列化时，忽略目标对象没有的属性。
+			 * 凡是使用该objectMapper反序列化时，都会拥有该特性
+			 * */
+			instance.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		}
 	}
+	
+	private static ObjectMapper getInstanceForObjectMapper(final Include incl)
+	{ return ObjectMapperSingletonContainer.setSerializationInclusion(incl); }
 	
 	/**
 	 * 获取@Scope("session")的bean
+	 * @deprecated
 	 * */
-	@Deprecated
+	@Deprecated(since="获取@Scope(\"session\")的bean")
 	public static Object getBean(final boolean allowCreateSession, final String beanName)
 	{ return HttpUtil.getHttpSession(allowCreateSession).getAttribute(beanName); }
 	
@@ -219,42 +233,43 @@ public final class BeanUtilServiceImpl implements ApplicationContextAware
 	
 	/**
 	 * 注入@Scope("session")的bean
+	 * @deprecated
 	 * */
-	@Deprecated
-	public static void setBean(final boolean allowCreateSession, final String beanName, final Object beanInstance)
+	@Deprecated(since="注入@Scope(\"session\")的bean")
+	public static void setBean(final boolean allowCreateSession, final String beanName, final Serializable beanInstance)
 	{ HttpUtil.getHttpSession(allowCreateSession).setAttribute(beanName, beanInstance); }
 	
-	public static void setBean(final HttpServletRequest httpServletRequest, final boolean allowCreateSession, final String beanName, final Object beanInstance)
+	public static void setBean(final HttpServletRequest httpServletRequest, final boolean allowCreateSession, final String beanName, final Serializable beanInstance)
 	{ httpServletRequest.getSession(allowCreateSession).setAttribute(beanName, beanInstance); }
 	
-	public static <T> Optional<T> getBean(final Class<T> clazz)
+	public <T> Optional<T> getBean(final Class<T> clazz)
 	{
 		T result = null;
-		try { result = APPLICATION_CONTEXT.getBean(clazz); }
-		catch (Exception ex) { log.error("获取Bean异常，异常原因为：", ex); }
+		try { result = this.applicationContext.getBean(clazz); }
+		catch (Exception ex) { log.error(GET_BEAN_ERROR_DESC, ex); }
 		return Optional.ofNullable(result);
 	}
 	
-	public static <T> Optional<T> getBean(final String name, final Class<T> clazz)
+	public <T> Optional<T> getBean(final String name, final Class<T> clazz)
 	{
 		T result = null;
-		try { result = APPLICATION_CONTEXT.getBean(name, clazz); }
-		catch (Exception ex) { log.error("获取Bean异常，异常原因为：", ex); }
+		try { result = this.applicationContext.getBean(name, clazz); }
+		catch (Exception ex) { log.error(GET_BEAN_ERROR_DESC, ex); }
 		return Optional.ofNullable(result);
 	}
 	
-	public static Optional<Object> getBean(final String name)
+	public Optional<Object> getBean(final String name)
 	{
 		Object result = null;
-		try { result = APPLICATION_CONTEXT.getBean(name); }
-		catch (Exception ex) { log.error("获取Bean异常，异常原因为：", ex); }
+		try { result = this.applicationContext.getBean(name); }
+		catch (Exception ex) { log.error(GET_BEAN_ERROR_DESC, ex); }
 		return Optional.ofNullable(result);
 	}
 	
-	public static <T> void addBean(final Class<T> beanClazz, final String beanName)
+	public <T> void addBean(final Class<T> beanClazz, final String beanName)
 	{ addBean(beanClazz, beanName, null, null); }
 	
-	public static <T> void addBean(final Class<T> beanClazz, final String beanName, final String initMethodName, final String destroyMethodName)
+	public <T> void addBean(final Class<T> beanClazz, final String beanName, final String initMethodName, final String destroyMethodName)
 	{
 		try
 		{
@@ -268,14 +283,14 @@ public final class BeanUtilServiceImpl implements ApplicationContextAware
 			if (!StrUtil.isEmptyIfStr(destroyMethodName))
 			{ bean.setDestroyMethodName(destroyMethodName); }
 			
-			DefaultListableBeanFactory defaultListableBeanFactory = (DefaultListableBeanFactory) APPLICATION_CONTEXT.getAutowireCapableBeanFactory();
+			DefaultListableBeanFactory defaultListableBeanFactory = (DefaultListableBeanFactory) this.applicationContext.getAutowireCapableBeanFactory();
 			defaultListableBeanFactory.registerBeanDefinition(beanName, bean);
 			defaultListableBeanFactory.initializeBean(bean, beanName);
 		}
 		catch (Exception ex) { log.error("新增Bean异常，异常原因为：", ex); }
 	}
 	
-	public static <T> void addBean(final Class<T> beanClazz, final String beanName, final String initMethodName, final String destroyMethodName, final Map<String, Object> fieldInfo)
+	public <T> void addBean(final Class<T> beanClazz, final String beanName, final String initMethodName, final String destroyMethodName, final Map<String, Object> fieldInfo)
 	{
 		try
 		{
@@ -286,8 +301,7 @@ public final class BeanUtilServiceImpl implements ApplicationContextAware
 			CollUtil.forEach//JavaCollectionsUtil.mapProcessor
 			(
 					fieldInfo, 
-					(final String key, final Object value, final int indx) -> 
-					{ beanDefinitionBuilder.addPropertyValue(key, value); }
+					(final String key, final Object value, final int indx) -> beanDefinitionBuilder.addPropertyValue(key, value)
 			);
 			
 			if (!StrUtil.isEmptyIfStr(initMethodName))
@@ -297,16 +311,16 @@ public final class BeanUtilServiceImpl implements ApplicationContextAware
 			{ beanDefinitionBuilder.setDestroyMethodName(destroyMethodName); }
 			
 			//获取BeanFactory  
-			DefaultListableBeanFactory defaultListableBeanFactory = (DefaultListableBeanFactory) APPLICATION_CONTEXT.getAutowireCapableBeanFactory();
+			DefaultListableBeanFactory defaultListableBeanFactory = (DefaultListableBeanFactory) this.applicationContext.getAutowireCapableBeanFactory();
 			defaultListableBeanFactory.registerBeanDefinition(beanName, beanDefinitionBuilder.getBeanDefinition());
 		}
 		catch (Exception ex) { log.error("新增Bean异常，异常原因为：", ex); }
 	}
 	
-	public static void removeBean(final String beanName)
+	public void removeBean(final String beanName)
 	{
 		//获取BeanFactory  
-		DefaultListableBeanFactory defaultListableBeanFactory = (DefaultListableBeanFactory) APPLICATION_CONTEXT.getAutowireCapableBeanFactory();
+		DefaultListableBeanFactory defaultListableBeanFactory = (DefaultListableBeanFactory) this.applicationContext.getAutowireCapableBeanFactory();
 		//删除bean.  
 		defaultListableBeanFactory.removeBeanDefinition(beanName);
 	}
@@ -314,22 +328,22 @@ public final class BeanUtilServiceImpl implements ApplicationContextAware
 	/**
 	 * 显示所有Bean的基础信息
 	 * */
-	public static Map<String, Class<?>> showBeansBaseInfo(final boolean isPrintInfo)
+	public Map<String, Class<?>> showBeansBaseInfo(final boolean isPrintInfo)
 	{
-		Map<String, Class<?>> result = new HashMap<String, Class<?>>();
+		Map<String, Class<?>> result = new HashMap<>();
 		
 		if (isPrintInfo)
 		{ log.info("============================================显示已加载的BEAN----开始==============================================="); }
 		
-		String[] beans = APPLICATION_CONTEXT.getBeanDefinitionNames();
+		String[] beans = this.applicationContext.getBeanDefinitionNames();
 		CollUtil.newArrayList(beans).forEach
 		(
 				bean -> 
 				{
-					result.put(bean, APPLICATION_CONTEXT.getType(bean));
+					result.put(bean, this.applicationContext.getType(bean));
 					
 					if (isPrintInfo)
-					{ log.info("Bean名称为：{}，类型为：{}", bean, APPLICATION_CONTEXT.getType(bean)); }
+					{ log.info("Bean名称为：{}，类型为：{}", bean, this.applicationContext.getType(bean)); }
 				}
 		);
 		
@@ -339,8 +353,8 @@ public final class BeanUtilServiceImpl implements ApplicationContextAware
 		return result;
 	}
 	
-	public static int shutdownApplication()
-	{ return SpringApplication.exit(APPLICATION_CONTEXT); }
+	public int shutdownApplication()
+	{ return SpringApplication.exit(this.applicationContext); }
 	
 	/**用于在application.properties获取属性，
 	 * 
@@ -359,15 +373,15 @@ public final class BeanUtilServiceImpl implements ApplicationContextAware
 		FooProperties foo = binder.bind("com.didispace", Bindable.of(FooProperties.class)).get();
 	 * 
 	 * */
-	public static <T> T getProperties(final String propertiesKey, final Class<T> clazz)
-	{ return BINDER.bind(propertiesKey, Bindable.of(clazz)).get(); }
+	public <T> T getProperties(final String propertiesKey, final Class<T> clazz)
+	{ return this.binder.bind(propertiesKey, Bindable.of(clazz)).get(); }
 	
-	public static <K, V> Map<K, V> getProperties(final String propertiesKey, final Class<K> keyType, final Class<V> valueType)
-	{ return BINDER.bind(propertiesKey, Bindable.mapOf(keyType, valueType)).get(); }
+	public <K, V> Map<K, V> getProperties(final String propertiesKey, final Class<K> keyType, final Class<V> valueType)
+	{ return this.binder.bind(propertiesKey, Bindable.mapOf(keyType, valueType)).get(); }
 	
-	public static <T> List<T> getPropertiesList(final String propertiesKey, final Class<T> clazz)
-	{ return BINDER.bind(propertiesKey, Bindable.listOf(clazz)).get(); }
+	public <T> List<T> getPropertiesList(final String propertiesKey, final Class<T> clazz)
+	{ return this.binder.bind(propertiesKey, Bindable.listOf(clazz)).get(); }
 	
-	public static <T> Set<T> getPropertiesSet(final String propertiesKey, final Class<T> clazz)
-	{ return BINDER.bind(propertiesKey, Bindable.setOf(clazz)).get(); }
+	public <T> Set<T> getPropertiesSet(final String propertiesKey, final Class<T> clazz)
+	{ return this.binder.bind(propertiesKey, Bindable.setOf(clazz)).get(); }
 }

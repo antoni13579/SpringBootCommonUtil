@@ -80,7 +80,7 @@ public class KafkaConfig
 	
 	@Bean
 	public KafkaTransactionManager<String, byte[]> kafkaTransactionManager(@Qualifier("defaultKafkaProducerFactory")DefaultKafkaProducerFactory<String, byte[]> defaultKafkaProducerFactory)
-	{ return new KafkaTransactionManager<String, byte[]>(defaultKafkaProducerFactory); }
+	{ return new KafkaTransactionManager<>(defaultKafkaProducerFactory); }
 	
 	/**
 	 * 记录一下KafkaTemplate函数使用场景
@@ -90,7 +90,7 @@ public class KafkaConfig
 	 * */
 	@Bean
 	public KafkaTemplate<String, byte[]> kafkaTemplate(@Qualifier("defaultKafkaProducerFactory")DefaultKafkaProducerFactory<String, byte[]> defaultKafkaProducerFactory)
-	{ return new KafkaTemplate<String, byte[]>(defaultKafkaProducerFactory); }
+	{ return new KafkaTemplate<>(defaultKafkaProducerFactory); }
 	
 	@Bean
 	public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, byte[]>> kafkaListenerContainerFactory()

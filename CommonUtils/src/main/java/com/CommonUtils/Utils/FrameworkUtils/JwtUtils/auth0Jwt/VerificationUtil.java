@@ -22,7 +22,7 @@ public final class VerificationUtil
 	public JWTVerifier getJWTVerifier()
 	{ return this.verification.build(); }
 	
-	public VerificationUtil setTokenPayload(final Map<String, Object> customPayloadClaims) throws Exception
+	public VerificationUtil setTokenPayload(final Map<String, Object> customPayloadClaims) throws VerificationUtilException
 	{
 		Iterator<Entry<String, Object>> iter = customPayloadClaims.entrySet().iterator();
 		while (iter.hasNext())
@@ -56,7 +56,7 @@ public final class VerificationUtil
 			{ this.verification.withArrayClaim(name, Convert.toIntArray(value)); }
 			
 			else 
-			{ throw new Exception("设置jwt token自定义payload的数据类型不符合要求！！！异常的数据类型为：" + value.getClass()); }
+			{ throw new VerificationUtilException("设置jwt token自定义payload的数据类型不符合要求！！！异常的数据类型为：" + value.getClass()); }
 		}
 		
 		return this;
@@ -86,25 +86,25 @@ public final class VerificationUtil
 		return this;
     }
 
-	public VerificationUtil setTokenPayloadLeeway(long leeway) throws IllegalArgumentException
+	public VerificationUtil setTokenPayloadLeeway(long leeway)
     {
 		this.verification.acceptLeeway(leeway);
 		return this;
     }
 
-	public VerificationUtil setTokenPayloadExpiresAt(long leeway) throws IllegalArgumentException
+	public VerificationUtil setTokenPayloadExpiresAt(long leeway)
     {
 		this.verification.acceptExpiresAt(leeway);
 		return this;
     }
 
-	public VerificationUtil setTokenPayloadNotBefore(long leeway) throws IllegalArgumentException
+	public VerificationUtil setTokenPayloadNotBefore(long leeway)
     {
 		this.verification.acceptNotBefore(leeway);
 		return this;
     }
 
-	public VerificationUtil setTokenPayloadIssuedAt(long leeway) throws IllegalArgumentException
+	public VerificationUtil setTokenPayloadIssuedAt(long leeway)
     {
 		this.verification.acceptIssuedAt(leeway);
 		return this;
@@ -115,4 +115,12 @@ public final class VerificationUtil
 		this.verification.withJWTId(jwtId);
 		return this;
     }
+	
+	private static class VerificationUtilException extends Exception
+	{
+		private static final long serialVersionUID = -5456925487458024739L;
+
+		private VerificationUtilException(final String message)
+		{ super(message); }
+	}
 }

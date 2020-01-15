@@ -45,5 +45,6 @@ public final class SftpProgressMonitorImpl implements SftpProgressMonitor
 	}
 
 	@Override
-	public void end() {}
+	public void end() 
+	{ log.debug("{}结束", this.msg); }
 }

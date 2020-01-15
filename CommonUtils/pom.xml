@@ -27,7 +27,6 @@
 		
 		<pagehelper.version>5.1.4</pagehelper.version>
 		<opencsv.version>4.2</opencsv.version>
-		<tomcat.databasepool.version>6.0.36</tomcat.databasepool.version>
 		<poi.ooxml.version>3.17</poi.ooxml.version>
 		<kettle.version>7.1.0.0-12</kettle.version>
 		<jython.version>2.7.0</jython.version>
@@ -49,13 +48,10 @@
 		<ikanalyzer.version>2012_u6</ikanalyzer.version>
 		<swagger.version>2.9.2</swagger.version>
 		<guava.version>28.0-jre</guava.version>
-		<dingding.api.version>20190716</dingding.api.version>
-		<baidu.api.version>4.11.3</baidu.api.version>
 		<shiro.version>1.4.0</shiro.version>
 		<mybatisplus.version>3.2.0</mybatisplus.version>
 		<mybatisplus.dynamic-datasource.version>2.5.6</mybatisplus.dynamic-datasource.version>
 		<mybatisplus.code-generator.version>3.2.0</mybatisplus.code-generator.version>
-		<druid.version>1.1.21</druid.version>
 		<jwt.version>3.8.2</jwt.version>
 		<eclipse-collections.version>10.0.0</eclipse-collections.version>
 		<lucene-core.version>7.7.2</lucene-core.version>
@@ -226,10 +222,6 @@
     		<groupId>org.springframework.boot</groupId>    
     		<artifactId>spring-boot-starter-jta-atomikos</artifactId>    
 		</dependency>
-		<dependency>
-    		<groupId>org.springframework.boot</groupId>
-    		<artifactId>spring-boot-starter-jta-bitronix</artifactId>
-		</dependency>
 		
 		<!-- Spring Boot NoSQL模块 -->
 		<dependency>
@@ -373,14 +365,6 @@
     		<groupId>com.opencsv</groupId>
     		<artifactId>opencsv</artifactId>
     		<version>${opencsv.version}</version>
-		</dependency>
-		
-		<!-- Tomcat的数据库连接池，基于老版本 -->
-		<dependency>
-    		<groupId>org.apache.tomcat</groupId>
-    		<artifactId>dbcp</artifactId>
-    		<version>${tomcat.databasepool.version}</version>
-    		<scope>provided</scope>
 		</dependency>
 		
 		<!-- Excel组件 -->
@@ -550,24 +534,6 @@
     		<artifactId>lucene-core</artifactId>
    	 		<version>${lucene-core.version}</version>
 		</dependency>
-		 
-		<!-- 百度API接口 -->
-		<dependency>
-    		<groupId>com.baidu.aip</groupId>
-    		<artifactId>java-sdk</artifactId>
-    		<version>${baidu.api.version}</version>
-    		<exclusions>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-api</artifactId>
-				</exclusion>
-				
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-simple</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
 		
 		<!-- Shiro -->
 		<dependency>
@@ -595,13 +561,6 @@
     		<groupId>com.baomidou</groupId>
     		<artifactId>mybatis-plus-generator</artifactId>
     		<version>${mybatisplus.code-generator.version}</version>
-		</dependency>
-		
-		<!-- Druid数据库连接池 -->
-		<dependency>
-    		<groupId>com.alibaba</groupId>
-    		<artifactId>druid-spring-boot-starter</artifactId>
-    		<version>${druid.version}</version>
 		</dependency>
 		
 		<!--JWT-->

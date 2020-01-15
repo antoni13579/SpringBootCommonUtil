@@ -1,8 +1,10 @@
 package com.CommonUtils.Utils;
 
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
+@Setter
 public final class HashCodeAndEqualsExample 
 {
 	private String id;
@@ -21,11 +23,7 @@ public final class HashCodeAndEqualsExample
     	{ return true; }
     	
     	HashCodeAndEqualsExample hashCodeAndEqualsExample = (HashCodeAndEqualsExample)obj;
-    	if (this.name.equals(hashCodeAndEqualsExample.name) && 
-    		this.age.equals(hashCodeAndEqualsExample.age))
-    	{ return true; }
-    	else
-    	{ return false; }
+    	return this.name.equals(hashCodeAndEqualsExample.name) && this.age.equals(hashCodeAndEqualsExample.age);
     }
     
     @Override

@@ -58,6 +58,6 @@ public final class ReactiveRedisTemplateConfig
 				break;
 		}
 		
-		return new ReactiveRedisTemplate<String, Object>(reactiveRedisConnectionFactory, redisSerializationContextBuilder.build());
+		return new ReactiveRedisTemplate<>(reactiveRedisConnectionFactory, redisSerializationContextBuilder.build());
 	}
 }

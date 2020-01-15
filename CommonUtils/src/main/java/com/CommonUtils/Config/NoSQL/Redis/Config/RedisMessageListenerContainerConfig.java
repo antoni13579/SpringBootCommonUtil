@@ -23,7 +23,6 @@ public final class RedisMessageListenerContainerConfig
 	{
 		RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);
-        //container.addMessageListener(new MessageListenerAdapter(beanName, beanMethodName), new PatternTopic(topicName));
         container.setMessageListeners(listeners);
         
         if (useUniqueThread)

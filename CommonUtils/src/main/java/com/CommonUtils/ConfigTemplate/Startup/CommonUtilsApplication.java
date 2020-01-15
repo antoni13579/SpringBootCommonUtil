@@ -12,6 +12,7 @@ import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
 import org.springframework.boot.autoconfigure.mongo.MongoReactiveAutoConfiguration;
 import org.springframework.boot.autoconfigure.r2dbc.ConnectionFactoryAutoConfiguration;
 import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafAutoConfiguration;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.integration.annotation.IntegrationComponentScan;
@@ -19,8 +20,6 @@ import org.springframework.integration.config.EnableIntegration;
 
 import com.CommonUtils.ConfigTemplate.CommonService.ICommonService;
 import com.CommonUtils.Utils.DBUtils.RedisUtil;
-import com.CommonUtils.Utils.DynaticUtils.Services.Impls.BeanUtilServiceImpl;
-import com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure;
 import com.baomidou.dynamic.datasource.spring.boot.autoconfigure.DynamicDataSourceAutoConfiguration;
 
 import cn.hutool.core.convert.Convert;
@@ -35,8 +34,6 @@ import lombok.extern.slf4j.Slf4j;
 		{
 				DataSourceAutoConfiguration.class, 
 				XADataSourceAutoConfiguration.class,
-				
-				DruidDataSourceAutoConfigure.class,
 				
 				DynamicDataSourceAutoConfiguration.class,
 				
@@ -65,7 +62,7 @@ public class CommonUtilsApplication
          * java.lang.IllegalStateException: availableProcessors is already set to [4], rejecting [4]
          */
         System.setProperty("es.set.netty.runtime.available.processors", "false");
-		SpringApplication.run(CommonUtilsApplication.class, args);
+        ConfigurableApplicationContext ctx = SpringApplication.run(CommonUtilsApplication.class, args);
 		
 		/**
 		 * Java 语言提供一种 ShutdownHook（钩子）进制，当 JVM 接受到系统的关闭通知之后，调用 ShutdownHook 内的方法，用以完成清理操作，从而平滑的退出应用。
@@ -103,21 +100,19 @@ Copy
 
 为了避免 ShutdownHook 线程被长时间阻塞，我们可以引入超时进制。如果等待一定时间之后，ShutdownHook 还未完成，由脚本直接调用 kill -9 强制退出或者 ShutdownHook 代码中引入超时进制。
 		 * */
-		RuntimeUtil.addShutdownHook(() -> { log.info("关闭应用，释放资源"); });
+		RuntimeUtil.addShutdownHook(() -> log.info("关闭应用，释放资源"));
 		
-		ICommonService commonService = BeanUtilServiceImpl.getBean("commonService", ICommonService.class).get();
+		ICommonService commonService = ctx.getBean("commonService", ICommonService.class);
 		try 
 		{
 			commonService.localTransactionByAnnotationWithKafka();
 			commonService.localTransactionByAnnotation();
 			
-			RedisTemplate<String, Object> redisTemplate = Convert.convert(new TypeReference<RedisTemplate<String, Object>>() {}, BeanUtilServiceImpl.getBean("redisTemplate").get());
+			RedisTemplate<String, Object> redisTemplate = Convert.convert(new TypeReference<RedisTemplate<String, Object>>() {}, ctx.getBean("redisTemplate"));
 			log.info("测试注解形式的Redis事务，存放在Redis的值为{}", RedisUtil.getForValue(redisTemplate, "123"));
 		} 
 		catch (Exception e) 
-		{
-			e.printStackTrace();
-		}
+		{ log.error("测试异常，异常原因为：", e); }
 		
 		commonService.localTransactionForKafka();
 		commonService.localTransactionForRedis();

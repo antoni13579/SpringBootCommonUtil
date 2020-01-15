@@ -7,45 +7,40 @@ import java.io.ObjectOutputStream;
 import java.nio.ByteBuffer;
 
 import cn.hutool.core.convert.Convert;
-import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.lang.TypeReference;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * 用hutool的代替
+ * @deprecated
+ * */
 @Slf4j
-@Deprecated
+@Deprecated(since="用hutool的代替")
 public final class BytesUtil 
 {
 	private BytesUtil() {}
 	
 	/**建议使用cn.hutool.core.convert.Convert.toByte*/ 
-	public static <T> byte getByte(final T obj) throws Exception
+	public static <T> byte getByte(final T obj) throws BytesUtilException
 	{
 		if (obj instanceof Byte)
 		{ return Byte.parseByte(obj.toString()); }
 		else
-		{ throw new Exception("无法转换为byte类型"); }
+		{ throw new BytesUtilException("无法转换为byte类型"); }
 	}
 	
 	/**字节数组转换为对象，请使用cn.hutool.core.util.ObjectUtil.deserialize或unserialize*/
 	public static <T> T fromBytes(byte[] bytes)
 	{
 		T obj = null;
-        ByteArrayInputStream bis = null;
-        ObjectInputStream ois = null;
-        try 
-        {
-            bis = new ByteArrayInputStream (bytes);
-            ois = new ObjectInputStream (bis);
-            obj = Convert.convert(new TypeReference<T>() {}, ois.readObject());
-
-        } 
+        try
+        (
+        		ByteArrayInputStream bis = new ByteArrayInputStream (bytes);
+        		ObjectInputStream ois = new ObjectInputStream (bis);
+        )
+        { obj = Convert.convert(new TypeReference<T>() {}, ois.readObject()); } 
         catch (Exception ex) 
         { log.error("字节数组转换为对象出现异常，异常原因为：{}", ex); } 
-        finally 
-        {            
-        	IoUtil.close(ois);
-        	IoUtil.close(bis);
-        }
         
         return obj;
 	}
@@ -56,24 +51,18 @@ public final class BytesUtil
 	public static <T> byte[] toBytes(T obj)
 	{
 		byte[] bytes = null;
-		ByteArrayOutputStream bos = null;
-        ObjectOutputStream oos = null;
-        
-        try 
+        try
+        (
+        		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        		ObjectOutputStream oos = new ObjectOutputStream(bos);
+        )
         {
-        	bos = new ByteArrayOutputStream();
-            oos = new ObjectOutputStream(bos);
             oos.writeObject(obj);            
             oos.flush();
             bytes = bos.toByteArray();
         } 
         catch (Exception ex) 
         { log.error("对象转换为字节数组出现异常，异常原因为：{}", ex); }
-        finally 
-        {            
-        	IoUtil.close(oos);
-        	IoUtil.close(bos);
-        }
 		
 		return bytes;
 	}
@@ -125,5 +114,13 @@ public final class BytesUtil
         }
 
         return new String(buf);
+	}
+	
+	private static class BytesUtilException extends Exception
+	{
+		private static final long serialVersionUID = 1394221463995628911L;
+
+		private BytesUtilException(final String message)
+		{ super(message); }
 	}
 }

@@ -1,14 +1,17 @@
 # database name
 spring.redis.database=0
 
-# server host1
+# server host1（集群不需要配置这个）
 spring.redis.host=127.0.0.1
 
 # server password
 #spring.redis.password= 
 
-#connection port
+#connection port（集群不需要配置这个）
 spring.redis.port=6379
+
+spring.redis.cluster.nodes=10.133.210.105:6379,10.133.210.105:6380
+spring.redis.cluster.max-redirects=3
 
 # pool settings ...
 spring.redis.jedis.pool.max-idle=8

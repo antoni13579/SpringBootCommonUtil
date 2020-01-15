@@ -5,6 +5,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -29,7 +30,10 @@ public final class RedisUtil
 	public static <K, V> boolean setExpireForValue(final RedisOperations<K, V> redisOperations, final RedisEntry<K, V> redisEntry, final long timeout, final TimeUnit unit)
 	{
 		try
-		{ return redisOperations.expire(redisEntry.getKey(), timeout, unit); }
+		{
+			Boolean result = redisOperations.expire(redisEntry.getKey(), timeout, unit);
+			return Optional.ofNullable(result).orElse(false);
+		}
 		catch (Exception ex)
 		{
 			log.error("通过RedisTemplate设置超时时间出现异常，异常原因为：", ex);
@@ -201,17 +205,21 @@ public final class RedisUtil
 		{ return Mono.just(false); }
 	}
 	
-	@Deprecated
+	/**
+	 * 已过时，因不使用ReactiveRedisConnection
+	 * @deprecated
+	 * */
+	@Deprecated(since="已过时，因不使用ReactiveRedisConnection")
 	public static <K, V> boolean setForValue(final ReactiveRedisConnection reactiveRedisConnection, final RedisEntry<K, V> redisEntry)
 	{
 		boolean result = false;
 		
 		try
 		{
-			result = reactiveRedisConnection.stringCommands()
-											.set(ByteBuffer.wrap(ObjectUtil.serialize(redisEntry.getKey())), 
-												 ByteBuffer.wrap(ObjectUtil.serialize(redisEntry.getValue())))
-											.block();
+			Boolean tmp = reactiveRedisConnection.stringCommands()
+												 .set(ByteBuffer.wrap(ObjectUtil.serialize(redisEntry.getKey())), ByteBuffer.wrap(ObjectUtil.serialize(redisEntry.getValue())))
+												 .block();
+			result = Optional.ofNullable(tmp).orElse(false);
 		}
 		catch (Exception ex)
 		{ log.error("通过ReactiveRedisConnection设置值出现异常，异常原因为：", ex); }
@@ -219,11 +227,15 @@ public final class RedisUtil
 		return result;
 	}
 	
-	@Deprecated
+	/**
+	 * 已过时，因不使用ReactiveRedisConnection
+	 * @deprecated
+	 * */
+	@Deprecated(since="已过时，因不使用ReactiveRedisConnection")
 	@SafeVarargs
 	public static <K, V> boolean setForValues(final ReactiveRedisConnection reactiveRedisConnection, final RedisEntry<K, V> ... redisEntrys)
 	{
-		Set<Boolean> result = new HashSet<Boolean>();
+		Set<Boolean> result = new HashSet<>();
 		if (!ArrayUtil.isEmpty(redisEntrys))
 		{
 			for (RedisEntry<K, V> redisEntry : redisEntrys)
@@ -295,7 +307,11 @@ public final class RedisUtil
 		return result;
 	}
 	
-	@Deprecated
+	/**
+	 * 已过时，因不使用ReactiveRedisConnection
+	 * @deprecated
+	 * */
+	@Deprecated(since="已过时，因不使用ReactiveRedisConnection")
 	public static <K, V> V getForValue(final ReactiveRedisConnection reactiveRedisConnection, final K key)
 	{
 		V result = null;
@@ -305,7 +321,7 @@ public final class RedisUtil
 			ByteBuffer byteBuffer = reactiveRedisConnection.stringCommands()
 					   									   .get(ByteBuffer.wrap(ObjectUtil.serialize(key)))
 					   									   .block();
-			result = ObjectUtil.deserialize(byteBuffer.array());
+			result = ObjectUtil.deserialize(Optional.ofNullable(byteBuffer).orElseThrow().array());
 		}
 		catch (Exception ex)
 		{ log.error("通过ReactiveRedisConnection获取值出现异常，异常原因为：", ex); }
@@ -313,7 +329,11 @@ public final class RedisUtil
 		return result;
 	}
 	
-	@Deprecated
+	/**
+	 * 已过时，因不使用ReactiveRedisConnection
+	 * @deprecated
+	 * */
+	@Deprecated(since="已过时，因不使用ReactiveRedisConnection")
 	@SafeVarargs
 	public static <K, V> Collection<V> getForValues(final ReactiveRedisConnection reactiveRedisConnection, final K ... keys)
 	{
@@ -332,7 +352,10 @@ public final class RedisUtil
 		long result = 0;
 		
 		try
-		{ result = redisOperations.delete(CollUtil.newArrayList(keys)); }
+		{
+			Long tmp = redisOperations.delete(CollUtil.newArrayList(keys));
+			result = Optional.ofNullable(tmp).orElse(0L);
+		}
 		catch (Exception ex)
 		{ log.error("通过RedisTemplate删除信息出现异常，异常原因为：", ex); }
 		

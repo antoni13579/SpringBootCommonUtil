@@ -6,8 +6,12 @@ import cn.hutool.core.util.ArrayUtil;
 
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * 用hutool代替
+ * @deprecated
+ * */
 @Slf4j
-@Deprecated
+@Deprecated(since="用hutool代替")
 public final class CharacterUtil 
 {
 	private CharacterUtil() {}
@@ -19,7 +23,7 @@ public final class CharacterUtil
 		
 		try
 		{
-			String tmp = str.substring(str.indexOf("x", 0) + 1, str.length());
+			String tmp = str.substring(str.indexOf('x', 0) + 1, str.length());
 			result = (char)Integer.parseInt(tmp, radix);
 		}
 		catch (Exception ex)
@@ -43,11 +47,19 @@ public final class CharacterUtil
 	}
 	
 	/**建议使用cn.hutool.core.convert.Convert.toChar*/ 
-	public static char getChar(final Object obj) throws Exception
+	public static char getChar(final Object obj) throws CharacterUtilException
 	{
 		if (obj instanceof Character)
 		{ return (char)obj; }
 		else
-		{ throw new Exception("无法转换为char类型"); }
+		{ throw new CharacterUtilException("无法转换为char类型"); }
+	}
+	
+	private static class CharacterUtilException extends Exception
+	{
+		private static final long serialVersionUID = -4115460077798060091L;
+		
+		private CharacterUtilException(final String message)
+		{ super(message); }
 	}
 }

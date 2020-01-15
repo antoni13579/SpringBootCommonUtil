@@ -9,6 +9,8 @@ public class MyBatisSqlLogBaseImpl implements Log
 {
 	public MyBatisSqlLogBaseImpl(String clazz) {}
 	
+	private static final String MY_BATIS_DEFAULT_DESC = "MyBatis相关信息为：{}";
+	
 	@Override
 	public boolean isDebugEnabled() 
 	{ return true; }
@@ -23,18 +25,18 @@ public class MyBatisSqlLogBaseImpl implements Log
 
 	@Override
 	public void error(String s) 
-	{ log.error("MyBatis相关信息为：{}", s); }
+	{ log.error(MY_BATIS_DEFAULT_DESC, s); }
 
 	@Override
 	public void debug(String s) 
-	{ log.info("MyBatis相关信息为：{}", s); }
+	{ log.info(MY_BATIS_DEFAULT_DESC, s); }
 
 	//这里的话，如果需要，就把trace改为info输出，就可以输出SQL执行后的结果
 	@Override
 	public void trace(String s) 
-	{ log.trace("MyBatis相关信息为：{}", s); }
+	{ log.trace(MY_BATIS_DEFAULT_DESC, s); }
 
 	@Override
 	public void warn(String s) 
-	{ log.warn("MyBatis相关信息为：{}", s); }
+	{ log.warn(MY_BATIS_DEFAULT_DESC, s); }
 }

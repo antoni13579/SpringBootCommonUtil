@@ -12,14 +12,16 @@ import org.apache.zookeeper.data.Stat;
 
 import lombok.extern.slf4j.Slf4j;
 
-/**Spring Boot没有提供一个统一的访问zk工具，相对来说zk客户端很多，建议由使用方自己实现zk的分布式工具*/
-@Deprecated
+/**Spring Boot没有提供一个统一的访问zk工具，相对来说zk客户端很多，建议由使用方自己实现zk的分布式工具
+ * @deprecated
+ * */
+@Deprecated(since="Spring Boot没有提供一个统一的访问zk工具，相对来说zk客户端很多，建议由使用方自己实现zk的分布式工具")
 @Slf4j
 public final class DistributedLockZookeeper 
 {
 	private DistributedLockZookeeper() {}
 	
-	public synchronized static boolean lock(final ZooKeeper zooKeeperClient, final String path)
+	public static synchronized boolean lock(final ZooKeeper zooKeeperClient, final String path)
 	{
 		try
 		{
@@ -42,7 +44,7 @@ public final class DistributedLockZookeeper
 		}
 	}
 	
-	public synchronized static void unlock(final ZooKeeper zooKeeperClient, final String path)
+	public static synchronized void unlock(final ZooKeeper zooKeeperClient, final String path)
 	{
 		try
 		{

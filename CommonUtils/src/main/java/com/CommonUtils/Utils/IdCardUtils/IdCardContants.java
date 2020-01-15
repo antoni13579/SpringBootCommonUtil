@@ -1,11 +1,12 @@
 package com.CommonUtils.Utils.IdCardUtils;
 
+import java.util.HashMap;
 import java.util.Map;
 
-import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.CustomCollections.HashMap;
-
-/**已废弃，请使用cn.hutool.core.util.IdcardUtil*/
-@Deprecated
+/**已废弃，请使用cn.hutool.core.util.IdcardUtil
+ * @deprecated
+ * */
+@Deprecated(since="已废弃，请使用cn.hutool.core.util.IdcardUtil")
 public final class IdCardContants 
 {
 	private IdCardContants() {}
@@ -17,15 +18,46 @@ public final class IdCardContants
 	public static final int CHINA_ID_MAX_LENGTH = 18;
 	
 	/** 每位加权因子 */
-	public static final int POWER[] = { 7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2 };
+	protected static final int[] POWER = { 7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2 };
 	
-	public static Map<Integer, String> CITY_CODES = new HashMap<Integer, String>()
-			.put(11, "北京").put(12, "天津").put(13, "河北").put(14, "山西").put(15, "内蒙古")
-			.put(21, "辽宁").put(22, "吉林").put(23, "黑龙江").put(31, "上海").put(32, "江苏")
-			.put(33, "浙江").put(34, "安徽").put(35, "福建").put(36, "江西").put(37, "山东")
-			.put(41, "河南").put(42, "湖北").put(43, "湖南").put(44, "广东").put(45, "广西")
-			.put(46, "海南").put(50, "重庆").put(51, "四川").put(52, "贵州").put(53, "云南")
-			.put(54, "西藏").put(61, "陕西").put(62, "甘肃").put(63, "青海").put(64, "宁夏")
-			.put(65, "新疆").put(71, "台湾").put(81, "香港").put(82, "澳门").put(91, "国外")
-			.getMap();
+	protected static final Map<Integer, String> CITY_CODES = new HashMap<>();
+	
+	static
+	{
+		CITY_CODES.put(11, "北京");
+		CITY_CODES.put(12, "天津");
+		CITY_CODES.put(13, "河北");
+		CITY_CODES.put(14, "山西");
+		CITY_CODES.put(15, "内蒙古");
+		CITY_CODES.put(21, "辽宁");
+		CITY_CODES.put(22, "吉林");
+		CITY_CODES.put(23, "黑龙江");
+		CITY_CODES.put(31, "上海");
+		CITY_CODES.put(32, "江苏");
+		CITY_CODES.put(33, "浙江");
+		CITY_CODES.put(34, "安徽");
+		CITY_CODES.put(35, "福建");
+		CITY_CODES.put(36, "江西");
+		CITY_CODES.put(37, "山东");
+		CITY_CODES.put(41, "河南");
+		CITY_CODES.put(42, "湖北");
+		CITY_CODES.put(43, "湖南");
+		CITY_CODES.put(44, "广东");
+		CITY_CODES.put(45, "广西");
+		CITY_CODES.put(46, "海南");
+		CITY_CODES.put(50, "重庆");
+		CITY_CODES.put(51, "四川");
+		CITY_CODES.put(52, "贵州");
+		CITY_CODES.put(53, "云南");
+		CITY_CODES.put(54, "西藏");
+		CITY_CODES.put(61, "陕西");
+		CITY_CODES.put(62, "甘肃");
+		CITY_CODES.put(63, "青海");
+		CITY_CODES.put(64, "宁夏");
+		CITY_CODES.put(65, "新疆");
+		CITY_CODES.put(71, "台湾");
+		CITY_CODES.put(81, "香港");
+		CITY_CODES.put(82, "澳门");
+		CITY_CODES.put(91, "国外");
+	}
 }

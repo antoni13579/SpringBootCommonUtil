@@ -9,7 +9,6 @@ import java.util.List;
 import javax.annotation.Resource;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -41,7 +40,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.servlet.AsyncHandlerInterceptor;
 import org.springframework.web.servlet.DispatcherServlet;
-import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.config.annotation.AsyncSupportConfigurer;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -97,7 +95,7 @@ public class WebConfiguration implements WebMvcConfigurer, WebApplicationInitial
 	@Bean
 	public FilterRegistrationBean<ShowRequestUrlFilter> showRequestUrlFilter()
 	{
-		FilterRegistrationBean<ShowRequestUrlFilter> registration = new FilterRegistrationBean<ShowRequestUrlFilter>();
+		FilterRegistrationBean<ShowRequestUrlFilter> registration = new FilterRegistrationBean<>();
 		registration.setFilter(new ShowRequestUrlFilter());
 		registration.addUrlPatterns("/*");
         registration.addInitParameter("paramName", "paramValue");
@@ -109,7 +107,7 @@ public class WebConfiguration implements WebMvcConfigurer, WebApplicationInitial
 	@Bean
 	public FilterRegistrationBean<SessionFilter> sessionFilter()
 	{
-		FilterRegistrationBean<SessionFilter> registration = new FilterRegistrationBean<SessionFilter>();
+		FilterRegistrationBean<SessionFilter> registration = new FilterRegistrationBean<>();
 		registration.setFilter(new SessionFilter());
 		registration.addUrlPatterns("/*");
         registration.addInitParameter("paramName", "paramValue");
@@ -181,7 +179,7 @@ public class WebConfiguration implements WebMvcConfigurer, WebApplicationInitial
 	public void addFormatters(FormatterRegistry registry)
 	{
 		//加入字符串自动转换为时间的功能，主要是表单提交了时间，后台用bean接收，如果没有这个转换，会报异常		
-		registry.addConverter(String.class, Date.class, (String source) -> { return DateUtil.parse(source, DatePattern.NORM_DATETIME_PATTERN); });
+		registry.addConverter(String.class, Date.class, source -> DateUtil.parse(source, DatePattern.NORM_DATETIME_PATTERN));
 	}
 	
 	@Override
@@ -265,12 +263,6 @@ public class WebConfiguration implements WebMvcConfigurer, WebApplicationInitial
 			else
 			{ throw new ServletException("request请求并不是HttpServletRequest，请排查原因"); }
 		}
-		
-		@Override
-		public void init(FilterConfig filterConfig) throws ServletException {}
-		
-		@Override
-		public void destroy() {}
 	}
 	
 	/**
@@ -298,12 +290,6 @@ public class WebConfiguration implements WebMvcConfigurer, WebApplicationInitial
 	        }
 	        chain.doFilter(req, res);
 		}
-		
-		@Override
-		public void init(FilterConfig filterConfig) throws ServletException {}
-		
-		@Override
-		public void destroy() {}
 	}
 	
 	public final class ShowRequestUrlInterceptor implements AsyncHandlerInterceptor
@@ -317,14 +303,5 @@ public class WebConfiguration implements WebMvcConfigurer, WebApplicationInitial
 			log.info("这里是Interceptor拦截下来的请求，请求的URL地址为 : {}", request.getRequestURI());
 			return true;
 		}
-		
-		@Override
-		public void postHandle(final HttpServletRequest request, final HttpServletResponse response, final Object handler, final ModelAndView modelAndView) throws Exception {}
-		
-		@Override
-		public void afterCompletion(final HttpServletRequest request, final HttpServletResponse response, final Object handler, final Exception ex) throws Exception {}
-		
-		@Override
-		public void afterConcurrentHandlingStarted(final HttpServletRequest request, final HttpServletResponse response,final Object handler) throws Exception {}
 	}
 }

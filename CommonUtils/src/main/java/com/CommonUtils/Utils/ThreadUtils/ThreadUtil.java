@@ -30,8 +30,12 @@ public final class ThreadUtil
 {
 	private ThreadUtil() {}
 	
-	/**建议使用cn.hutool.core.thread.ThreadUtil.execAsync*/ 
-	@Deprecated
+	private static final String COMPLETABLE_FUTURE_ERROR_DESC = "使用CompletableFuture出现异常，异常原因为：";
+	
+	/**建议使用cn.hutool.core.thread.ThreadUtil.execAsync
+	 * @deprecated
+	 * */ 
+	@Deprecated(since="建议使用cn.hutool.core.thread.ThreadUtil.execAsync")
 	public static void submit(final ThreadPoolTaskExecutor threadPool, final Collection<Future<?>> futures, final Runnable ... tasks)
 	{
 		if (!ArrayUtil.isEmpty(tasks) && (null != futures) && (null != threadPool))
@@ -41,9 +45,11 @@ public final class ThreadUtil
 		}
 	}
 	
+	/**建议使用cn.hutool.core.thread.ThreadUtil.execAsync
+	 * @deprecated
+	 * */ 
+	@Deprecated(since="建议使用cn.hutool.core.thread.ThreadUtil.execAsync")
 	@SafeVarargs
-	/**建议使用cn.hutool.core.thread.ThreadUtil.execAsync*/ 
-	@Deprecated
 	public static <T> void submit(final ThreadPoolTaskExecutor threadPool, final Collection<Future<T>> futures, final Callable<T> ... tasks)
 	{
 		if (!ArrayUtil.isEmpty(tasks) && (null != futures) && (null != threadPool))
@@ -53,11 +59,13 @@ public final class ThreadUtil
 		}
 	}
 	
-	/**建议使用cn.hutool.core.thread.ThreadUtil.execAsync*/ 
-	@Deprecated
+	/**建议使用cn.hutool.core.thread.ThreadUtil.execAsync
+	 * @deprecated
+	 * */ 
+	@Deprecated(since="建议使用cn.hutool.core.thread.ThreadUtil.execAsync")
 	public static List<Future<?>> submit(final ThreadPoolTaskExecutor threadPool, final Runnable ... tasks)
 	{
-		List<Future<?>> result = new ArrayList<Future<?>>();
+		List<Future<?>> result = new ArrayList<>();
 		if (!ArrayUtil.isEmpty(tasks))
 		{
 			for (Runnable task : tasks)
@@ -66,12 +74,14 @@ public final class ThreadUtil
 		return result;
 	}
 	
+	/**建议使用cn.hutool.core.thread.ThreadUtil.execAsync
+	 * @deprecated
+	 * */ 
+	@Deprecated(since="建议使用cn.hutool.core.thread.ThreadUtil.execAsync")
 	@SafeVarargs
-	/**建议使用cn.hutool.core.thread.ThreadUtil.execAsync*/ 
-	@Deprecated
 	public static <T> List<Future<T>> submit(final ThreadPoolTaskExecutor threadPool, final Callable<T> ... tasks)
 	{
-		List<Future<T>> result = new ArrayList<Future<T>>();
+		List<Future<T>> result = new ArrayList<>();
 		if (!ArrayUtil.isEmpty(tasks))
 		{
 			for (Callable<T> task : tasks)
@@ -106,8 +116,10 @@ public final class ThreadUtil
 		}
 	}
 	
-	/**建议使用cn.hutool.core.thread.ThreadUtil.sleep相关函数*/ 
-	@Deprecated
+	/**建议使用cn.hutool.core.thread.ThreadUtil.sleep相关函数
+	 * @deprecated
+	 * */ 
+	@Deprecated(since="建议使用cn.hutool.core.thread.ThreadUtil.sleep相关函数")
 	public static void sleep(final long millis)
 	{
 		try
@@ -206,7 +218,7 @@ public final class ThreadUtil
 		}
 		catch (Exception ex)
 		{
-			log.error("使用CompletableFuture出现异常，异常原因为：", ex);
+			log.error(COMPLETABLE_FUTURE_ERROR_DESC, ex);
 			result = false;
 		}
 		return result;
@@ -222,7 +234,7 @@ public final class ThreadUtil
 		}
 		catch (Exception ex)
 		{
-			log.error("使用CompletableFuture出现异常，异常原因为：", ex);
+			log.error(COMPLETABLE_FUTURE_ERROR_DESC, ex);
 			result = false;
 		}
 		return result;
@@ -235,7 +247,7 @@ public final class ThreadUtil
 		{ result = CompletableFuture.anyOf(futures.toArray(new CompletableFuture[futures.size()])).get(); }
 		catch (Exception ex)
 		{
-			log.error("使用CompletableFuture出现异常，异常原因为：", ex);
+			log.error(COMPLETABLE_FUTURE_ERROR_DESC, ex);
 			result = null;
 		}
 		return Optional.ofNullable(result);
@@ -248,7 +260,7 @@ public final class ThreadUtil
 		{ result = CompletableFuture.anyOf(futures.toArray(new CompletableFuture[futures.size()])).get(timeout, unit); }
 		catch (Exception ex)
 		{
-			log.error("使用CompletableFuture出现异常，异常原因为：", ex);
+			log.error(COMPLETABLE_FUTURE_ERROR_DESC, ex);
 			result = null;
 		}
 		return Optional.ofNullable(result);

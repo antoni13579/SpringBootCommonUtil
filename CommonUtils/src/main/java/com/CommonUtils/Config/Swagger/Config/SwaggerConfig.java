@@ -29,6 +29,7 @@ import springfox.documentation.spring.web.plugins.Docket;
  * */
 public final class SwaggerConfig 
 {
+	private SwaggerConfig() {}
 	/**
 	 * 如果不清楚，DocumentationType就用默认值DocumentationType.SWAGGER_2
 	 * */

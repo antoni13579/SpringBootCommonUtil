@@ -12,9 +12,11 @@ import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 
-/**已废弃，请使用cn.hutool.core.util.IdcardUtil*/
+/**已废弃，请使用cn.hutool.core.util.IdcardUtil
+ * @deprecated
+ * */
+@Deprecated(since="已废弃，请使用cn.hutool.core.util.IdcardUtil")
 @Slf4j
-@Deprecated
 public final class IdCardUtil 
 {
 	private IdCardUtil() {}
@@ -135,6 +137,9 @@ public final class IdCardUtil
 				break;
 			case 0:
 				sCode = "1";
+				break;
+			default:
+				sCode = "-9999";
 				break;
 		}
 		return sCode;

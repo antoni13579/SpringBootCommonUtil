@@ -9,8 +9,12 @@ import com.CommonUtils.Utils.IOUtils.IOUtil;
 
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * 已过期
+ * @deprecated
+ * */
 @Slf4j
-@Deprecated
+@Deprecated(since="已过期")
 public final class CommonUtil 
 {
 	private CommonUtil() {}
@@ -41,15 +45,14 @@ public final class CommonUtil
 	{
 		T dest = null;
 		
-		ByteArrayOutputStream baos = null;
-		ObjectOutputStream oos = null;
-		
 		ByteArrayInputStream bais = null;
 		ObjectInputStream ois = null;
 		try
+		(
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				ObjectOutputStream oos = new ObjectOutputStream(baos);
+		)
 		{
-			baos = new ByteArrayOutputStream();
-			oos = new ObjectOutputStream(baos);
 			oos.writeObject(src);
 			bais = new ByteArrayInputStream(baos.toByteArray());
 			ois = new ObjectInputStream(bais);
@@ -58,7 +61,7 @@ public final class CommonUtil
 		catch (Exception ex)
 		{ log.error("深度拷贝异常，异常原因为：", ex); }
 		finally
-		{ IOUtil.closeQuietly(ois, oos, bais, baos); }
+		{ IOUtil.closeQuietly(ois, bais); }
 		return dest;
 	}
 }

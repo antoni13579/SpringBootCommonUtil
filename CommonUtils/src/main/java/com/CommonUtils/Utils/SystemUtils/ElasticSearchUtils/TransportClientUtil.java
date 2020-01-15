@@ -30,11 +30,11 @@ public final class TransportClientUtil
 	
 	/**创建索引*/
 	public static boolean createIndex(final TransportClient client, final String index) 
-	{ return isIndexExist(client, index) ? false : client.admin().indices().prepareCreate(index).execute().actionGet().isAcknowledged(); }
+	{ return client.admin().indices().prepareCreate(index).execute().actionGet().isAcknowledged(); }
 	
 	/**删除索引*/
 	public static boolean deleteIndex(final TransportClient client, final String index) 
-	{ return isIndexExist(client, index) ? client.admin().indices().prepareDelete(index).execute().actionGet().isAcknowledged() : false; }
+	{ return client.admin().indices().prepareDelete(index).execute().actionGet().isAcknowledged(); }
 	
 	/**判断索引是否存在, true为存在，false为不存在*/
     public static boolean isIndexExist(final TransportClient client, final String index) 
@@ -42,7 +42,7 @@ public final class TransportClientUtil
     
     /**判断inde下指定type是否存在*/
     public static boolean isTypeExist(final TransportClient client, final String index, final String type) 
-    { return isIndexExist(client, index) ? client.admin().indices().prepareTypesExists(index).setTypes(type).execute().actionGet().isExists() : false; }
+    { return client.admin().indices().prepareTypesExists(index).setTypes(type).execute().actionGet().isExists(); }
     
     /**
      * 数据添加，正定ID
@@ -60,7 +60,6 @@ public final class TransportClientUtil
     							 final String id) 
     {
         IndexResponse response = client.prepareIndex(index, type, id).setSource(jsonObject).get();
-        //LOGGER.info("addData response status:{},id:{}", response.status().getStatus(), response.getId());
         return response.getId();
     }
     
@@ -89,10 +88,7 @@ public final class TransportClientUtil
     								  final String index, 
     								  final String type, 
     								  final String id) 
-    {
-        client.prepareDelete(index, type, id).execute().actionGet();
-        //LOGGER.info("deleteDataById response status:{},id:{}", response.status().getStatus(), response.getId());
-    }
+    { client.prepareDelete(index, type, id).execute().actionGet(); }
     
     /**
      * 通过ID 更新数据
@@ -159,8 +155,6 @@ public final class TransportClientUtil
     {
         SearchRequestBuilder searchRequestBuilder = client.prepareSearch(index)
         												  .setSearchType(SearchType.QUERY_THEN_FETCH)
-        												  
-        												  //searchRequestBuilder.setQuery(QueryBuilders.matchAllQuery());
         												  .setQuery(query)
         												  
         												  //分页应用
@@ -191,15 +185,8 @@ public final class TransportClientUtil
             searchRequestBuilder.highlighter(new HighlightBuilder().field(highlightField));
         }
 
-        //打印的内容 可以在 Elasticsearch head 和 Kibana  上执行查询
-        //LOGGER.info("\n{}", searchRequestBuilder);
-
         // 执行搜索,返回搜索响应信息
         SearchResponse searchResponse = searchRequestBuilder.execute().actionGet();
-
-        //long length = searchResponse.getHits().getHits().length;
-
-        //LOGGER.debug("共查询到[{}]条数据,处理数据条数[{}]", totalHits, length);
 
         ElasticSearchPage result = null;
         if (searchResponse.status().getStatus() == 200) 
@@ -252,15 +239,7 @@ public final class TransportClientUtil
         if (size > 0) 
         { searchRequestBuilder.setSize(size); }
 
-        //打印的内容 可以在 Elasticsearch head 和 Kibana  上执行查询
-        //LOGGER.info("\n{}", searchRequestBuilder);
-
         SearchResponse searchResponse = searchRequestBuilder.execute().actionGet();
-
-        //long totalHits = searchResponse.getHits().totalHits;
-        //long length = searchResponse.getHits().getHits().length;
-
-        //LOGGER.info("共查询到[{}]条数据,处理数据条数[{}]", totalHits, length);
 
         if (searchResponse.status().getStatus() == 200) 
         {
@@ -281,7 +260,7 @@ public final class TransportClientUtil
     private static List<Map<String, Object>> setSearchResponse(final SearchResponse searchResponse, final String highlightField) 
     {
         List<Map<String, Object>> sourceList = new ArrayList<>();
-        StringBuffer stringBuffer = new StringBuffer();
+        StringBuilder stringBuilder = new StringBuilder();
 
         for (SearchHit searchHit : searchResponse.getHits().getHits()) 
         {
@@ -289,16 +268,15 @@ public final class TransportClientUtil
 
             if (!StrUtil.isEmpty(highlightField)) 
             {
-                //System.out.println("遍历 高亮结果集，覆盖 正常结果集" + searchHit.getSourceAsMap());
                 Text[] text = searchHit.getHighlightFields().get(highlightField).getFragments();
 
                 if (text != null) 
                 {
                     for (Text str : text) 
-                    { stringBuffer.append(str.string()); }
+                    { stringBuilder.append(str.string()); }
                     
 					//遍历 高亮结果集，覆盖 正常结果集
-                    searchHit.getSourceAsMap().put(highlightField, stringBuffer.toString());
+                    searchHit.getSourceAsMap().put(highlightField, stringBuilder.toString());
                 }
             }
             

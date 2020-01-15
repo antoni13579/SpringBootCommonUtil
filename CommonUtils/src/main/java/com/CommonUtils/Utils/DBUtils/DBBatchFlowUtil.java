@@ -18,9 +18,11 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -29,6 +31,7 @@ import javax.transaction.HeuristicRollbackException;
 import javax.transaction.NotSupportedException;
 import javax.transaction.RollbackException;
 import javax.transaction.SystemException;
+import javax.transaction.UserTransaction;
 
 import org.springframework.batch.core.ItemProcessListener;
 import org.springframework.batch.core.ItemReadListener;
@@ -42,7 +45,6 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemStreamWriter;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider;
@@ -63,14 +65,12 @@ import org.springframework.transaction.jta.JtaTransactionManager;
 import com.CommonUtils.Config.IO.SpringBatch.Config.Core.JobLauncherConfig;
 import com.CommonUtils.Config.IO.SpringBatch.Config.Core.JobRepositoryConfig;
 import com.CommonUtils.Config.ThreadPool.Config.ThreadPoolTaskExecutorConfig;
-import com.CommonUtils.Utils.DBUtils.DBHandleUtil;
 import com.CommonUtils.Utils.DBUtils.DBHandleUtil.PreparedStatementOperationType;
 import com.CommonUtils.Utils.DBUtils.Bean.DBBaseInfo.AbstractDBInfo;
 import com.CommonUtils.Utils.DBUtils.Bean.DBBaseInfo.DBInfo;
 import com.CommonUtils.Utils.DBUtils.Bean.DBBaseInfo.DBInfoForDataSource;
 
 import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
-import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.CustomCollections.HashSet;
 import com.CommonUtils.Utils.DynaticUtils.Services.Impls.BeanUtilServiceImpl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -105,6 +105,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public final class DBBatchFlowUtil
 {
+	private DBBatchFlowUtil() {}
+	
+	private static final String CSV_TEXT_FILE_TO_DB_ERROR_DESC = "读取文件文件数据后，对其进去入库出现异常，异常原因为：";
+	private static final String DB_TO_OTHERS_ERROR_DESC = "批量数据流处理执行失败，异常原因为：";
+	private static final String ABSTRACT_DB_INFO_TYPE_ERROR_DESC = "出现了新的AbstractDBInfo继承子类，请及时处理";
+	
 	/**读取数据库数据，经过处理后，写入到文件
 	 * 
 	 * dateFomat参数建议使用cn.hutool.core.date.DatePattern来提供日期格式
@@ -119,32 +125,26 @@ public final class DBBatchFlowUtil
 								 	   final int fetchSize,
 								 	   final Replacer<Map<String, Object>> ... itemProcessors)
 	{
-		Connection sourceConnection = null;
-		PreparedStatement sourcePreparedStatement = null;
-		ResultSet sourceResultSet = null;
-		
-		FileOutputStream fos = null;
-		OutputStreamWriter osw = null;
-		BufferedWriter bw = null;
 		boolean result = false;
 		try
+		(
+				Connection sourceConnection = DBHandleUtil.getConnection(sourceDBInfo);
+				PreparedStatement sourcePreparedStatement = DBHandleUtil.getPreparedStatement(PreparedStatementOperationType.READ, sourceConnection, sourceDBInfo.getSql(), fetchSize);
+				ResultSet sourceResultSet = sourcePreparedStatement.executeQuery();
+				FileOutputStream fos = new FileOutputStream(targetFile, append);
+				OutputStreamWriter osw = new OutputStreamWriter(fos, encode);
+				BufferedWriter bw = new BufferedWriter(osw);
+		)
 		{
 			char[] lineDelimiter = {CharUtil.CR, CharUtil.LF};
-			List<Map<String, Object>> records = new ArrayList<Map<String, Object>>();
-			sourceConnection = DBHandleUtil.getConnection(sourceDBInfo);
-			sourcePreparedStatement = DBHandleUtil.getPreparedStatement(PreparedStatementOperationType.READ, sourceConnection, sourceDBInfo.getSql(), fetchSize);
+			List<Map<String, Object>> records = new ArrayList<>();
 			DBHandleUtil.setPreparedStatement(PreparedStatementOperationType.READ, sourcePreparedStatement, sourceDBInfo.getBindingParams());
 			
-			sourceResultSet = sourcePreparedStatement.executeQuery();
 			ResultSetMetaData sourceResultSetMetaData = sourcePreparedStatement.getMetaData();
-			
-			fos = new FileOutputStream(targetFile, append);
-			osw = new OutputStreamWriter(fos, encode);
-			bw = new BufferedWriter(osw);
 			
 			while (sourceResultSet.next())
 			{
-				Map<String, Object> record = new LinkedHashMap<String, Object>();
+				Map<String, Object> record = new LinkedHashMap<>();
 				for (int i = 1; i <= sourceResultSetMetaData.getColumnCount(); i++) 
 				{
 					String columnName = null;
@@ -206,7 +206,6 @@ public final class DBBatchFlowUtil
 							if (!StrUtil.isEmptyIfStr(line))
 							{
 								bw.write(line);
-								//bw.write("\r\n");
 								bw.write(lineDelimiter);
 							}
 						}
@@ -219,11 +218,9 @@ public final class DBBatchFlowUtil
 		}
 		catch (Exception ex)
 		{
-			log.error("批量数据流处理执行失败，异常原因为：", ex);
+			log.error(DB_TO_OTHERS_ERROR_DESC, ex);
 			result = false;
 		}
-		finally
-		{ DbUtil.close(bw, osw, fos, sourceResultSet, sourcePreparedStatement, sourceConnection); }
 		
 		return result;
 	}
@@ -253,7 +250,7 @@ public final class DBBatchFlowUtil
 		boolean result = false;
 		try
 		{
-			List<Map<String, Object>> records = new ArrayList<Map<String, Object>>();
+			List<Map<String, Object>> records = new ArrayList<>();
 			
 			//源数据库初始化
 			sourceConnection = DBHandleUtil.getConnection(sourceDBInfo);
@@ -265,7 +262,7 @@ public final class DBBatchFlowUtil
 			//开始处理数据
 			while (sourceResultSet.next())
 			{
-				Map<String, Object> record = new LinkedHashMap<String, Object>();
+				Map<String, Object> record = new LinkedHashMap<>();
 				for (int i = 1; i <= sourceResultSetMetaData.getColumnCount(); i++) 
 				{
 					String columnName = null;
@@ -295,7 +292,7 @@ public final class DBBatchFlowUtil
 		}
 		catch (Exception ex)
 		{
-			log.error("批量数据流处理执行失败，异常原因为：", ex);			
+			log.error(DB_TO_OTHERS_ERROR_DESC, ex);			
 			result = false;
 		}
 		finally
@@ -309,6 +306,7 @@ public final class DBBatchFlowUtil
 								  final Collection<DBInfoForDataSource> targetDBinfoForDataSources,
 								  final Map<String,JobParameter> jobParameters,
 								  final int fetchSize,
+								  final JtaTransactionManager jtaTransactionManager,
 								  final ItemProcessor<Map<String, Object>, Map<String, Object>> ... processors)
 	{
 		boolean result = false;
@@ -319,14 +317,15 @@ public final class DBBatchFlowUtil
 			List<Object> readerParameters = new ArrayList<>();			
 			sourceDBinfoForDataSource.getBindingParams()
 									 .stream()
-									 .map(bindingParam -> { return CollUtil.newArrayList(bindingParam); })
+									 .map(CollUtil::newArrayList)
 									 .collect(Collectors.toList())
-									 .forEach(x -> { readerParameters.addAll(x); });
+									 .forEach(readerParameters::addAll);
 
 			//运行作业
-			JtaTransactionManager jtaTransactionManager = BeanUtilServiceImpl.getBean(JtaTransactionManager.class).orElseThrow(() -> { return new Exception("找不到指定的分布式事务管理器！！"); });
 			JobRepository jobRepository = JobRepositoryConfig.getMapJobRepositoryInstance(jtaTransactionManager);
 			threadPoolTaskExecutor = ThreadPoolTaskExecutorConfig.getThreadPoolTaskExecutor(true, 1, 1);
+			List<ItemProcessor<Map<String, Object>, Map<String, Object>>> list = new ArrayList<>();
+			list.add(map -> map);
 			JobLauncherConfig.getInstance(threadPoolTaskExecutor, jobRepository)
 							 .run
 							 (
@@ -363,7 +362,7 @@ public final class DBBatchFlowUtil
 									  							private Map<String, Object> item;
 									  							
 																@Override
-																public void beforeRead() {}
+																public void beforeRead() { log.debug("正在读取数据"); }
 
 																@Override
 																public void afterRead(Map<String, Object> item) { this.item = item; }
@@ -378,14 +377,7 @@ public final class DBBatchFlowUtil
 									  				.processor
 									  				(
 									  						new CompositeItemProcessorBuilder<Map<String, Object>, Map<String, Object>>()
-									  							.delegates
-									  							(
-									  									CollUtil.isEmpty(CollUtil.newArrayList(processors)) ? 
-									  											new com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.CustomCollections.ArrayList<ItemProcessor<Map<String, Object>, Map<String, Object>>>()
-									  												.add(map -> { return map; })
-									  												.getList() :
-									  											CollUtil.newArrayList(processors)
-									  							)
+									  							.delegates(CollUtil.isEmpty(CollUtil.newArrayList(processors)) ? list: CollUtil.newArrayList(processors))
 									  							.build()
 									  				)
 									  				.listener
@@ -418,16 +410,15 @@ public final class DBBatchFlowUtil
 									  									BeanUtilServiceImpl.transfer
 											  							(
 											  									targetDBinfoForDataSource -> 
-											  									{
-											  										return new JdbcBatchItemWriterBuilder<Map<String, Object>>()
+											  										new JdbcBatchItemWriterBuilder<Map<String, Object>>()
 											  													.assertUpdates(false)
 											  													.dataSource(targetDBinfoForDataSource.getDataSource())
 											  													.itemPreparedStatementSetter(new ColumnMapItemPreparedStatementSetter())
 											  													.itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<Map<String, Object>>())
 											  													.namedParametersJdbcTemplate(new NamedParameterJdbcTemplate(targetDBinfoForDataSource.getJdbcTemplate()))
 											  													.sql(targetDBinfoForDataSource.getSql())
-											  													.build();
-											  									}, 
+											  													.build()
+											  									, 
 											  									targetDBinfoForDataSources
 											  							)
 									  							)
@@ -466,10 +457,7 @@ public final class DBBatchFlowUtil
 			result = true;
 		}
 		catch (Exception ex)
-		{
-			log.error("批量数据流处理执行失败，异常原因为：", ex);
-			result = false;
-		}
+		{ log.error(DB_TO_OTHERS_ERROR_DESC, ex); }
 		finally
 		{
 			if (null != threadPoolTaskExecutor)
@@ -483,6 +471,7 @@ public final class DBBatchFlowUtil
 	public static boolean dbToDbs(final AbstractDBInfo sourceDBInfo, 
 			 					  final Collection<DBInfoForDataSource> targetDBinfoForDataSources, 
 			 					  final int fetchSize,
+			 					  final JtaTransactionManager jtaTransactionManager,
 			 					  final Replacer<Map<String, Object>> ... itemProcessors)
 	{
 		Connection sourceConnection = null;
@@ -491,7 +480,7 @@ public final class DBBatchFlowUtil
 		boolean result = false;
 		try
 		{
-			List<Map<String, Object>> records = new ArrayList<Map<String, Object>>();
+			List<Map<String, Object>> records = new ArrayList<>();
 			
 			//源数据库初始化
 			sourceConnection = DBHandleUtil.getConnection(sourceDBInfo);
@@ -500,12 +489,10 @@ public final class DBBatchFlowUtil
 			sourceResultSet = sourcePreparedStatement.executeQuery();
 			ResultSetMetaData sourceResultSetMetaData = sourcePreparedStatement.getMetaData();
 			
-			JtaTransactionManager jtaTransactionManager = BeanUtilServiceImpl.getBean(JtaTransactionManager.class).orElseThrow(() -> { return new Exception("找不到指定的分布式事务管理器！！"); });
-			
 			//开始处理数据
 			while (sourceResultSet.next())
 			{
-				Map<String, Object> record = new LinkedHashMap<String, Object>();
+				Map<String, Object> record = new LinkedHashMap<>();
 				for (int i = 1; i <= sourceResultSetMetaData.getColumnCount(); i++) 
 				{
 					String columnName = null;
@@ -523,10 +510,11 @@ public final class DBBatchFlowUtil
 				if (records.size() % fetchSize == 0 || sourceResultSet.isLast())
 				{
 					List<Map<String, Object>> newRecords = batchProcess(records, itemProcessors);
-					jtaTransactionManager.getUserTransaction().begin();
+					UserTransaction userTransaction = jtaTransactionManager.getUserTransaction();
+					Optional.ofNullable(userTransaction).orElseThrow().begin();
 					for (DBInfoForDataSource targetDBinfoForDataSource : targetDBinfoForDataSources)
 					{ targetDBinfoForDataSource.getJdbcTemplate().batchUpdate(targetDBinfoForDataSource.getSql(), new BatchPreparedStatementSetterImplForMap().setAbstractDBInfo(sourceDBInfo).setRecords(newRecords).setResultSetMetaData(sourceResultSetMetaData)); }
-					jtaTransactionManager.getUserTransaction().commit();
+					Optional.ofNullable(userTransaction).orElseThrow().commit();
 					records.clear();
 				}
 			}
@@ -535,7 +523,7 @@ public final class DBBatchFlowUtil
 		}
 		catch (Exception ex)
 		{
-			log.error("批量数据流处理执行失败，异常原因为：", ex);
+			log.error(DB_TO_OTHERS_ERROR_DESC, ex);
 			result = false;
 		}
 		finally
@@ -562,7 +550,7 @@ public final class DBBatchFlowUtil
 		boolean result = false;
 		try
 		{
-			List<Map<String, Object>> records = new ArrayList<Map<String, Object>>();
+			List<Map<String, Object>> records = new ArrayList<>();
 			
 			//源数据库初始化
 			sourceConnection = DBHandleUtil.getConnection(sourceDBInfo);
@@ -585,12 +573,12 @@ public final class DBBatchFlowUtil
 				targetJdbcTemplate = targetDBinfoForDataSource.getJdbcTemplate();
 			}
 			else
-			{ throw new Exception("出现了新的AbstractDBInfo继承子类，请及时处理"); }
+			{ throw new DBBatchFlowUtilException(ABSTRACT_DB_INFO_TYPE_ERROR_DESC); }
 			
 			//开始处理数据
 			while (sourceResultSet.next())
 			{
-				Map<String, Object> record = new LinkedHashMap<String, Object>();
+				Map<String, Object> record = new LinkedHashMap<>();
 				for (int i = 1; i <= sourceResultSetMetaData.getColumnCount(); i++) 
 				{
 					String columnName = null;
@@ -627,7 +615,7 @@ public final class DBBatchFlowUtil
 		}
 		catch (Exception ex)
 		{
-			log.error("批量数据流处理执行失败，异常原因为：", ex);
+			log.error(DB_TO_OTHERS_ERROR_DESC, ex);
 			if (!usePool)
 			{ DBHandleUtil.rollback(targetConnection); }
 			
@@ -666,7 +654,7 @@ public final class DBBatchFlowUtil
 			
 			while (sourceResultSet.next())
 			{
-				Map<String, Object> record = new LinkedHashMap<String, Object>();
+				Map<String, Object> record = new LinkedHashMap<>();
 				for (int i = 1; i <= sourceResultSetMetaData.getColumnCount(); i++) 
 				{
 					String columnName = null;
@@ -720,7 +708,7 @@ public final class DBBatchFlowUtil
 		boolean result = false;
 		try
 		{
-			List<Map<String, Object>> records = new ArrayList<Map<String, Object>>();
+			List<Map<String, Object>> records = new ArrayList<>();
 			sourceConnection = DBHandleUtil.getConnection(sourceDBInfo);
 			sourcePreparedStatement = DBHandleUtil.getPreparedStatement(PreparedStatementOperationType.READ, sourceConnection, sourceDBInfo.getSql(), fetchSize);
 			DBHandleUtil.setPreparedStatement(PreparedStatementOperationType.READ, sourcePreparedStatement, sourceDBInfo.getBindingParams());
@@ -732,7 +720,7 @@ public final class DBBatchFlowUtil
 			
 			while (sourceResultSet.next())
 			{
-				Map<String, Object> record = new LinkedHashMap<String, Object>();
+				Map<String, Object> record = new LinkedHashMap<>();
 				for (int i = 1; i <= sourceResultSetMetaData.getColumnCount(); i++) 
 				{
 					String columnName = null;
@@ -806,21 +794,17 @@ public final class DBBatchFlowUtil
 										final Charset encode, 
 										final long skipRow, 
 										final int fetchSize,
+										final JtaTransactionManager jtaTransactionManager,
 										final Replacer<String[]> ... itemProcessors)
 	{
-		InputStream fis = null;
-		Reader isr = null;
-		BufferedReader br = null;
-		
 		boolean result = false;
 		try
+		(
+				InputStream fis = new FileInputStream(srcFile);
+				Reader isr = new InputStreamReader(fis, encode);
+				BufferedReader br = new BufferedReader(isr);
+		)
 		{
-			fis = new FileInputStream(srcFile);
-			isr = new InputStreamReader(fis, encode);
-			br = new BufferedReader(isr);
-			
-			JtaTransactionManager jtaTransactionManager = BeanUtilServiceImpl.getBean(JtaTransactionManager.class).orElseThrow(() -> { return new Exception("找不到指定的分布式事务管理器！！"); });
-			
 			String line;
 			List<String[]> records = new ArrayList<>();
 			long rows = 0;
@@ -830,7 +814,6 @@ public final class DBBatchFlowUtil
 				if (rows == skipRow)
 				{ continue; }
 				
-				//String[] record = StringUtils.splitPreserveAllTokens(line, delimiter);
 				List<String> record = StrSpliter.split(line, delimiter, false, false);
 				records.add(record.toArray(new String[record.size()]));
 				if (records.size() % fetchSize == 0)
@@ -842,11 +825,9 @@ public final class DBBatchFlowUtil
 		}
 		catch (Exception ex)
 		{
-			log.error("读取文件文件数据后，对其进去入库出现异常，异常原因为：", ex);
+			log.error(CSV_TEXT_FILE_TO_DB_ERROR_DESC, ex);
 			result = false;
 		}
-		finally
-		{ DbUtil.close(br, isr, fis); }
 		
 		return result;
 	}
@@ -860,21 +841,18 @@ public final class DBBatchFlowUtil
 									   final int fetchSize,
 									   final Replacer<String[]> ... itemProcessors)
 	{
-		InputStream fis = null;
-		Reader isr = null;
-		BufferedReader br = null;
-		
 		Connection targetConnection = null;
 		PreparedStatement targetPreparedStatement = null;
 		JdbcTemplate targetJdbcTemplate = null;
 		boolean usePool = false;
 		boolean result = false;
 		try
+		(
+				InputStream fis = new FileInputStream(srcFile);
+				Reader isr = new InputStreamReader(fis, encode);
+				BufferedReader br = new BufferedReader(isr);
+		)
 		{
-			fis = new FileInputStream(srcFile);
-			isr = new InputStreamReader(fis, encode);
-			br = new BufferedReader(isr);
-			
 			if (targetDBInfo instanceof DBInfo)
 			{
 				targetConnection = DBHandleUtil.getConnection(targetDBInfo);
@@ -887,7 +865,7 @@ public final class DBBatchFlowUtil
 				targetJdbcTemplate = dbInfoForDataSource.getJdbcTemplate();
 			}
 			else
-			{ throw new Exception("出现了新的AbstractDBInfo继承子类，请及时处理"); }
+			{ throw new DBBatchFlowUtilException(ABSTRACT_DB_INFO_TYPE_ERROR_DESC); }
 			
 			String line;
 			List<String[]> records = new ArrayList<>();
@@ -898,7 +876,6 @@ public final class DBBatchFlowUtil
 				if (rows == skipRow)
 				{ continue; }
 				
-				//String[] record = StringUtils.splitPreserveAllTokens(line, delimiter);
 				List<String> record = StrSpliter.split(line, delimiter, false, false);
 				records.add(record.toArray(new String[record.size()]));
 				if (records.size() % fetchSize == 0)
@@ -919,14 +896,14 @@ public final class DBBatchFlowUtil
 		}
 		catch (Exception ex)
 		{
-			log.error("读取文件文件数据后，对其进去入库出现异常，异常原因为：", ex);
+			log.error(CSV_TEXT_FILE_TO_DB_ERROR_DESC, ex);
 			if (!usePool)
 			{ DBHandleUtil.rollback(targetConnection); }
 			
 			result = false;
 		}
 		finally
-		{ DbUtil.close(br, isr, fis, targetPreparedStatement, targetConnection); }
+		{ DbUtil.close(targetPreparedStatement, targetConnection); }
 		
 		return result;
 	}
@@ -938,12 +915,12 @@ public final class DBBatchFlowUtil
 									 final int sheetIndx,
 									 final int skipRow,
 									 final int fetchSize,
+									 final JtaTransactionManager jtaTransactionManager,
 									 final Replacer<Object[]> ... itemProcessors)
 	{
 		boolean result = false;
 		try
 		{
-			JtaTransactionManager jtaTransactionManager = BeanUtilServiceImpl.getBean(JtaTransactionManager.class).orElseThrow(() -> { return new Exception("找不到指定的分布式事务管理器！！"); });
 			List<Object[]> records = new ArrayList<>();
 			ExcelUtil.readBySax
 			(
@@ -982,7 +959,7 @@ public final class DBBatchFlowUtil
 		Connection targetConnection = null;
 		PreparedStatement targetPreparedStatement = null;
 		JdbcTemplate targetJdbcTemplate = null;		
-		Set<Boolean> usePools = new HashSet<Boolean>().getSet();
+		Set<Boolean> usePools = new HashSet<>();
 		boolean result = false;
 		try
 		{
@@ -998,7 +975,7 @@ public final class DBBatchFlowUtil
 				targetJdbcTemplate = dbInfoForDataSource.getJdbcTemplate();
 			}
 			else
-			{ throw new Exception("出现了新的AbstractDBInfo继承子类，请及时处理"); }
+			{ throw new DBBatchFlowUtilException(ABSTRACT_DB_INFO_TYPE_ERROR_DESC); }
 			
 			List<Object[]> records = new ArrayList<>();
 			ExcelUtil.readBySax
@@ -1029,8 +1006,6 @@ public final class DBBatchFlowUtil
 			log.error("读取Excel文件数据后，对其进去入库出现异常，异常原因为：", ex);
 			if (!JavaCollectionsUtil.getOperationFlowResult(usePools))
 			{ DBHandleUtil.rollback(targetConnection); }
-			
-			result = false;
 		}
 		finally
 		{ DbUtil.close(targetPreparedStatement, targetConnection); }
@@ -1046,25 +1021,19 @@ public final class DBBatchFlowUtil
 								   final long skipRow, 
 								   final CsvReadConfig csvReadConfig, 
 								   final int fetchSize,
+								   final JtaTransactionManager jtaTransactionManager,
 								   final Replacer<String[]> ... itemProcessors)
 	{
-		FileInputStream fos = null;
-    	BufferedInputStream bis = null;
-    	InputStreamReader isr = null;
-    	BufferedReader br = null;
-    	CsvParser csvParser = null;
-    	
 		boolean result = false;
 		try
+		(
+				FileInputStream fos = new FileInputStream(srcFile);
+				BufferedInputStream bis = new BufferedInputStream(fos);
+				InputStreamReader isr = new InputStreamReader(bis, encode);
+				BufferedReader br = new BufferedReader(isr);
+				CsvParser csvParser = new CsvParser(br, csvReadConfig);
+		)
 		{
-			fos = new FileInputStream(srcFile);
-    		bis = new BufferedInputStream(fos);
-    		isr = new InputStreamReader(bis, encode);
-    		br = new BufferedReader(isr);
-    		csvParser = new CsvParser(br, csvReadConfig);
-    		
-    		JtaTransactionManager jtaTransactionManager = BeanUtilServiceImpl.getBean(JtaTransactionManager.class).orElseThrow(() -> { return new Exception("找不到指定的分布式事务管理器！！"); });
-    		
     		List<String[]> records = new ArrayList<>();
     		long rows = 0;
     		CsvRow csvRow;
@@ -1085,11 +1054,9 @@ public final class DBBatchFlowUtil
 		}
 		catch (Exception ex)
 		{
-			log.error("读取文件文件数据后，对其进去入库出现异常，异常原因为：", ex);
+			log.error(CSV_TEXT_FILE_TO_DB_ERROR_DESC, ex);
 			result = false;
 		}
-		finally
-		{ DbUtil.close(csvParser, br, isr, bis, fos); }
 		
 		return result;
 	}
@@ -1104,12 +1071,6 @@ public final class DBBatchFlowUtil
 								  final int fetchSize,
 								  final Replacer<String[]> ... itemProcessors)
 	{
-		FileInputStream fos = null;
-    	BufferedInputStream bis = null;
-    	InputStreamReader isr = null;
-    	BufferedReader br = null;
-    	CsvParser csvParser = null;
-    	
     	Connection targetConnection = null;
 		PreparedStatement targetPreparedStatement = null;
 		JdbcTemplate targetJdbcTemplate = null;
@@ -1117,14 +1078,14 @@ public final class DBBatchFlowUtil
     	
 		boolean result = false;
 		try
+		(
+				FileInputStream fos = new FileInputStream(srcFile);
+				BufferedInputStream bis = new BufferedInputStream(fos);
+				InputStreamReader isr = new InputStreamReader(bis, encode);
+				BufferedReader br = new BufferedReader(isr);
+				CsvParser csvParser = new CsvParser(br, csvReadConfig);
+		)
 		{
-			fos = new FileInputStream(srcFile);
-    		bis = new BufferedInputStream(fos);
-    		isr = new InputStreamReader(bis, encode);
-    		br = new BufferedReader(isr);
-    		csvParser = new CsvParser(br, csvReadConfig);
-    		
-    		
     		if (targetDBInfo instanceof DBInfo)
 			{
 				targetConnection = DBHandleUtil.getConnection(targetDBInfo);
@@ -1137,7 +1098,7 @@ public final class DBBatchFlowUtil
 				targetJdbcTemplate = dbInfoForDataSource.getJdbcTemplate();
 			}
 			else
-			{ throw new Exception("出现了新的AbstractDBInfo继承子类，请及时处理"); }
+			{ throw new DBBatchFlowUtilException(ABSTRACT_DB_INFO_TYPE_ERROR_DESC); }
     		
     		List<String[]> records = new ArrayList<>();
     		long rows = 0;
@@ -1168,14 +1129,14 @@ public final class DBBatchFlowUtil
 		}
 		catch (Exception ex)
 		{
-			log.error("读取文件文件数据后，对其进去入库出现异常，异常原因为：", ex);
+			log.error(CSV_TEXT_FILE_TO_DB_ERROR_DESC, ex);
 			if (!usePool)
 			{ DBHandleUtil.rollback(targetConnection); }
 			
 			result = false;
 		}
 		finally
-		{ DbUtil.close(csvParser, br, isr, bis, fos, targetPreparedStatement, targetConnection); }
+		{ DbUtil.close(targetPreparedStatement, targetConnection); }
 		
 		return result;
 	}
@@ -1194,13 +1155,14 @@ public final class DBBatchFlowUtil
 											final List<T[]> records,
 											final JtaTransactionManager jtaTransactionManager,
 											final Collection<DBInfoForDataSource> targetDBinfoForDataSources) 
-	throws NotSupportedException, SystemException, SecurityException, IllegalStateException, RollbackException, HeuristicMixedException, HeuristicRollbackException
+	throws NotSupportedException, SystemException, RollbackException, HeuristicMixedException, HeuristicRollbackException
 	{
 		List<T[]> newRecords = batchProcess(records, itemProcessors);
-		jtaTransactionManager.getUserTransaction().begin();
+		UserTransaction userTransaction = jtaTransactionManager.getUserTransaction();
+		Optional.ofNullable(userTransaction).orElseThrow().begin();
 		for (DBInfoForDataSource targetDBinfoForDataSource : targetDBinfoForDataSources)
 		{ targetDBinfoForDataSource.getJdbcTemplate().batchUpdate(targetDBinfoForDataSource.getSql(), new BatchPreparedStatementSetterImplForArray<T>().setRecords(newRecords)); }
-		jtaTransactionManager.getUserTransaction().commit();
+		Optional.ofNullable(userTransaction).orElseThrow().commit();
 		records.clear();
 	}
 	
@@ -1219,7 +1181,7 @@ public final class DBBatchFlowUtil
 	{
 		if (!cn.hutool.core.util.ArrayUtil.isEmpty(itemProcessors))
 		{
-			List<T> newRecords = new ArrayList<T>();
+			List<T> newRecords = new ArrayList<>();
 			
 			for (int i = 0; i < itemProcessors.length; i++)
 			{
@@ -1234,7 +1196,7 @@ public final class DBBatchFlowUtil
 				}
 				else
 				{
-					Collection<T> tempRecords = new ArrayList<T>();
+					Collection<T> tempRecords = new ArrayList<>();
 					
 					for (T newRecord : newRecords)
 					{
@@ -1292,7 +1254,7 @@ public final class DBBatchFlowUtil
 		private JtaTransactionManager jtaTransactionManager;
 					
 		@Override
-		public void open(ExecutionContext executionContext) throws ItemStreamException 
+		public void open(ExecutionContext executionContext)
 		{
 			this.delegates.forEach
 			(
@@ -1305,7 +1267,7 @@ public final class DBBatchFlowUtil
 		}
 
 		@Override
-		public void update(ExecutionContext executionContext) throws ItemStreamException 
+		public void update(ExecutionContext executionContext) 
 		{
 			this.delegates.forEach
 			(
@@ -1318,7 +1280,7 @@ public final class DBBatchFlowUtil
 		}
 
 		@Override
-		public void close() throws ItemStreamException 
+		public void close()
 		{
 			this.delegates.forEach
 			(
@@ -1333,10 +1295,11 @@ public final class DBBatchFlowUtil
 		@Override
 		public void write(List<? extends Map<String, Object>> items) throws Exception 
 		{
-			this.jtaTransactionManager.getUserTransaction().begin();
+			UserTransaction userTransaction = this.jtaTransactionManager.getUserTransaction();
+			Optional.ofNullable(userTransaction).orElseThrow().begin();
 			for (ItemWriter<Map<String, Object>> writer : this.delegates) 
 			{ writer.write(items); }
-			this.jtaTransactionManager.getUserTransaction().commit();
+			Optional.ofNullable(userTransaction).orElseThrow().commit();
 		}
 	}
 	
@@ -1426,6 +1389,14 @@ public final class DBBatchFlowUtil
 		{ return this.records.size(); }
 	}
 	
+	private static class DBBatchFlowUtilException extends Exception
+	{
+		private static final long serialVersionUID = 8792802388405843504L;
+
+		private DBBatchFlowUtilException(final String message)
+		{ super(message); }
+	}
+	
 	@SafeVarargs
 	public static <T> void pageQueryHandlerBean(final double totalDataCount, 
 		  	  									final double pageSize, 
@@ -1444,19 +1415,17 @@ public final class DBBatchFlowUtil
 		double totalPage = Math.ceil((totalDataCount + pageSize - 1) / pageSize);
 		for (long pageNo = 1; pageNo < totalPage; pageNo++)
 		{
-			List<T> records = baseMapper.selectPage(new Page<T>(pageNo, Double.valueOf(pageSize).longValue()), queryWrapper).getRecords();
+			Double pageSizeTmp = Double.valueOf(pageSize);
+			List<T> records = baseMapper.selectPage(new Page<T>(pageNo, pageSizeTmp.longValue()), queryWrapper).getRecords();
 			JavaCollectionsUtil.collectionProcessor
 			(
 					records, 
 					(final T value, final int indx, final int length) -> 
-					{
 						JavaCollectionsUtil.collectionProcessor
 						(
 								CollUtil.newArrayList(itemProcessorForCollections), 
-								(final JavaCollectionsUtil.ItemProcessorForCollection<T> val, final int inx, final int len) -> 
-								{ val.process(value, indx, length); }
-						);
-					}
+								(final JavaCollectionsUtil.ItemProcessorForCollection<T> val, final int inx, final int len) -> val.process(value, indx, length)
+						)
 			);
 		}
 	}
@@ -1479,19 +1448,17 @@ public final class DBBatchFlowUtil
 		double totalPage = Math.ceil((totalDataCount + pageSize - 1) / pageSize);
 		for (long pageNo = 1; pageNo < totalPage; pageNo++)
 		{
-			List<Map<String, Object>> records = baseMapper.selectMapsPage(new Page<T>(pageNo, Double.valueOf(pageSize).longValue()), queryWrapper).getRecords();
+			Double pageSizeTmp = Double.valueOf(pageSize);
+			List<Map<String, Object>> records = baseMapper.selectMapsPage(new Page<T>(pageNo, pageSizeTmp.longValue()), queryWrapper).getRecords();
 			JavaCollectionsUtil.collectionProcessor
 			(
 					records, 
 					(final String key, final Object value, final int indx) -> 
-					{
 						JavaCollectionsUtil.collectionProcessor
 						(
 								CollUtil.newArrayList(itemProcessorForMaps), 
-								(final JavaCollectionsUtil.ItemProcessorForMap<String, Object> val, final int inx, final int len) -> 
-								{ val.process(key, value, indx); }
-						);
-					}
+								(final JavaCollectionsUtil.ItemProcessorForMap<String, Object> val, final int inx, final int len) -> val.process(key, value, indx)
+						)
 			);
 		}
 	}

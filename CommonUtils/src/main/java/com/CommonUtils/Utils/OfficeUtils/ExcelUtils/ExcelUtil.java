@@ -42,32 +42,35 @@ import cn.hutool.http.Header;
 import cn.hutool.json.JSONUtil;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * hutool工具类可以替换这个
+ * @deprecated
+ * */
+@Deprecated(since="hutool工具类可以替换这个")
 @Slf4j
-@Deprecated
 public final class ExcelUtil 
-{	
+{
+	private ExcelUtil() {}
+	
 	/**建议cn.hutool.extra.servlet.ServletUtil.write*/
 	public static void exportExcel(final HttpServletRequest request, final HttpServletResponse response, final File outputFile)
 	{
-		OutputStream bos = null;
-		OutputStream os = null;
-		InputStream fis = null;
-		InputStream bis = null;
 		try
+		(
+				OutputStream os = response.getOutputStream();		// 取得输出流
+				OutputStream bos = new BufferedOutputStream(os);		//缓冲输出流
+				InputStream fis = new FileInputStream(outputFile);
+				InputStream bis = new BufferedInputStream(fis);		// 缓冲流
+		)
 		{
 			request.setCharacterEncoding("utf-8");
             response.setCharacterEncoding("utf-8");
             response.setContentType("html/text");
-            os = response.getOutputStream();		// 取得输出流
-            bos = new BufferedOutputStream(os);		//缓冲输出流
             response.reset();						// 清空输出流
             
             response.setHeader(Header.CONTENT_DISPOSITION.toString(), "attachment; filename=" + new URLEncoder().encode(outputFile.getName(), StandardCharsets.UTF_8));		// 设定输出文件头
             response.setContentType("application/msexcel");																			// 定义输出类型
             
-            fis = new FileInputStream(outputFile);
-			bis = new BufferedInputStream(fis);		// 缓冲流
-			
 			byte[] data = new byte[1024];
             int bytes = 0;
             while ((bytes = bis.read(data, 0, data.length)) != -1) 
@@ -76,13 +79,6 @@ public final class ExcelUtil
 		}
 		catch (Exception e)
 		{ log.error("输出文件信息内容给response出异常，异常原因为：", e); }
-		finally
-		{			
-			IoUtil.close(bos);
-			IoUtil.close(os);
-			IoUtil.close(bis);
-			IoUtil.close(fis);
-		}
 	}
 	
 	/**建议cn.hutool.extra.servlet.ServletUtil.write*/
@@ -103,28 +99,21 @@ public final class ExcelUtil
 			{
 				case STRING:
 					if (!StringUtil.isStrEmpty(cell.getStringCellValue()))
-					{
-						cellValue = null;
-						cellValue = cell.getStringCellValue().trim();
-					}
+					{ cellValue = cell.getStringCellValue().trim(); }
 					
 					break;
 				case NUMERIC:
-					cellValue = null;
 					cellValue = Double.toString(cell.getNumericCellValue());
 					break;
 				case FORMULA:
-					cellValue = null;
 					cellValue = cell.getCellFormula();
 					break;
 				case BLANK:
 					break;
 				case BOOLEAN:
-					cellValue = null;
 					cellValue = Boolean.toString(cell.getBooleanCellValue());
 					break;
 				case ERROR:
-					cellValue = null;
 					cellValue = Byte.toString(cell.getErrorCellValue());
 					break;
 				default:
@@ -328,7 +317,7 @@ public final class ExcelUtil
 			else if (isXlsx(file))
 			{ workBook = new XSSFWorkbook(file); }
 			else
-			{ throw new Exception("需要读取的并不是Excel格式的文件"); }
+			{ throw new ExcelUtilException("需要读取的并不是Excel格式的文件"); }
 			
 			//没有指定sheet名称
 			if (StringUtil.isStrEmpty(sheetName))
@@ -416,7 +405,7 @@ public final class ExcelUtil
 					Cell cell = row.getCell(cellNum);
 					if (null == cell) { continue; }
 
-					cells.put("CELL" + String.valueOf(cellNum), getCellValue(cell));
+					cells.put("CELL" + cellNum, getCellValue(cell));
 				}
 
 				result.getRows().add(cells);
@@ -426,5 +415,13 @@ public final class ExcelUtil
 		}
 
 		return null;
+	}
+	
+	private static class ExcelUtilException extends Exception
+	{
+		private static final long serialVersionUID = 8566490947457349330L;
+
+		private ExcelUtilException(final String message)
+		{ super(message); }
 	}
 }

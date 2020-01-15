@@ -14,7 +14,7 @@ public final class KafkaUtil
 	
 	public static <K, V> boolean delete(final KeyValueStore<K, V> kvStore)
 	{
-		boolean processorResult = KeyValueStoreProcessor(kvStore, (final KeyValue<K, V> entry, final KeyValueStore<K, V> tmpKVStore) -> { tmpKVStore.delete(entry.key); });
+		boolean processorResult = keyValueStoreProcessor(kvStore, (final KeyValue<K, V> entry, final KeyValueStore<K, V> tmpKVStore) -> tmpKVStore.delete(entry.key));
 		if (processorResult)
 		{
 			kvStore.flush();
@@ -34,7 +34,7 @@ public final class KafkaUtil
 	}
 	
 	@SafeVarargs
-	public static <K, V> boolean KeyValueStoreProcessor(final KeyValueStore<K, V> kvStore, final ItemProcessor<K, V> ... itemProcessorForKeyValueStores)
+	public static <K, V> boolean keyValueStoreProcessor(final KeyValueStore<K, V> kvStore, final ItemProcessor<K, V> ... itemProcessorForKeyValueStores)
 	{
 		if (null != kvStore)
 		{
@@ -45,8 +45,7 @@ public final class KafkaUtil
 				JavaCollectionsUtil.collectionProcessor
 				(
 						CollUtil.newArrayList(itemProcessorForKeyValueStores), 
-						(final ItemProcessor<K, V> itemProcessorForKeyValueStore, final int inx, final int length) -> 
-						{ itemProcessorForKeyValueStore.process(entry, kvStore); }
+						(final ItemProcessor<K, V> itemProcessorForKeyValueStore, final int inx, final int length) -> itemProcessorForKeyValueStore.process(entry, kvStore)
 				);
 			}
 			

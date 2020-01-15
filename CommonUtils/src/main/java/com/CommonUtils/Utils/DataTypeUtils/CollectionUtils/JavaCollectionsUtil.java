@@ -17,6 +17,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.collections4.keyvalue.MultiKey;
 import org.apache.commons.collections4.map.MultiKeyMap;
@@ -108,78 +110,32 @@ public final class JavaCollectionsUtil
 	
 	/**
 	 * 检测Map是否为空，true为空，false为非空
-	 * */
-	/**建议使用cn.hutool.core.map.MapUtil.isEmpty或isNotEmpty*/ 
-	@Deprecated
+	 * 建议使用cn.hutool.core.map.MapUtil.isEmpty或isNotEmpty
+	 * @deprecated
+	 * */ 
+	@Deprecated(since="建议使用cn.hutool.core.map.MapUtil.isEmpty或isNotEmpty")
 	public static <K, V> boolean isMapEmpty(final Map<K, V> map)
-	{
-		if (null == map || map.isEmpty())
-		{ return true; }
-		
-		return false;
-	}
+	{ return null == map || map.isEmpty(); }
 	
 	public static <K, V> boolean isMapEmpty(final MultiKeyMap<K, V> map)
-	{
-		if (null == map || map.isEmpty())
-		{ return true; }
-		
-		return false;
-	}
+	{ return null == map || map.isEmpty(); }
 	
 	/**
 	 * 检测实现了Collection接口，如List，Set等是否为空，true为空，false为非空
-	 * */
-	/**建议使用cn.hutool.core.collection.CollUtil.isEmpty或isNotEmpty*/ 
-	@Deprecated
+	 * 建议使用cn.hutool.core.collection.CollUtil.isEmpty或isNotEmpty
+	 * @deprecated
+	 * */ 
+	@Deprecated(since="建议使用cn.hutool.core.collection.CollUtil.isEmpty或isNotEmpty")
 	public static <T> boolean isCollectionEmpty(final Collection<T> collection)
-	{
-		if (null == collection || collection.isEmpty())
-		{ return true; }
-		
-		return false;
-	}
+	{ return null == collection || collection.isEmpty(); }
 	
-	@Deprecated
-	public static boolean collectionEquals(final Collection<String[]> records1, final Collection<String[]> records2)
-    {
-    	//两个都是空，则为相等
-    	if (JavaCollectionsUtil.isCollectionEmpty(records1) && JavaCollectionsUtil.isCollectionEmpty(records2))
-    	{ return true; }
-    	
-    	//【一个不是空，另一个是，不是相等】 或 【 一个是空，另一个不是，不是相等】
-    	else if ((!JavaCollectionsUtil.isCollectionEmpty(records1) && JavaCollectionsUtil.isCollectionEmpty(records2)) || 
-    			 (JavaCollectionsUtil.isCollectionEmpty(records1) && !JavaCollectionsUtil.isCollectionEmpty(records2)))
-    	{ return false; }
-    	
-    	//两个都不是空
-    	else
-    	{
-    		if (records1.size() != records2.size())
-    		{ return false; }
-    		
-    		int matched = 0;
-    		for (String[] fileRecord : records1)
-    		{
-    			for (String[] needUpdateRecord : records2)
-    			{
-    				if (com.CommonUtils.Utils.DataTypeUtils.ArrayUtils.ArrayUtil.arrayEquals(fileRecord, needUpdateRecord))
-    				{ matched++; }
-    			}
-    		}
-    		
-    		if (matched == records1.size())
-    		{ return true; }
-    		
-    		return false;
-    	}
-    }
-	
-	/**建议使用cn.hutool.core.collection.CollUtil.get相关函数*/ 
-	@Deprecated
+	/**建议使用cn.hutool.core.collection.CollUtil.get相关函数
+	 * @deprecated
+	 * */ 
+	@Deprecated(since="建议使用cn.hutool.core.collection.CollUtil.get相关函数")
 	public static <T> T getItem(final Collection<T> items, final int dstIndx)
 	{
-		List<T> result = new ArrayList<T>();
+		List<T> result = new ArrayList<>();
 		collectionProcessor(items, (T item, int indx, int length) -> { if (dstIndx == indx) { result.add(item);} });
 		return result.get(0);
 	}
@@ -190,7 +146,7 @@ public final class JavaCollectionsUtil
 	public static boolean getOperationFlowResult(final Set<Boolean> items)
 	{
 		//不为空才能进入下一步判断
-		if (!isCollectionEmpty(items))
+		if (!CollUtil.isEmpty(items))
 		{
 			//true与false同时存在，说明有其中一个流程失败，直接返回false
 			if (items.size() > 1)
@@ -198,7 +154,7 @@ public final class JavaCollectionsUtil
 			
 			//只有唯一结果，返回是false还是true
 			else
-			{ return getItem(items, 0); }
+			{ return CollUtil.get(items, 0); }
 		}
 		
 		//为空直接是false
@@ -206,26 +162,29 @@ public final class JavaCollectionsUtil
 		{ return false; }
 	}
 	
-	/**建议使用cn.hutool.core.collection.CollUtil.values*/ 
-	@Deprecated
+	/**建议使用cn.hutool.core.collection.CollUtil.values
+	 * @deprecated
+	 * */ 
+	@Deprecated(since="建议使用cn.hutool.core.collection.CollUtil.values")
 	public static <K, V> Collection<V> getMapValues(final Map<K, V> map)
 	{
-		Collection<V> records = new ArrayList<V>();
-		mapProcessor(map, (K key, V value, int indx) -> { records.add(value); });
+		Collection<V> records = new ArrayList<>();
+		mapProcessor(map, (K key, V value, int indx) -> records.add(value));
 		return records;
 	}
 	
 	public static <K, V> Collection<V> getMapValues(final MultiKeyMap<K, V> map)
 	{
 		Collection<V> records = new ArrayList<>();
-		mapProcessor(map, (final MultiKey<? extends K> key, final V value, final int indx) -> { records.add(value); });
+		mapProcessor(map, (final MultiKey<? extends K> key, final V value, final int indx) -> records.add(value));
 		return records;
 	}
 	
 	/**
 	 * 针对Map做的通用型迭代处理，建议使用cn.hutool.core.collection.CollUtil.forEach
+	 * @deprecated
 	 * */
-	@Deprecated
+	@Deprecated(since="针对Map做的通用型迭代处理，建议使用cn.hutool.core.collection.CollUtil.forEach")
 	@SafeVarargs
 	public static <K, V> boolean mapProcessor(final Map<K, V> map, final ItemProcessorForMap<K, V> ... itemProcessorForMaps)
 	{		
@@ -276,7 +235,7 @@ public final class JavaCollectionsUtil
 	@SafeVarargs
 	public static <T> boolean collectionProcessor(final Collection<T> values, final ItemProcessorForCollection<T> ... itemProcessorForCollections)
 	{
-		if (!isCollectionEmpty(values))
+		if (!CollUtil.isEmpty(values))
 		{
 			int indx = 0;
 			int length = values.size();
@@ -302,8 +261,7 @@ public final class JavaCollectionsUtil
 		return collectionProcessor
 		(
 				records, 
-				(final Map<K, V> record, final int indx, final int length) -> 
-				{ mapProcessor(record, itemProcessorForMaps); }
+				(final Map<K, V> record, final int indx, final int length) -> mapProcessor(record, itemProcessorForMaps)
 		);
 	}
 	
@@ -313,37 +271,9 @@ public final class JavaCollectionsUtil
 		return collectionProcessor
 		(
 				records,
-				(final MultiKeyMap<K, V> record, final int indx, final int length) -> 
-				{ mapProcessor(record, itemProcessorForMultiKeyMaps); }
+				(final MultiKeyMap<K, V> record, final int indx, final int length) -> mapProcessor(record, itemProcessorForMultiKeyMaps)
 		);
 	}
-	
-	/*
-	@SafeVarargs
-	public static <T> boolean collectionProcessorForArray(final Collection<T[]> records, final ItemProcessorForCollection<T> ... itemProcessorForCollections)
-	{
-		return collectionProcessor
-		(
-				records, 
-				(final T[] values, final int indx, final int length) -> 
-				{
-					collectionProcessor
-					(
-							CollUtil.newArrayList(values),
-							(final T tempValue, final int inx, final int len) -> 
-							{								
-								collectionProcessor
-								(
-										CollUtil.newArrayList(itemProcessorForCollections),
-										(final ItemProcessorForCollection<T> itemProcessorForCollection, final int ix, final int le) -> 
-										{ itemProcessorForCollection.process(tempValue, inx, len); }
-								);
-							}
-					);
-				}
-		);
-	}
-	*/
 	
 	public static <T> Collection<T> collectionOperation(final Set<T> a, final Set<T> b, final OperationType operationType)
 	{		
@@ -353,12 +283,10 @@ public final class JavaCollectionsUtil
 				return CollUtil.intersection(a, b);
 				
 			case LEFT_SUBTRACT:
-				//return CollectionUtils.subtract(a, b);
-				return CollUtil.disjunction(a, b).stream().filter((val) -> { return a.contains(val); }).collect(Collectors.toList());
+				return CollUtil.disjunction(a, b).stream().filter(a::contains).collect(Collectors.toList());
 				
 			case RIGHT_SUBTRACT:
-				//return CollectionUtils.subtract(b, a);
-				return CollUtil.disjunction(a, b).stream().filter((val) -> { return b.contains(val); }).collect(Collectors.toList());
+				return CollUtil.disjunction(a, b).stream().filter(b::contains).collect(Collectors.toList());
 			
 			case UNION:
 				return CollUtil.union(a, b);
@@ -373,8 +301,9 @@ public final class JavaCollectionsUtil
 	
 	/**
 	 * List转Set
+	 * @deprecated
 	 * */
-	@Deprecated
+	@Deprecated(since="ist转Set")
 	public static <T> Set<T> toSet(final List<T> list, final CollectionType collectionType)
 	{
 		if (isCollectionEmpty(list))
@@ -382,11 +311,11 @@ public final class JavaCollectionsUtil
 		
 		switch (collectionType)
 		{
-			case HashSet:
+			case HASH_SET:
 				return new HashSet<>(list);
-			case TreeSet:
+			case TREE_SET:
 				return new TreeSet<>(list);
-			case LinkedHashSet:
+			case LINKED_HASHSET:
 				return new LinkedHashSet<>(list);
 			default:
 				return new HashSet<>(list);
@@ -395,8 +324,9 @@ public final class JavaCollectionsUtil
 	
 	/**
 	 * Set转List
+	 * @deprecated
 	 * */
-	@Deprecated
+	@Deprecated(since="Set转List")
 	public static <T> List<T> toList(final Set<T> set, final CollectionType collectionType)
 	{
 		if (isCollectionEmpty(set))
@@ -404,16 +334,22 @@ public final class JavaCollectionsUtil
 		
 		switch (collectionType)
 		{
-			case ArrayList:
+			case ARRAY_LIST:
 				return new ArrayList<>(set);
-			case LinkedList:
+			case LINKED_LIST:
 				return new LinkedList<>(set);
+			case COPY_ON_WRITE_ARRAY_LIST:
+				return new CopyOnWriteArrayList<>(set);
 			default:
 				return new ArrayList<>(set);
 		}
 	}
 	
-	@Deprecated
+	/**
+	 * 已过时
+	 * @deprecated
+	 * */
+	@Deprecated(since="已过时")
 	public static <K, V> Map<K, V> toMap(final MultiKeyMap<K, V> map, final int keyIndex, final MapType mapType)
 	{
 		if (isMapEmpty(map))
@@ -422,14 +358,17 @@ public final class JavaCollectionsUtil
 		Map<K, V> temp = null;
 		switch (mapType)
 		{
-			case HashMap:
+			case HASH_MAP:
 				temp = new HashMap<>();
 				break;
-			case TreeMap:
+			case TREE_MAP:
 				temp = new TreeMap<>();
 				break;
-			case LinkedHashMap:
+			case LINKED_HASH_MAP:
 				temp = new LinkedHashMap<>();
+				break;
+			case CONCURRENT_HASH_MAP:
+				temp = new ConcurrentHashMap<>();
 				break;
 			default:
 				temp = new HashMap<>();
@@ -440,13 +379,16 @@ public final class JavaCollectionsUtil
 		mapProcessor
 		(
 				map, 
-				(final MultiKey<? extends K> key, final V value, final int indx) -> 
-				{ result.put(key.getKey(keyIndex), value); }
+				(final MultiKey<? extends K> key, final V value, final int indx) -> result.put(key.getKey(keyIndex), value)
 		);
 		return result;
 	}
 	
-	@Deprecated
+	/**
+	 * 已过时
+	 * @deprecated
+	 * */
+	@Deprecated(since="已过时")
 	public static Collection<Map<String, Column>> toMaps(final Table table, final int keyIndex, final MapType mapType, final CollectionType collectionType)
 	{
 		if (null == table || isCollectionEmpty(table.getColumns()))
@@ -455,20 +397,23 @@ public final class JavaCollectionsUtil
 		Collection<Map<String, Column>> temp = null;
 		switch (collectionType)
 		{
-			case HashSet:
+			case HASH_SET:
 				temp = new HashSet<>();
 				break;
-			case TreeSet:
+			case TREE_SET:
 				temp = new TreeSet<>();
 				break;
-			case LinkedHashSet:
+			case LINKED_HASHSET:
 				temp = new LinkedHashSet<>();
 				break;
-			case ArrayList:
+			case ARRAY_LIST:
 				temp = new ArrayList<>();
 				break;
-			case LinkedList:
+			case LINKED_LIST:
 				temp = new LinkedList<>();
+				break;
+			case COPY_ON_WRITE_ARRAY_LIST:
+				temp = new CopyOnWriteArrayList<>();
 				break;
 			default:
 				temp = new ArrayList<>();
@@ -479,19 +424,22 @@ public final class JavaCollectionsUtil
 		collectionProcessor
 		(
 				table.getColumns(),
-				(final MultiKeyMap<String, Column> value, final int indx, final int length) ->
-				{ result.add(toMap(value, keyIndex, mapType)); }
+				(final MultiKeyMap<String, Column> value, final int indx, final int length) -> result.add(toMap(value, keyIndex, mapType))
 		);
 		return result;
 	}
 	
-	/**建议使用cn.hutool.core.util.ObjectUtil.defaultIfNull*/ 
-	@Deprecated
+	/**建议使用cn.hutool.core.util.ObjectUtil.defaultIfNull
+	 * @deprecated
+	 * */ 
+	@Deprecated(since="建议使用cn.hutool.core.util.ObjectUtil.defaultIfNull")
 	public static <T> Collection<T> ifNullForCollection(final T val)
 	{ return nvlForCollection(val); }
 	
-	/**建议使用cn.hutool.core.util.ObjectUtil.defaultIfNull*/ 
-	@Deprecated
+	/**建议使用cn.hutool.core.util.ObjectUtil.defaultIfNull
+	 * @deprecated
+	 * */ 
+	@Deprecated(since="建议使用cn.hutool.core.util.ObjectUtil.defaultIfNull")
 	public static <T> Collection<T> nvlForCollection(final T val)
 	{
 		Collection<T> result = null;
@@ -525,7 +473,7 @@ public final class JavaCollectionsUtil
 					result = ObjectUtil.cloneByStream(v);
 				}
 				else
-				{ throw new Exception("执行Collection的NVL函数出现问题，主要是无法生成Collection"); }
+				{ throw new JavaCollectionsUtilException("执行Collection的NVL函数出现问题，主要是无法生成Collection"); }
 			}
 			else
 			{ result = Collections.emptyList(); }
@@ -536,13 +484,17 @@ public final class JavaCollectionsUtil
 		return result;
 	}
 	
-	/**建议使用cn.hutool.core.util.ObjectUtil.defaultIfNull*/ 
-	@Deprecated
+	/**建议使用cn.hutool.core.util.ObjectUtil.defaultIfNull
+	 * @deprecated
+	 * */ 
+	@Deprecated(since="建议使用cn.hutool.core.util.ObjectUtil.defaultIfNull")
 	public static <K, T, V> Map<K, V> ifNullForMap(final T val)
 	{ return nvlForMap(val); }
 	
-	/**建议使用cn.hutool.core.util.ObjectUtil.defaultIfNull*/ 
-	@Deprecated
+	/**建议使用cn.hutool.core.util.ObjectUtil.defaultIfNull
+	 * @deprecated
+	 * */ 
+	@Deprecated(since="建议使用cn.hutool.core.util.ObjectUtil.defaultIfNull")
 	public static <K, T, V> Map<K, V> nvlForMap(final T val)
 	{
 		Map<K, V> result = null;
@@ -566,7 +518,7 @@ public final class JavaCollectionsUtil
 					result = ObjectUtil.cloneByStream(v);
 				}
 				else
-				{ throw new Exception("执行Map的NVL函数出现问题，主要是无法生成Map"); }
+				{ throw new JavaCollectionsUtilException("执行Map的NVL函数出现问题，主要是无法生成Map"); }
 			}
 			else
 			{ result = Collections.emptyMap(); }
@@ -576,22 +528,32 @@ public final class JavaCollectionsUtil
 		return result;
 	}
 	
-	@Deprecated
+	/**
+	 * 已过时
+	 * @deprecated
+	 * */
+	@Deprecated(since="已过时")
 	public enum CollectionType
 	{
-		HashSet,
-		TreeSet,
-		LinkedHashSet,
-		ArrayList,
-		LinkedList
+		HASH_SET,
+		TREE_SET,
+		LINKED_HASHSET,
+		ARRAY_LIST,
+		LINKED_LIST,
+		COPY_ON_WRITE_ARRAY_LIST
 	}
 	
-	@Deprecated
+	/**
+	 * 已过时
+	 * @deprecated
+	 * */
+	@Deprecated(since="已过时")
 	public enum MapType
 	{
-		HashMap,
-		TreeMap,
-		LinkedHashMap
+		HASH_MAP,
+		TREE_MAP,
+		LINKED_HASH_MAP,
+		CONCURRENT_HASH_MAP
 	}
 	
 	public enum OperationType 
@@ -603,7 +565,6 @@ public final class JavaCollectionsUtil
 	    DISJUNCTION;
 	}
 	
-	@Deprecated
 	@FunctionalInterface
 	public interface ItemProcessorForMap<K, V>
 	{ void process(final K key, final V value, final int indx); }
@@ -615,4 +576,12 @@ public final class JavaCollectionsUtil
 	@FunctionalInterface
 	public interface ItemProcessorForCollection<T>
 	{ void process(final T value, final int indx, final int length); }
+	
+	private static class JavaCollectionsUtilException extends Exception
+	{
+		private static final long serialVersionUID = 2476613733425501189L;
+
+		private JavaCollectionsUtilException(final String message)
+		{ super(message); }
+	}
 }

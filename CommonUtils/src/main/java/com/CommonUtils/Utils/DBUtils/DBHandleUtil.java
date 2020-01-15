@@ -21,6 +21,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.Random;
 
 import org.apache.commons.collections4.map.MultiKeyMap;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
@@ -37,8 +39,8 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.db.DbUtil;
 import cn.hutool.db.meta.JdbcType;
 import lombok.Getter;
 import lombok.ToString;
@@ -48,6 +50,8 @@ import lombok.extern.slf4j.Slf4j;
 public final class DBHandleUtil 
 {
 	private DBHandleUtil() {}
+	
+	private static final String ABSTRACT_DB_INFO_TYPE_ERROR_DESC = "出现了新的AbstractDBInfo继承子类，请及时处理";
 	
 	public static void commit(final PreparedStatement[] preparedStatements, final Connection[] connections, final boolean useBatch) throws SQLException
 	{
@@ -68,13 +72,10 @@ public final class DBHandleUtil
 			{ connection.commit(); }
 		}
 		
-		if (useBatch) 
+		if (useBatch && !cn.hutool.core.util.ArrayUtil.isEmpty(preparedStatements)) 
 		{
-			if (!cn.hutool.core.util.ArrayUtil.isEmpty(preparedStatements))
-			{
-				for (PreparedStatement preparedStatement : preparedStatements)
-				{ preparedStatement.clearBatch(); }
-			}
+			for (PreparedStatement preparedStatement : preparedStatements)
+			{ preparedStatement.clearBatch(); }
 		}
 	}
 	
@@ -104,8 +105,8 @@ public final class DBHandleUtil
 		try
 		{
 			connection = DBHandleUtil.getConnection(sourceDBInfo);
-			preparedStatement = DBHandleUtil.getPreparedStatement(PreparedStatementOperationType.READ, connection, sourceDBInfo.getSql(), fetchSize);
-			DBHandleUtil.setPreparedStatement(PreparedStatementOperationType.READ, preparedStatement, sourceDBInfo.getBindingParams());
+			preparedStatement = DBHandleUtil.getPreparedStatement(PreparedStatementOperationType.READ, connection, Optional.ofNullable(sourceDBInfo).orElseThrow().getSql(), fetchSize);
+			DBHandleUtil.setPreparedStatement(PreparedStatementOperationType.READ, preparedStatement, Optional.ofNullable(sourceDBInfo).orElseThrow().getBindingParams());
 			ResultSetMetaData resultSetMetaData = preparedStatement.getMetaData();
 			
 			String[] columnNames = new String[resultSetMetaData.getColumnCount()];
@@ -134,7 +135,7 @@ public final class DBHandleUtil
 		catch (Exception ex)
 		{ log.error("生成INSERT语句出现异常，异常原因为：", ex); }
 		finally
-		{ releaseRelatedResourcesNoDataSource(new Connection[] {connection}, null, new PreparedStatement[] {preparedStatement}); }
+		{ DbUtil.close(preparedStatement, connection); }
 		
 		return result;
 	}
@@ -155,10 +156,10 @@ public final class DBHandleUtil
 		return sb.toString();
 	}
 	
-	public static String generateInsertSqlWithBindingParams(final String tableName, final String ... columnNames) throws Exception
+	public static String generateInsertSqlWithBindingParams(final String tableName, final String ... columnNames) throws DBHandleUtilException
 	{
 		if (cn.hutool.core.util.ArrayUtil.isEmpty(columnNames))
-		{ throw new Exception("生成INSERT语句，字段名称不能为空！！！"); }
+		{ throw new DBHandleUtilException("生成INSERT语句，字段名称不能为空！！！"); }
 		
 		StringBuilder sb = new StringBuilder().append("INSERT INTO ")
 											  .append(tableName)
@@ -190,7 +191,7 @@ public final class DBHandleUtil
 		return sb.toString();
 	}
 	
-	public static Connection getConnection(final AbstractDBInfo abstractDBInfo) throws Exception
+	public static Connection getConnection(final AbstractDBInfo abstractDBInfo) throws DBHandleUtilException, ClassNotFoundException, SQLException
 	{
 		if (null != abstractDBInfo)
 		{
@@ -212,7 +213,7 @@ public final class DBHandleUtil
 				return connection;
 			}
 			else
-			{ throw new Exception("出现了新的AbstractDBInfo继承子类，请及时处理"); }
+			{ throw new DBHandleUtilException(ABSTRACT_DB_INFO_TYPE_ERROR_DESC); }
 		}
 		else
 		{ return null; }
@@ -300,7 +301,7 @@ public final class DBHandleUtil
 		String prefix = DateUtil.format(new Date(), DatePattern.PURE_DATETIME_PATTERN);
 		
 		//(数据类型)(最小值+Math.random()*(最大值-最小值+1))
-		int randomNum = (int)(1 + Math.random() * (99999999 - 1 + 1));
+		int randomNum = 1 + new Random().nextInt() * (99999999 - 1 + 1);
 		
 		String suffix = StrUtil.padPre(Integer.toString(randomNum), 8, '0');
 		
@@ -323,23 +324,21 @@ public final class DBHandleUtil
 		if (!FileUtil.isFile(file))
 		{ return Collections.emptyList(); }
 		
-		InputStream fis = null;
-		Reader isr = null;
-		BufferedReader br = null;
 		Collection<String> result = new ArrayList<>();
 		try
+		(
+				InputStream fis = new FileInputStream(file);
+				Reader isr = new InputStreamReader(fis, encode);
+				BufferedReader br = new BufferedReader(isr);
+		)
 		{
-			fis = new FileInputStream(file);
-			isr = new InputStreamReader(fis, encode);
-			br = new BufferedReader(isr);
-			
 			String line;
 			StringBuilder sb = null;
 			while (null != (line = br.readLine()))
 			{
 				if (line.contains(";"))
 				{
-					result.add(sb.append(line).append(" ").toString());
+					result.add(Optional.ofNullable(sb).orElseThrow().append(line).append(" ").toString());
 					sb = null;
 				}
 				else
@@ -353,24 +352,19 @@ public final class DBHandleUtil
 		}
 		catch (Exception ex)
 		{ log.error("读取文件，获取查询SQL出现异常，异常原因为：", ex); }
-		finally
-		{
-			IoUtil.close(br);
-			IoUtil.close(isr);
-			IoUtil.close(fis);
-		}
 		
 		return result;
 	}
 	
 	/**
 	 * 释放相关资源，但不包含数据库连接池，建议使用cn.hutool.db.DbUtil.close
+	 * @deprecated
 	 * */
-	@Deprecated
+	@Deprecated(since="释放相关资源，但不包含数据库连接池，建议使用cn.hutool.db.DbUtil.close")
 	public static void releaseRelatedResourcesNoDataSource(final Connection[] connections, final ResultSet[] resultSets, final PreparedStatement[] preparedStatements)
 	{		
-		CollUtil.newArrayList(resultSets).forEach(resultSet -> { JdbcUtils.closeResultSet(resultSet); });
-		CollUtil.newArrayList(preparedStatements).forEach(preparedStatement -> { JdbcUtils.closeStatement(preparedStatement); });
+		CollUtil.newArrayList(resultSets).forEach(JdbcUtils::closeResultSet);
+		CollUtil.newArrayList(preparedStatements).forEach(JdbcUtils::closeStatement);
 		CollUtil.newArrayList(connections)
 				.forEach
 				(
@@ -436,7 +430,7 @@ public final class DBHandleUtil
 				{ dbInfoForDataSource.getJdbcTemplate().batchUpdate(dbInfoForDataSource.getSql()); }
 			}
 			else
-			{ throw new Exception("出现了新的AbstractDBInfo继承子类，请及时处理"); }
+			{ throw new DBHandleUtilException(ABSTRACT_DB_INFO_TYPE_ERROR_DESC); }
 		}
 		catch (Exception ex)
 		{
@@ -445,7 +439,7 @@ public final class DBHandleUtil
 			{ DBHandleUtil.rollback(connection); }
 		}
 		finally
-		{ DBHandleUtil.releaseRelatedResourcesNoDataSource(new Connection[] {connection}, null, new PreparedStatement[] {preparedStatement}); }
+		{ DbUtil.close(preparedStatement, connection); }
 	}
 	
 	public static List<Map<String, Object>> getRecords(final AbstractDBInfo abstractDBInfo, final int fetchSize)
@@ -467,7 +461,7 @@ public final class DBHandleUtil
 				ResultSetMetaData resultSetMetaData = preparedStatement.getMetaData();
 				while (resultSet.next())
 				{
-					Map<String, Object> record = new HashMap<String, Object>();
+					Map<String, Object> record = new HashMap<>();
 					for (int i = 1; i <= resultSetMetaData.getColumnCount(); i++) 
 					{
 						String columnName = null;
@@ -492,12 +486,12 @@ public final class DBHandleUtil
 				{ result = dbInfoForDataSource.getJdbcTemplate().queryForList(dbInfoForDataSource.getSql()); }
 			}
 			else
-			{ throw new Exception("出现了新的AbstractDBInfo继承子类，请及时处理"); }
+			{ throw new DBHandleUtilException(ABSTRACT_DB_INFO_TYPE_ERROR_DESC); }
 		}
 		catch (Exception ex)
 		{ log.error("获取数据库记录出现异常，异常为：", ex); }
 		finally
-		{ DBHandleUtil.releaseRelatedResourcesNoDataSource(new Connection[] {connection}, new ResultSet[] {resultSet}, new PreparedStatement[] {preparedStatement}); }
+		{ DbUtil.close(resultSet, preparedStatement, connection); }
 		
 		return result;
 	}
@@ -509,9 +503,17 @@ public final class DBHandleUtil
 		READ("以读取模式配置PreparedStatement"),
 		WRITE("以修改模式配置PreparedStatement");
 		
-		private final String preparedStatementOperationType;
+		private final String type;
 		
-		private PreparedStatementOperationType(final String preparedStatementOperationType) 
-		{ this.preparedStatementOperationType = preparedStatementOperationType; }
+		private PreparedStatementOperationType(final String type) 
+		{ this.type = type; }
+	}
+	
+	private static class DBHandleUtilException extends Exception
+	{
+		private static final long serialVersionUID = 5722777661383339219L;
+
+		private DBHandleUtilException(final String message)
+		{ super(message); }
 	}
 }

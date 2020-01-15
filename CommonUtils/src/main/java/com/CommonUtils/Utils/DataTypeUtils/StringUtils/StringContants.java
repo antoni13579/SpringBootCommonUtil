@@ -2,6 +2,8 @@ package com.CommonUtils.Utils.DataTypeUtils.StringUtils;
 
 public final class StringContants 
 {
+	private StringContants() {}
+	
 	/**
 	 * 正则表达式，意思是只允许大小写字母与横杠的存在
 	 * */
@@ -32,16 +34,22 @@ public final class StringContants
 	 * */
 	public static final String PATTERN_5 = "\\s+";
 	
-	/**验证邮箱格式的正则表达式，建议使用cn.hutool.core.lang.PatternPool.EMAIL*/
-	@Deprecated
+	/**验证邮箱格式的正则表达式，建议使用cn.hutool.core.lang.PatternPool.EMAIL
+	 * @deprecated
+	 * */
+	@Deprecated(since="验证邮箱格式的正则表达式，建议使用cn.hutool.core.lang.PatternPool.EMAIL")
 	public static final String PATTERN_6 = "\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*";
 	
-	/**验证数字的正则表达式，建议使用cn.hutool.core.lang.PatternPool.NUMBERS*/
-	@Deprecated
+	/**验证数字的正则表达式，建议使用cn.hutool.core.lang.PatternPool.NUMBERS
+	 * @deprecated
+	 * */
+	@Deprecated(since="验证数字的正则表达式，建议使用cn.hutool.core.lang.PatternPool.NUMBERS")
 	public static final String PATTERN_7 = "^[0-9]*$";
 	
-	/**提取数字的正则表达式，建议使用cn.hutool.core.lang.PatternPool.NUMBERS*/
-	@Deprecated
+	/**提取数字的正则表达式，建议使用cn.hutool.core.lang.PatternPool.NUMBERS
+	 * @deprecated
+	 * */
+	@Deprecated(since="提取数字的正则表达式，建议使用cn.hutool.core.lang.PatternPool.NUMBERS")
 	public static final String PATTERN_8 = "[^0-9]";
 	
 	/**验证国内座机号*/
@@ -50,7 +58,9 @@ public final class StringContants
 	/**验证国内座机号*/
 	public static final String PATTERN_10 = "\\d{3}-\\d{8}|\\d{4}-\\{7,8}";
 	
-	/**验证国内手机号，建议使用cn.hutool.core.lang.PatternPool.MOBILE*/
-	@Deprecated
+	/**验证国内手机号，建议使用cn.hutool.core.lang.PatternPool.MOBILE
+	 * @deprecated
+	 * */
+	@Deprecated(since="验证国内手机号，建议使用cn.hutool.core.lang.PatternPool.MOBILE")
 	public static final String PATTERN_11 = "0?(13|14|15|18)[0-9]{9}";
 }

@@ -1,6 +1,7 @@
 package com.CommonUtils.Config.Kafka.Stream.Config.LowLevel;
 
 import java.time.Duration;
+import java.util.Properties;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.Serde;
@@ -13,12 +14,10 @@ import org.apache.kafka.streams.processor.Processor;
 import org.apache.kafka.streams.processor.ProcessorContext;
 import org.apache.kafka.streams.processor.ProcessorSupplier;
 import org.apache.kafka.streams.processor.PunctuationType;
-import org.apache.kafka.streams.processor.Punctuator;
 import org.apache.kafka.streams.state.KeyValueStore;
 import org.apache.kafka.streams.state.Stores;
 
 import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.JavaCollectionsUtil;
-import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.CustomCollections.Properties;
 import com.CommonUtils.Utils.SystemUtils.KafkaUtils.KafkaUtil;
 
 import cn.hutool.core.collection.CollUtil;
@@ -27,8 +26,10 @@ import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.util.ObjectUtil;
 import lombok.extern.slf4j.Slf4j;
 
-/**这个是模板，推荐自主实现*/
-@Deprecated
+/**这个是模板，推荐自主实现
+ * @deprecated
+ * */
+@Deprecated(since="这个是模板，推荐自主实现")
 @Slf4j
 public final class KafkaLowStreamConfig 
 {
@@ -49,14 +50,14 @@ public final class KafkaLowStreamConfig
 										       final Serde<T> valueSerde,
 										       final ItemProcessor ... itemProcessors)
 	{
-		Properties props = new Properties()
-				.put(StreamsConfig.APPLICATION_ID_CONFIG, kafkaStreamJobName)
-				.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaBroker)
-        		.put(StreamsConfig.CACHE_MAX_BYTES_BUFFERING_CONFIG, 2048)
-        		.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass())
-        		.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, valueSerde.getClass())
-        		// setting offset reset to earliest so that we can re-run the demo code with the same pre-loaded data
-        		.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+		Properties props = new Properties();
+		props.put(StreamsConfig.APPLICATION_ID_CONFIG, kafkaStreamJobName);
+		props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaBroker);
+		props.put(StreamsConfig.CACHE_MAX_BYTES_BUFFERING_CONFIG, 2048);
+		props.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass());
+		props.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, valueSerde.getClass());
+        // setting offset reset to earliest so that we can re-run the demo code with the same pre-loaded data
+		props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
         Topology builder = new Topology()
         		.addSource("Source", kafkaTopicName)
@@ -65,14 +66,14 @@ public final class KafkaLowStreamConfig
         
         switch (eStoreBuilderType)
         {
-        	case WindowStoreBuilder:
+        	case WINDOW_STORE_BUILDER:
         		log.warn("未实现WindowStoreBuilder");
         		break;
         		
-        	case KeyValueStoreBuilder:
+        	case KEY_VALUE_STORE_BUILDER:
         		switch (eKeyValueStoreType)
         		{
-        			case Persistent:
+        			case PERSISTENT:
         				builder.addStateStore
         				(
         						Stores.keyValueStoreBuilder
@@ -85,7 +86,7 @@ public final class KafkaLowStreamConfig
         				);
         				break;
         				
-        			case InMemory:
+        			case IN_MEMORY:
         				builder.addStateStore
         				(
         						Stores.keyValueStoreBuilder
@@ -98,7 +99,7 @@ public final class KafkaLowStreamConfig
         				);
         				break;
         				
-        			case LruMap:
+        			case LRU_MAP:
         				builder.addStateStore
         				(
         						Stores.keyValueStoreBuilder
@@ -117,7 +118,7 @@ public final class KafkaLowStreamConfig
         		}
         		break;
         	
-        	case SessionStoreBuilder:
+        	case SESSION_STORE_BUILDER:
         		log.warn("未实现SessionStoreBuilder");
         		break;
         		
@@ -126,7 +127,7 @@ public final class KafkaLowStreamConfig
         		break;
         }
 
-        return new KafkaStreams(builder, props.getProperties());
+        return new KafkaStreams(builder, props);
 	}
 	
 	public static class JobProcessorSupplier implements ProcessorSupplier<String, byte[]>
@@ -174,26 +175,23 @@ public final class KafkaLowStreamConfig
 				(
 						Duration.ofMillis(JobProcessor.this.intervalMs), 
 						JobProcessor.this.punctuationType, 
-						new Punctuator() 
+						
+						//基于时间的流逝周期性地执行
+						//这个函数一般不需要添加任何代码，如果加了，很有可能会与process方法有冲突，导致消息数据不对，具体测试过，里面写了代码，process方法的遍历kvStore的值就有问题了
+						timestamp -> 
 						{
-							//基于时间的流逝周期性地执行
-							//这个函数一般不需要添加任何代码，如果加了，很有可能会与process方法有冲突，导致消息数据不对，具体测试过，里面写了代码，process方法的遍历kvStore的值就有问题了
-							@Override
-							public void punctuate(long timestamp) 
-							{								
-								boolean processorResult = KafkaUtil.KeyValueStoreProcessor
-								(
-										JobProcessor.this.kvStore, 
-										(final KeyValue<String, byte[]> entry, final KeyValueStore<String, byte[]> kvStore) -> 
-										{
-											//这句不能加，加入就会影响到原来的Kafka消息，导致程序报错
-											//TestJobProcessor.this.processorContext.forward(entry.key, entry.value);
-										}
-								);
-								
-								if (processorResult)
-								{ JobProcessor.this.kvStore.flush(); }
-							}
+							boolean processorResult = KafkaUtil.keyValueStoreProcessor
+							(
+									JobProcessor.this.kvStore, 
+									(final KeyValue<String, byte[]> entry, final KeyValueStore<String, byte[]> internalKvStore) -> 
+									{
+										//这句不能加，加入就会影响到原来的Kafka消息，导致程序报错
+										//TestJobProcessor.this.processorContext.forward(entry.key, entry.value);
+									}
+							);
+									
+							if (processorResult)
+							{ JobProcessor.this.kvStore.flush(); }
 						}
 				);
 				
@@ -218,8 +216,7 @@ public final class KafkaLowStreamConfig
 						JavaCollectionsUtil.collectionProcessor
 						(
 								CollUtil.newArrayList(JobProcessor.this.itemProcessors), 
-								(final ItemProcessor itemProcessor, final int indx, final int length) -> 
-								{ itemProcessor.process(tmpValue, JobProcessor.this.processorContext, JobProcessor.this.kvStore); }
+								(final ItemProcessor itemProcessor, final int indx, final int length) -> itemProcessor.process(tmpValue, JobProcessor.this.processorContext, JobProcessor.this.kvStore)
 						);
 					}
 				}
@@ -236,15 +233,15 @@ public final class KafkaLowStreamConfig
 	
 	public enum EKeyValueStoreType
 	{
-		Persistent,
-		InMemory,
-		LruMap
+		PERSISTENT,
+		IN_MEMORY,
+		LRU_MAP
 	}
 	
 	public enum EStoreBuilderType 
 	{
-		WindowStoreBuilder,
-		KeyValueStoreBuilder,
-		SessionStoreBuilder;
+		WINDOW_STORE_BUILDER,
+		KEY_VALUE_STORE_BUILDER,
+		SESSION_STORE_BUILDER;
 	}
 }

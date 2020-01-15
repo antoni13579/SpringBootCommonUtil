@@ -14,7 +14,7 @@ public final class JobRepositoryConfig
 	
 	public static JobRepository getMapJobRepositoryInstance(final PlatformTransactionManager platformTransactionManager) throws Exception
 	{
-		MapJobRepositoryFactoryBean result = new MapJobRepositoryFactoryBean();;
+		MapJobRepositoryFactoryBean result = new MapJobRepositoryFactoryBean();
 		result.setTransactionManager(platformTransactionManager);
 		return result.getObject();
 	}

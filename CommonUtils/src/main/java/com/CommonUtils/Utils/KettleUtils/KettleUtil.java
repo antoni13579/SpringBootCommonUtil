@@ -8,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public final class KettleUtil 
 {
+	private KettleUtil() {}
+	
 	public static void release()
 	{
 		try

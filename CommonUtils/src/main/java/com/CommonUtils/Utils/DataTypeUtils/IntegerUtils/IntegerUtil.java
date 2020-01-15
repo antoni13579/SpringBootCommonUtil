@@ -19,20 +19,22 @@ public final class IntegerUtil
 {
 	private IntegerUtil() {}
 	
+	private static final String AGGREGATION_KEY = "ALL_AGGREGATION";
+	
 	public static IntSummaryStatistics aggregation(final Integer ... params)
 	{
-		Map<String, IntSummaryStatistics> map = groupBy((x) -> { return "ALL_AGGREGATION"; }, (x) -> { return x; }, params);
+		Map<String, IntSummaryStatistics> map = groupBy(x -> AGGREGATION_KEY, x -> x, params);
 		if (!CollUtil.isEmpty(map))
-		{ return map.get("ALL_AGGREGATION"); }
+		{ return map.get(AGGREGATION_KEY); }
 		else
 		{ return new IntSummaryStatistics(); }
 	}
 	
 	public static IntSummaryStatistics aggregation(final Collection<Integer> coll)
 	{
-		Map<String, IntSummaryStatistics> map = groupBy((x) -> { return "ALL_AGGREGATION"; }, (x) -> { return x; }, coll);
+		Map<String, IntSummaryStatistics> map = groupBy(x -> AGGREGATION_KEY, x -> x, coll);
 		if (!CollUtil.isEmpty(map))
-		{ return map.get("ALL_AGGREGATION"); }
+		{ return map.get(AGGREGATION_KEY); }
 		else
 		{ return new IntSummaryStatistics(); }
 	}
@@ -66,29 +68,37 @@ public final class IntegerUtil
 				(final String groupByKey, final IntSummaryStatistics groupByResult, final int indx) -> 
 				{
 					List<String> tmp = StrSpliter.split(groupByKey, delimiter, false, false);
-					//String[] groupByFields = StringUtils.splitPreserveAllTokens(groupByKey, delimiter);
 					String[] groupByFields = tmp.toArray(new String[tmp.size()]);
 					JavaCollectionsUtil.collectionProcessor
 					(
 							CollUtil.newArrayList(processors), 
-							(final ItemProcessorForProcessGroupByResult val, final int inx, final int length) -> 
-							{ val.process(groupByResult, groupByFields); }
+							(final ItemProcessorForProcessGroupByResult val, final int inx, final int length) -> val.process(groupByResult, groupByFields)
 					);
 				}
 		);
 	}
 	
-	/**建议使用cn.hutool.core.convert.Convert.toInt*/ 
-	@Deprecated
-	public static <T> int getInteger(final T obj) throws Exception
+	/**建议使用cn.hutool.core.convert.Convert.toInt
+	 * @deprecated
+	 * */ 
+	@Deprecated(since="建议使用cn.hutool.core.convert.Convert.toInt")
+	public static <T> int getInteger(final T obj) throws IntegerUtilException
 	{
 		if (obj instanceof Integer)
 		{ return Integer.parseInt(obj.toString()); }
 		else
-		{ throw new Exception("无法转换为int类型"); }
+		{ throw new IntegerUtilException("无法转换为int类型"); }
 	}
 	
 	@FunctionalInterface
 	public interface ItemProcessorForProcessGroupByResult
 	{ void process(final IntSummaryStatistics groupByResult, final String[] groupByFields); }
+	
+	private static class IntegerUtilException extends Exception
+	{
+		private static final long serialVersionUID = 9044037958023326023L;
+
+		private IntegerUtilException(final String message)
+		{ super(message); }
+	}
 }

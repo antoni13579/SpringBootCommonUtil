@@ -17,7 +17,7 @@ public final class DistributedLockRedis
 {
 	private DistributedLockRedis() {}
 	
-	public synchronized static <K, V> boolean lock(final RedisTemplate<K, V> redisTemplate, final RedisEntry<K, V> redisEntry)
+	public static synchronized <K, V> boolean lock(final RedisTemplate<K, V> redisTemplate, final RedisEntry<K, V> redisEntry)
 	{
 		V val = RedisUtil.getForValue(redisTemplate, redisEntry.getKey());
 		
@@ -36,7 +36,7 @@ public final class DistributedLockRedis
 		}
 	}
 	
-	public synchronized static <K, V> boolean lock(final ReactiveRedisTemplate<K, V> reactiveRedisTemplate, final RedisEntry<K, V> redisEntry)
+	public static synchronized <K, V> boolean lock(final ReactiveRedisTemplate<K, V> reactiveRedisTemplate, final RedisEntry<K, V> redisEntry)
 	{
 		Mono<V> val = RedisUtil.getForValue(reactiveRedisTemplate, redisEntry.getKey());
 		
@@ -56,10 +56,10 @@ public final class DistributedLockRedis
 		}
 	}
 	
-	public synchronized static <K, V> void unlock(final RedisTemplate<K, V> redisTemplate, final K key)
+	public static synchronized <K, V> void unlock(final RedisTemplate<K, V> redisTemplate, final K key)
 	{ RedisUtil.deleteForValues(redisTemplate, key); }
 	
-	public synchronized static <K, V> void unlock(final ReactiveRedisTemplate<K, V> reactiveRedisTemplate, final K key)
+	public static synchronized <K, V> void unlock(final ReactiveRedisTemplate<K, V> reactiveRedisTemplate, final K key)
 	{ RedisUtil.deleteForValues(reactiveRedisTemplate, key); }
 	
 	public synchronized <K, V> boolean renewal(final RedisTemplate<K, V> redisTemplate, final RedisEntry<K, V> redisEntry)

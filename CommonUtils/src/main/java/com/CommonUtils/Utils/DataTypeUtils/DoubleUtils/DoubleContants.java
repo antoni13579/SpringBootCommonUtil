@@ -1,6 +1,10 @@
 package com.CommonUtils.Utils.DataTypeUtils.DoubleUtils;
 
-@Deprecated
+/**
+ * 已过时
+ * @deprecated
+ * */
+@Deprecated(since="已过时")
 public final class DoubleContants 
 {
 	private DoubleContants() {}

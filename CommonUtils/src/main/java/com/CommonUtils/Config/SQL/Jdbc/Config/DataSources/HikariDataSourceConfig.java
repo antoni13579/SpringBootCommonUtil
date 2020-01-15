@@ -57,7 +57,7 @@ public final class HikariDataSourceConfig
 		/**
 		 * 是否自动提交池中返回的连接。默认值为true。一般是有必要自动提交上一个连接中的事物的。如果为false，那么就需要应用层手动提交事物。
 		 * */
-		//hikariDataSource.setAutoCommit(isAutoCommit);
+		hikariDataSource.setAutoCommit(true);
 		return hikariDataSource;
 	}
 }

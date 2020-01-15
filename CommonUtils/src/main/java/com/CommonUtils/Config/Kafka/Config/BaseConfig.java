@@ -1,5 +1,8 @@
 package com.CommonUtils.Config.Kafka.Config;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.Deserializer;
@@ -13,9 +16,13 @@ import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 import org.springframework.kafka.listener.ContainerProperties.AckMode;
 
-import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.CustomCollections.HashMap;
-
 /**使用此类，记得进行create bean动作，并加入@EnableKafka注解*/
+/**
+ * Kafka 发生重平衡的有以下几种情况：
+消费组成员发生变更，有新消费者加入或者离开，或者有消费者崩溃；
+消费组订阅的主题数量发生变更；
+消费组订阅的分区数发生变更。
+ * */
 public final class BaseConfig 
 {
 	private BaseConfig() {}
@@ -114,31 +121,35 @@ Consumer：消费者类，使用该类我们可以手动提交偏移量、控制
 																																    final boolean useAutoCommit,
 																																    final Deserializer<V> valueDeserializer)
 	{
-		HashMap<String, Object> configs = new HashMap<String, Object>()
-												.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaBrokers)
-				 								.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, "100")
-				 								.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, "15000")
-				 								//.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class)
-				 								//.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ByteArrayDeserializer.class)
-				 								.put(ConsumerConfig.GROUP_ID_CONFIG, kafkaGroup)
-				 								.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest")
+		Map<String, Object> configs = new HashMap<>();
+		configs.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaBrokers);
+		configs.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, "100");
+		configs.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, "15000");
+		//configs.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class)
+		//configs.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ByteArrayDeserializer.class)
+		configs.put(ConsumerConfig.GROUP_ID_CONFIG, kafkaGroup);
+		configs.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
 				 
-				 								//设置批量消费每次最多消费多少条消息记录
-				 								.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, 50);
+		/**
+		 *  * 消费消息是需要时间的，假设Kafka每次给你消费1000条，每条消息处理需要2ms，那么总耗时是2000ms，是小于300000ms，那么就不会出现被kafka踢出消费组，
+		 *   * 出现Kafka Rebalance的情况
+		 *   * */
+		//设置批量消费每次最多消费多少条消息记录
+		configs.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, 1000);
+				 								
+		//定下每次消费耗时的最高额度
+		configs.put(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, 300000);
 		
-		if (useAutoCommit)
-		{ configs.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, true); }
+		//配置自动确认消费或手工确认消费（使用Ack机制确认消费，禁止自动提交）
 		
-		//使用Ack机制确认消费，禁止自动提交
-		else
-		{ configs.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false); }
+		configs.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, useAutoCommit);
 		
 		ConcurrentKafkaListenerContainerFactory<String, V> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory
         (
         		new DefaultKafkaConsumerFactory<String, V>
                 (
-                		configs.getMap(),
+                		configs,
                 		new StringDeserializer(),
                 		valueDeserializer
                 )
@@ -169,25 +180,27 @@ Consumer：消费者类，使用该类我们可以手动提交偏移量、控制
 		  																					final Serializer<V> valueSerializer,
 		  																					final String transactionIdPrefix)
 	{
+		Map<String, Object> config = new HashMap<>();
+		config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaBrokers);
+		config.put(ProducerConfig.RECEIVE_BUFFER_CONFIG, 1000);
+		 
+		config.put(ProducerConfig.BATCH_SIZE_CONFIG, 4096);
+		config.put(ProducerConfig.LINGER_MS_CONFIG, 1);
+		config.put(ProducerConfig.BUFFER_MEMORY_CONFIG, 40960);
+		 
+		 /**
+		  * 设置这里，主要是提示了Must set retries to non-zero when using the idempotent producer的报错
+		  * 百度了一下，需要设置幂等发送
+		  * */
+		config.put(ProducerConfig.RETRIES_CONFIG, 1);
+		config.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, true);
+		 
+		 //config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class)
+		 //config.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, ByteArraySerializer.class)
+
 		DefaultKafkaProducerFactory<String, V> result =  new DefaultKafkaProducerFactory<>
         (
-        		new HashMap<String, Object>().put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaBrokers)
-        									 .put(ProducerConfig.RECEIVE_BUFFER_CONFIG, 1000)
-        									 
-        									 .put(ProducerConfig.BATCH_SIZE_CONFIG, 4096)
-        									 .put(ProducerConfig.LINGER_MS_CONFIG, 1)
-        									 .put(ProducerConfig.BUFFER_MEMORY_CONFIG, 40960)
-        									 
-        									 /**
-        									  * 设置这里，主要是提示了Must set retries to non-zero when using the idempotent producer的报错
-        									  * 百度了一下，需要设置幂等发送
-        									  * */
-        									 .put(ProducerConfig.RETRIES_CONFIG, 1)
-        									 .put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, true)
-        									 
-        									 //.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class)
-        									 //.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, ByteArraySerializer.class)
-        									 .getMap(),
+        		config,
         		new StringSerializer(),
         		valueSerializer
         );

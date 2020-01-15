@@ -7,9 +7,9 @@ public final class DBContants
 {
 	private DBContants() {}
 	
-	public static final int inSqlStatementForOracle = 1000;
+	public static final int IN_SQL_STATEMENT_FOR_ORACLE = 1000;
 	
-	public static final int inSqlStatementForMySql = 100;
+	public static final int IN_SQL_STATEMENT_FOR_MYSQL = 100;
 	
 	public static final String TERADATA_JDBC_DRIVER = "com.teradata.jdbc.TeraDriver";
 	

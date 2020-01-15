@@ -16,8 +16,12 @@ import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.TypeReference;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * 有hutool相关工具类使用
+ * @deprecated
+ * */
+@Deprecated(since="有hutool相关工具类使用")
 @Slf4j
-@Deprecated
 public final class ReflectUtil 
 {
 	private ReflectUtil() {}
@@ -47,7 +51,7 @@ public final class ReflectUtil
 			//获取所有的字段包括private/public，但不包括继承的字段
 			Field[] declaredFields = obj.getClass().getDeclaredFields();
 			
-			Set<Field> fieldSets = new HashSet<Field>();
+			Set<Field> fieldSets = new HashSet<>();
 			fieldSets.addAll(CollUtil.newArrayList(fields));
 			fieldSets.addAll(CollUtil.newArrayList(declaredFields));
 			
@@ -73,7 +77,7 @@ public final class ReflectUtil
 	/**建议使用cn.hutool.core.util.ReflectUtil.getFieldValue*/ 
 	public static Map<String, Object> getBeanFieldValue(final Object obj)
 	{
-		Map<String, Object> result = new HashMap<String, Object>();
+		Map<String, Object> result = new HashMap<>();
 		
 		try
 		{
@@ -83,7 +87,7 @@ public final class ReflectUtil
 			//获取所有的字段包括private/public，但不包括继承的字段
 			Field[] declaredFields = obj.getClass().getDeclaredFields();
 			
-			Set<Field> fieldSets = new HashSet<Field>();
+			Set<Field> fieldSets = new HashSet<>();
 			fieldSets.addAll(CollUtil.newArrayList(fields));
 			fieldSets.addAll(CollUtil.newArrayList(declaredFields));
 			
@@ -117,14 +121,9 @@ public final class ReflectUtil
 		if (null == srcClazz || null == targetClazz)
 		{ return false; }
 		
-		Set<Boolean> results = new HashSet<Boolean>()
-		{
-			private static final long serialVersionUID = 4082443775730843278L;
-			{
-				add(targetClazz.isAssignableFrom(srcClazz));
-				add(srcClazz.isAssignableFrom(targetClazz));
-			}
-		};
+		Set<Boolean> results = new HashSet<>();
+		results.add(targetClazz.isAssignableFrom(srcClazz));
+		results.add(srcClazz.isAssignableFrom(targetClazz));
 		
 		if (results.size() == 1) { return CollUtil.get(results, 0); }
 		else { return true; }
@@ -155,8 +154,7 @@ public final class ReflectUtil
 			ClassLoader classLoader = clazz.getClassLoader();
 			String classPath = clazz.getName().replace('.', '/') + ".class";
 			URL url = classLoader.getResource(classPath);
-			String path = url.getPath();
-			return path;
+			return url.getPath();
 		}
 		
 		return "";

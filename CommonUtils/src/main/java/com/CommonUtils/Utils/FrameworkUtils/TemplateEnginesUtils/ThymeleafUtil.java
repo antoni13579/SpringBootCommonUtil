@@ -17,8 +17,7 @@ public final class ThymeleafUtil
 		CollUtil.forEach//JavaCollectionsUtil.mapProcessor
 		(
 				attributes, 
-				(String key, Object value, int indx) -> 
-				{ context.setVariable(key, value); }
+				(String key, Object value, int indx) -> context.setVariable(key, value)
 		);
 		
 		return templateEngine.process(template, context);

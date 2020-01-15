@@ -7,8 +7,10 @@ import com.CommonUtils.Utils.SystemUtils.SystemInfoUtils.SystemInfo.SystemPlatfo
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
-/**请使用cn.hutool.core.util.RuntimeUtil*/
-@Deprecated
+/**请使用cn.hutool.core.util.RuntimeUtil
+ * @deprecated
+ * */
+@Deprecated(since="请使用cn.hutool.core.util.RuntimeUtil")
 @Slf4j
 @Setter
 /**
@@ -64,7 +66,7 @@ public final class ExecuteCommand
 		String cmd = null;
 		switch (systemPlatform)
 		{
-			case Windows:
+			case WINDOWS:
 				cmd = "cmd /c ";
 				break;
 			default:

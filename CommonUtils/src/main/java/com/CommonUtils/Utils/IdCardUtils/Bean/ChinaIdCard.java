@@ -13,9 +13,11 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
-/**已废弃，请使用cn.hutool.core.util.IdcardUtil*/
-/**中国身份证号码信息拆解*/
-@Deprecated
+/**中国身份证号码信息拆解，已废弃，请使用cn.hutool.core.util.IdcardUtil
+ * @deprecated
+ * 
+ * */
+@Deprecated(since="已废弃，请使用cn.hutool.core.util.IdcardUtil")
 @Getter
 @Setter
 @Accessors(chain = true)

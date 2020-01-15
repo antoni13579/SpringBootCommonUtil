@@ -7,38 +7,38 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.nio.file.Path;
+import java.util.Optional;
 
 import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
 
 import cn.hutool.core.io.IoUtil;
 import lombok.extern.slf4j.Slf4j;
 
+/***
+ * hutool相关工具类可以代替
+ * @deprecated
+ *
+ */
+ @Deprecated(since="hutool相关工具类可以代替")
 @Slf4j
-@Deprecated
 public final class DirectoryUtil 
 {
+	private DirectoryUtil() {}
+	
 	/**
 	 * 判断指定的路径是否为目录，目录返回true，不是则返回false，建议使用cn.hutool.core.io.FileUtil.isDirectory
 	 * */
 	public static boolean isDirectory(final String path)
 	{
 		File file = new File(path);
-		if (file.exists() && file.isDirectory() && !StringUtil.isStrEmpty(path))
-		{ return true; }
-		
-		return false;
+		return file.exists() && file.isDirectory() && !StringUtil.isStrEmpty(path);
 	}
 	
 	/**
 	 * 判断指定的路径是否为目录，目录返回true，不是则返回false，建议使用cn.hutool.core.io.FileUtil.isDirectory
 	 * */
 	public static boolean isDirectory(final File file)
-	{
-		if (null != file && file.exists() && file.isDirectory())
-		{ return true; }
-		
-		return false;
-	}
+	{ return null != file && file.exists() && file.isDirectory(); }
 	
 	/**
 	 * 判断指定的路径是否为目录，目录返回true，不是则返回false，建议使用cn.hutool.core.io.FileUtil.isDirectory
@@ -111,28 +111,25 @@ public final class DirectoryUtil
 			File tmpFile = new File(destDirectoryFile.getAbsolutePath() + File.separator + srcDirectoryFile.getName());
 			tmpFile.mkdir();
 			File[] files = srcDirectoryFile.listFiles();
-			for (File file : files)
-			{ subCopyDirectoryNio(file, tmpFile); }
+			Optional<File[]> tmpFiles = Optional.ofNullable(files);
+			if (tmpFiles.isPresent())
+			{
+				for (File file : files)
+				{
+					File tmp = Optional.ofNullable(file).orElseThrow();
+					subCopyDirectoryNio(tmp, tmpFile);
+				}
+			}
         }
 		
 		//类型为文件
 		else
 		{
-            //String result = FileUtil.copyFileNio(srcDirectoryFile.getPath(), destDirectoryFile.getAbsolutePath() + File.separator + srcDirectoryFile.getName());
-            
 			FileInputStream fis = new FileInputStream(new File(srcDirectoryFile.getPath()));
 			FileOutputStream fos = new FileOutputStream(new File(destDirectoryFile.getAbsolutePath() + File.separator + srcDirectoryFile.getName()));
             IoUtil.copy(fis, fos);
             IoUtil.close(fis);
             IoUtil.close(fos);
-            
-            /*
-            if ("FAILED".equalsIgnoreCase(result))
-            {
-            	log.warn("采用Nio目录复制出现了异常，请查询日志，程序退出，源路径={}，目标路径={}", srcDirectoryFile.getPath(), destDirectoryFile.getPath());
-            	return;
-            }
-            */
         }
 	}
 	
@@ -162,15 +159,17 @@ public final class DirectoryUtil
 			File tmpFile = new File(destDirectoryFile.getAbsolutePath() + File.separator + srcDirectoryFile.getName());
 			tmpFile.mkdir();
 			File[] files = srcDirectoryFile.listFiles();
-			for (File file : files)
-			{ subCopyDirectoryBio(file, tmpFile); }
+			Optional<File[]> tempFiles = Optional.ofNullable(files);
+			if (tempFiles.isPresent())
+			{
+				for (File file : files)
+				{ subCopyDirectoryBio(file, tmpFile); }
+			}
         }
 		
 		//类型为文件
 		else
 		{
-            //String result = FileUtil.copyFileBio(srcDirectoryFile.getPath(), destDirectoryFile.getAbsolutePath() + File.separator + srcDirectoryFile.getName());
-            
             FileInputStream fis = new FileInputStream(new File(srcDirectoryFile.getPath()));
             BufferedInputStream bis = IoUtil.toBuffered(fis);
             
@@ -183,13 +182,6 @@ public final class DirectoryUtil
             IoUtil.close(fis);
             IoUtil.close(bos);
             IoUtil.close(fos);
-            /*
-            if ("FAILED".equalsIgnoreCase(result))
-            {
-            	log.warn("采用Bio目录复制出现了异常，请查询日志，程序退出，源路径={}，目标路径={}", srcDirectoryFile.getPath(), destDirectoryFile.getPath());
-            	return;
-            }
-            */
         }
 	}
 	

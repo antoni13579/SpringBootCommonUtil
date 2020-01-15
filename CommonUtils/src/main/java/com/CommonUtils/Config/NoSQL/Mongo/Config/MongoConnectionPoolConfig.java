@@ -10,6 +10,11 @@ import com.mongodb.ReadPreference;
 import com.mongodb.ServerAddress;
 import com.mongodb.WriteConcern;
 
+/**
+ * 已过时
+ * @deprecated
+ * */
+@Deprecated(since="已过时")
 public final class MongoConnectionPoolConfig 
 {
 	private MongoConnectionPoolConfig() {}

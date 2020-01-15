@@ -49,7 +49,7 @@ public class MyBatisConfiguration
                         			.setAutoReconnect(true)
                         			.setCharacterEncoding("utf8")
                         			.setDataBase("mydb1")
-                        			.setDefaultFetchSize(DBContants.inSqlStatementForMySql)
+                        			.setDefaultFetchSize(DBContants.IN_SQL_STATEMENT_FOR_MYSQL)
                         			.setHostIp("localhost")
                         			.setPort(3306)
                         			.setServerTimezone(ZoneId.SHORT_IDS.get("CTT"))

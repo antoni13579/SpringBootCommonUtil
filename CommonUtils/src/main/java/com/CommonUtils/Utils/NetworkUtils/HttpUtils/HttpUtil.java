@@ -3,12 +3,13 @@ package com.CommonUtils.Utils.NetworkUtils.HttpUtils;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -25,7 +26,6 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.util.UriUtils;
 
-import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.CustomCollections.HashMap;
 import com.CommonUtils.Utils.DataTypeUtils.StringUtils.StringUtil;
 
 import cn.hutool.core.io.IoUtil;
@@ -39,20 +39,22 @@ public final class HttpUtil
 {
 	private HttpUtil() {}
 	
-	/**建议cn.hutool.extra.servlet.ServletUtil.write*/
-	@Deprecated
+	/**建议cn.hutool.extra.servlet.ServletUtil.write\
+	 * @deprecated
+	 * */
+	@Deprecated(since="建议cn.hutool.extra.servlet.ServletUtil.write")
 	private static Map<String, Object> downloadResponse(final long contentLength, final String paramFileName)
 	{
-		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+		ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+		
+		HttpServletRequest request = Optional.ofNullable(servletRequestAttributes).orElseThrow().getRequest();
         String header = request.getHeader(Header.USER_AGENT.toString()).toUpperCase();
-        HttpStatus status = HttpStatus.CREATED;
+        HttpStatus status = null;
         
         String fileName = paramFileName;
         
         if (header.contains("MSIE") || header.contains("TRIDENT") || header.contains("EDGE")) 
         {
-            //fileName = URLEncoder.encode(fileName, "UTF-8");
-            //fileName = fileName.replace("+", "%20");    // IE下载文件名空格变+号问题
         	fileName = UriUtils.encode(fileName, StandardCharsets.UTF_8);
             status = HttpStatus.OK;
         } 
@@ -67,38 +69,42 @@ public final class HttpUtil
         headers.setContentDispositionFormData("attachment", fileName);
         headers.setContentLength(contentLength);
         
-        return new HashMap<String, Object>().put("HEADERS", headers).put("STATUS", status).getMap();
+        Map<String, Object> map = new HashMap<>();
+        map.put("HEADERS", headers);
+        map.put("STATUS", status);
+        return map;
 	}
 	
 	/**
-	 * 生成下载响应信息
-	 * 
-	 * 由于一个奇葩的浏览器————IE的存在，响应的时候需要对它单独处理，同时响应给用户的文件名中有可能包含一些不是英文和数字的字符，如汉语，也需要进行处理
+	 * 生成下载响应信息，由于一个奇葩的浏览器————IE的存在，响应的时候需要对它单独处理，同时响应给用户的文件名中有可能包含一些不是英文和数字的字符，如汉语，也需要进行处理 
+	 * 建议cn.hutool.extra.servlet.ServletUtil.write
+	 * @deprecated
 	 * */
-	/**建议cn.hutool.extra.servlet.ServletUtil.write*/
-	@Deprecated
-	public static ResponseEntity<Resource> downloadResponse(final com.CommonUtils.Utils.NetworkUtils.HttpUtils.Bean.DownloadFileInfo fileInfo) throws UnsupportedEncodingException, MalformedURLException
+	@Deprecated(since="建议cn.hutool.extra.servlet.ServletUtil.write")
+	public static ResponseEntity<Resource> downloadResponse(final com.CommonUtils.Utils.NetworkUtils.HttpUtils.Bean.DownloadFileInfo fileInfo) throws MalformedURLException
 	{
 		File file = fileInfo.getFile();
-        //Resource body = new FileSystemResource(file);
         Resource body = new UrlResource(file.toURI());        
         Map<String, Object> configResult = downloadResponse(file.length(), fileInfo.getFileName());
-        return new ResponseEntity<Resource>(body, (HttpHeaders)configResult.get("HEADERS"), (HttpStatus)configResult.get("STATUS"));
+        return new ResponseEntity<>(body, (HttpHeaders)configResult.get("HEADERS"), (HttpStatus)configResult.get("STATUS"));
 	}
 	
-	/**建议cn.hutool.extra.servlet.ServletUtil.write*/
-	@Deprecated
+	/**建议cn.hutool.extra.servlet.ServletUtil.write
+	 * @deprecated
+	 * */
+	@Deprecated(since="建议cn.hutool.extra.servlet.ServletUtil.write")
 	public static ResponseEntity<byte[]> downloadResponse(final byte[] datas, final String paramFileName)
 	{        
         Map<String, Object> configResult = downloadResponse(datas.length, paramFileName);
-        return new ResponseEntity<byte[]>(datas, (HttpHeaders)configResult.get("HEADERS"), (HttpStatus)configResult.get("STATUS"));
+        return new ResponseEntity<>(datas, (HttpHeaders)configResult.get("HEADERS"), (HttpStatus)configResult.get("STATUS"));
 	}
 	
 	/**
-	 * HttpServletResponse回写信息给前端，其中contentType由MediaType提供
+	 *HttpServletResponse回写信息给前端，其中contentType由MediaType提供 
+	 * 建议使用cn.hutool.extra.servlet.ServletUtil.write相关方法
+	 * @deprecated
 	 * */
-	/**建议使用cn.hutool.extra.servlet.ServletUtil.write相关方法*/
-	@Deprecated
+	@Deprecated(since="建议使用cn.hutool.extra.servlet.ServletUtil.write相关方法")
 	public static void responseInfo(final HttpServletResponse response, 
 									final String str, 
 									final MediaType mediaType)
@@ -118,14 +124,17 @@ public final class HttpUtil
 	}
 	
 	/**
-	 * 当前的HTTP Session也可以通过原始Servlet API以编程方式获得：
+	 * 当前的HTTP Session也可以通过原始Servlet API以编程方式获得
+	 * @deprecated
 	 * */
-	@Deprecated
+	@Deprecated(since="当前的HTTP Session也可以通过原始Servlet API以编程方式获得")
 	public static HttpSession getHttpSession(final boolean allowCreateSession)
 	{ return ((ServletRequestAttributes)RequestContextHolder.currentRequestAttributes()).getRequest().getSession(allowCreateSession); }
 	
-	/**建议使用cn.hutool.http.HttpConnection*/
-	@Deprecated
+	/**建议使用cn.hutool.http.HttpConnection
+	 * @deprecated
+	 * */
+	@Deprecated(since="cn.hutool.http.HttpConnection")
 	public static HttpURLConnection getHttpURLConnection(final String urlPath, 
 														 final RequestMethod requestMethod,
 														 final String contentType,
@@ -162,22 +171,15 @@ public final class HttpUtil
 	 */
 	public static void redirectUrl(HttpServletRequest request, HttpServletResponse response, String url)
 	{
-		boolean isforward = false;
 		try 
 		{
 			if (isAjaxRequest(request))
-			{
-				request.getRequestDispatcher(url).forward(request, response); // AJAX不支持Redirect改用Forward
-				isforward = true;
-			}
+			{ request.getRequestDispatcher(url).forward(request, response); }
 			else
-			{
-				response.sendRedirect(request.getContextPath() + url);
-				isforward = false;
-			}
+			{ response.sendRedirect(request.getContextPath() + url); }
 		} 
 		catch (Exception ex) 
-		{ log.error("{}网页出现异常，网页路径为：{}，异常原因为：", isforward ? "转发" : "重定向", url, ex); }
+		{ log.error("重定向或转发网页出现异常，网页路径为：{}，异常原因为：", url, ex); }
 	}
 	
 	/**
@@ -190,8 +192,6 @@ public final class HttpUtil
 		if (accept != null && accept.indexOf(ContentType.JSON.toString()) != -1) { return true; }
 
 		String xRequestedWith = request.getHeader("X-Requested-With");
-		if (xRequestedWith != null && xRequestedWith.indexOf("XMLHttpRequest") != -1) { return true; }
-		
-		return false;
+		return xRequestedWith != null && xRequestedWith.indexOf("XMLHttpRequest") != -1;
 	}
 }

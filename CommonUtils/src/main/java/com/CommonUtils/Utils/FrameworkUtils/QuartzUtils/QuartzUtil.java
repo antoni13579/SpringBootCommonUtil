@@ -105,7 +105,7 @@ public final class QuartzUtil //implements ApplicationListener<ContextClosedEven
 	{
 		if (!ArrayUtil.isEmpty(quartzJobsInfos))
 		{
-			List<JobKey> jobKeys = new ArrayList<JobKey>();
+			List<JobKey> jobKeys = new ArrayList<>();
 			for (QuartzJobsInfo quartzJobsInfo : quartzJobsInfos)
 			{ jobKeys.add(new JobKey(quartzJobsInfo.getJobName(), quartzJobsInfo.getGroup())); }
 			deleteJobs(jobKeys, scheduler);
@@ -228,11 +228,10 @@ MISFIRE_INSTRUCTION_RESCHEDULE_NOW_WITH_REMAINING_REPEAT_COUNT
 	 * */
 	public static Trigger getSimpleTrigger(final String jobName, final String group, final SimpleScheduleBuilder simpleScheduleBuilder)
 	{
-		Trigger trigger = TriggerBuilder.newTrigger()
-										.withIdentity(jobName, group)
-										.withSchedule(simpleScheduleBuilder)
-										.build();
-		return trigger;
+		return TriggerBuilder.newTrigger()
+							 .withIdentity(jobName, group)
+							 .withSchedule(simpleScheduleBuilder)
+							 .build();
 	}
 
 	/**

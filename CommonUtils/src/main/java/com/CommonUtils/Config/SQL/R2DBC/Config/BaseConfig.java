@@ -10,8 +10,12 @@ import io.r2dbc.pool.SimplePoolMetricsRecorder;
 import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.ValidationDepth;
 
-/**R2DBC为实验中的功能，暂不推荐使用*/
-@Deprecated
+
+/**
+ * R2DBC为实验中的功能，暂不推荐使用
+ * @deprecated
+ * */
+@Deprecated(since="R2DBC为实验中的功能，暂不推荐使用")
 public final class BaseConfig 
 {
 	private BaseConfig() {}
@@ -26,7 +30,7 @@ public final class BaseConfig
 				ConnectionPoolConfiguration.builder(connectionFactory)
 										   .acquireRetry(3)
 										   .clock(Clock.system(ZoneId.of(zoneIdKey, ZoneId.SHORT_IDS)))
-										   .customizer((customizer) -> {})
+										   //.customizer((customizer) -> {})
 										   .initialSize(2)
 										   .maxSize(40)
 										   .maxIdleTime(Duration.ofMillis(600000))

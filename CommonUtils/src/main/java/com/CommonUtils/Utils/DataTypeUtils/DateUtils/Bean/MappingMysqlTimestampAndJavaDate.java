@@ -28,10 +28,10 @@ public final class MappingMysqlTimestampAndJavaDate
 	{
 		this.mysqlTimestamp = mysqlTimestamp;
 		
-		String[] arr = new BigDecimal(this.mysqlTimestamp)
-				.setScale(4, RoundingMode.HALF_UP)
-				.toPlainString()
-				.split("\\.");
+		String[] arr = BigDecimal.valueOf(this.mysqlTimestamp)
+								 .setScale(4, RoundingMode.HALF_UP)
+								 .toPlainString()
+								 .split("\\.");
 		
 		if (arr.length == 2)
 		{ this.mysqlTimestampForSmallNumber = Long.valueOf(arr[1]); }
@@ -45,7 +45,7 @@ public final class MappingMysqlTimestampAndJavaDate
 	public MappingMysqlTimestampAndJavaDate(final Date javaDate)
 	{
 		this.javaDate = javaDate;		
-		this.mysqlTimestamp =  this.javaDate.getTime() / this.rate;
+		this.mysqlTimestamp =  (this.javaDate.getTime() / this.rate) * 1.0;
 		this.mysqlTimestampForInteger = (long) this.mysqlTimestamp;
 	}
 }

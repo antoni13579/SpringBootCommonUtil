@@ -1,6 +1,10 @@
 package com.CommonUtils.Utils.DataTypeUtils.DateUtils;
 
-@Deprecated
+/**
+ * 用hutool的格式类即可
+ * @deprecated
+ * */
+@Deprecated(since="用hutool的格式类即可")
 public final class DateContants 
 {
 	private DateContants() {}
@@ -25,7 +29,7 @@ public final class DateContants
 	/**建议使用cn.hutool.core.date.DatePattern.CHINESE_DATE_PATTERN*/
 	public static final String DATE_FORMAT_7 = "yyyy年MM月dd日";
 	
-	public static final String DAY_NAMES[] = { "星期日", "星期一", "星期二", "星期三", "星期四", "星期五","星期六" };  
+	protected static final String[] DAY_NAMES = { "星期日", "星期一", "星期二", "星期三", "星期四", "星期五","星期六" };  
 	
 	public static final String YEAR_FORMAT = "yyyy";
 	

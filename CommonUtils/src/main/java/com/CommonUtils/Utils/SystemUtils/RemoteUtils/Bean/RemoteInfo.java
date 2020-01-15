@@ -4,7 +4,11 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-@Deprecated
+/**
+ * hutool已封装了对应的工具类
+ * @deprecated
+ * */
+@Deprecated(since="hutool已封装了对应的工具类")
 @Getter
 @Setter
 @ToString

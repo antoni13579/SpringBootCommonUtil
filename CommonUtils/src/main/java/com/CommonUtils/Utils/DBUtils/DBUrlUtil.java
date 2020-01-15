@@ -11,6 +11,8 @@ import cn.hutool.core.util.StrUtil;
 
 public final class DBUrlUtil 
 {
+	private DBUrlUtil() {}
+	
 	private static final String TERADATA_URL = "jdbc:teradata://$HOST_IP/CLIENT_CHARSET=$CLIENT_CHARSET,TMODE=$TMODE,CHARSET=$CHARSET,LOB_SUPPORT=$LOB_SUPPORT,database=$database";
 	private static final StringBuilder MYSQL_URL = new StringBuilder();
 	private static final String ORACLE_URL = "jdbc:oracle:thin:@";
@@ -113,7 +115,7 @@ public final class DBUrlUtil
 		return result;
 	}
 	
-	public static String getSqlServerUrl(final SqlServerUrl sqlServerUrl, final SqlServerJdbcDriver jdbcDriver) throws Exception
+	public static String getSqlServerUrl(final SqlServerUrl sqlServerUrl, final SqlServerJdbcDriver jdbcDriver) throws DBUrlUtilException
 	{
 		switch (jdbcDriver)
 		{
@@ -126,7 +128,15 @@ public final class DBUrlUtil
 						  								.replaceAll("\\$PORT", Integer.toString(sqlServerUrl.getPort()))
 						  								.replaceAll("\\$DATABASE", sqlServerUrl.getDataBase());
 			default:
-				throw new Exception("出现了新的SQL_SERVER的数据库驱动，无法处理！！！");
+				throw new DBUrlUtilException("出现了新的SQL_SERVER的数据库驱动，无法处理！！！");
 		}
+	}
+	
+	private static class DBUrlUtilException extends Exception
+	{
+		private static final long serialVersionUID = -4035435186711258053L;
+
+		private DBUrlUtilException(final String message)
+		{ super(message); }
 	}
 }

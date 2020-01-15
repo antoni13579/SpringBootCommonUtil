@@ -29,6 +29,8 @@ elasticsearch.port=9300
 */
 	
 {
+	private BaseConfig() {}
+	
 	public static TransportClient getTransportClient(final String clusterName, 
 													 //final String name, 
 													 //final String host,
@@ -36,7 +38,7 @@ elasticsearch.port=9300
 													 final Map<String, Integer> hostAndPorts,
 													 final int poolSize) throws UnknownHostException
 	{
-		TransportClient client =  new PreBuiltTransportClient
+		TransportClient client = new PreBuiltTransportClient
 		(
 				Settings.builder()
 						.put("cluster.name", clusterName)

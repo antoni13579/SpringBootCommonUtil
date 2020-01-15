@@ -90,7 +90,7 @@ public class HomeRestController
 	public WebAsyncTask<List<Map<String, Object>>> getUserModule()
 	{
 		URL url = Thread.currentThread().getContextClassLoader().getResource(this.userModulePath);		
-		WebAsyncTask<List<Map<String, Object>>> result = new WebAsyncTask<List<Map<String, Object>>>
+		WebAsyncTask<List<Map<String, Object>>> result = new WebAsyncTask<>
 		(
 				4000L, 
 				this.commonThreadPool, 
@@ -150,7 +150,7 @@ public class HomeRestController
 	public DeferredResult<Collection<TreeNode<Map<String, Object>>>> getMenusOfModule(String menuType)
 	{
 		DeferredResult<Collection<TreeNode<Map<String, Object>>>> result = new DeferredResult<>(4000L, Collections.emptyList());
-		result.onTimeout(() -> { log.warn("获取子菜单超时"); });
+		result.onTimeout(() -> log.warn("获取子菜单超时"));
 		
 		this.commonThreadPool.submit
 		(
@@ -197,12 +197,15 @@ public class HomeRestController
 						try 
 						{ Thread.sleep(10); } 
 						catch (InterruptedException e) 
-						{ e.printStackTrace(); }
+						{
+							log.error("睡眠异常，异常原因为：", e);
+							Thread.currentThread().interrupt();
+						}
 						
 						try 
 						{ emitter.send(i, MediaType.APPLICATION_JSON); } 
 						catch (IOException e) 
-						{ e.printStackTrace(); }
+						{ log.error("IO异常，异常原因为：", e); }
 					}
 					
 					emitter.complete();
@@ -230,12 +233,15 @@ public class HomeRestController
 						try 
 						{ Thread.sleep(10); } 
 						catch (InterruptedException e) 
-						{ e.printStackTrace(); }
+						{
+							log.error("睡眠异常，异常原因为：", e);
+							Thread.currentThread().interrupt();
+						}
 						
 						try 
 						{ emitter.send(SseEmitter.event().comment("This is test event").id(UUID.randomUUID().toString()).name("onlog").reconnectTime(3000).data(i)); } 
 						catch (IOException e) 
-						{ e.printStackTrace(); }
+						{ log.error("IO异常，异常原因为：", e); }
 					}
 					
 					emitter.complete();
@@ -252,19 +258,18 @@ public class HomeRestController
 				   .map(data -> ServerSentEvent.<Object>builder()
 						   					   .event("countDown")
 						   					   .id(Long.toString(data.getT1()))
-						   					   .data(data.getT2().toString())
+						   					   .data(data.getT2())
 						   					   .build());
 	}
 	
 	private String getCountDownSec() 
 	{
-		int count_down_sec=3*60*60;
-		if (count_down_sec>0) 
+		int countDownSec=3*60*60;
+		if (countDownSec>0) 
 		{
-			int h = count_down_sec/(60*60);
-			int m = (count_down_sec%(60*60))/60;
-			int s = (count_down_sec%(60*60))%60;
-			count_down_sec--;
+			int h = countDownSec/(60*60);
+			int m = (countDownSec%(60*60))/60;
+			int s = (countDownSec%(60*60))%60;
 			return "活动倒计时："+h+" 小时 "+m+" 分钟 "+s+" 秒";
 		}
 		return "活动倒计时：0 小时 0 分钟 0 秒";

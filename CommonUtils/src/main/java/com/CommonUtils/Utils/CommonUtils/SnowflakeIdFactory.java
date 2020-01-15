@@ -2,39 +2,40 @@ package com.CommonUtils.Utils.CommonUtils;
 
 /**
  * 已过时，请使用com.baomidou.mybatisplus.core.toolkit.IdWorker这个类实现分布式ID
+ * @deprecated
  * */
-@Deprecated
+@Deprecated(since="已过时，请使用com.baomidou.mybatisplus.core.toolkit.IdWorker这个类实现分布式ID")
 public final class SnowflakeIdFactory 
 {
 	//开始时间戳（对应的日期为：2010-11-04 09:42:54）
-	private final long twepoch = 1288834974657L;
+	private static final long TWEPOCH = 1288834974657L;
 	
 	//机器ID所占的位数
-    private final long workerIdBits = 5L;
+    private static final long WORKER_ID_BITS = 5L;
     
     //数据标识ID所占的位数
-    private final long datacenterIdBits = 5L;
+    private static final long DATA_CENTER_ID_BITS = 5L;
     
     //支持的最大机器id，结果是31 (这个移位算法可以很快的计算出几位二进制数所能表示的最大十进制数)
-    private final long maxWorkerId = -1L ^ (-1L << workerIdBits);
+    private static final long MAX_WORKER_ID = -1L ^ (-1L << WORKER_ID_BITS);
     
     //支持的最大数据标识id，结果是31
-    private final long maxDatacenterId = -1L ^ (-1L << datacenterIdBits);
+    private static final long MAX_DATA_CENTER_ID = -1L ^ (-1L << DATA_CENTER_ID_BITS);
     
     //序列在id中占的位数
-    private final long sequenceBits = 12L;
+    private static final long SEQUENCE_BITS = 12L;
     
     //机器ID向左移12位
-    private final long workerIdShift = sequenceBits;
+    private static final long WORKER_ID_SHIFT = SEQUENCE_BITS;
     
     //数据标识id向左移17位(12+5)
-    private final long datacenterIdShift = sequenceBits + workerIdBits;
+    private static final long DATA_CENTER_ID_SHIFT = SEQUENCE_BITS + WORKER_ID_BITS;
     
     //时间截向左移22位(5+5+12)
-    private final long timestampLeftShift = sequenceBits + workerIdBits + datacenterIdBits;
+    private static final long TIMESTAMP_LEFT_SHIFT = SEQUENCE_BITS + WORKER_ID_BITS + DATA_CENTER_ID_BITS;
     
     //生成序列的掩码，这里为4095 (0b111111111111=0xfff=4095)
-    private final long sequenceMask = -1L ^ (-1L << sequenceBits);
+    private static final long SEQUENCE_MASK = -1L ^ (-1L << SEQUENCE_BITS);
  
     //工作机器ID(0~31)
     private long workerId;
@@ -54,11 +55,11 @@ public final class SnowflakeIdFactory
      * */
     public SnowflakeIdFactory(final long workerId, final long datacenterId) 
     {
-        if (workerId > this.maxWorkerId || workerId < 0) 
-        { throw new IllegalArgumentException(String.format("worker Id can't be greater than %d or less than 0", this.maxWorkerId)); }
+        if (workerId > MAX_WORKER_ID || workerId < 0) 
+        { throw new IllegalArgumentException(String.format("worker Id can't be greater than %d or less than 0", MAX_WORKER_ID)); }
         
-        if (datacenterId > this.maxDatacenterId || datacenterId < 0) 
-        { throw new IllegalArgumentException(String.format("datacenter Id can't be greater than %d or less than 0", this.maxDatacenterId)); }
+        if (datacenterId > MAX_DATA_CENTER_ID || datacenterId < 0) 
+        { throw new IllegalArgumentException(String.format("datacenter Id can't be greater than %d or less than 0", MAX_DATA_CENTER_ID)); }
         
         this.workerId = workerId;
         this.datacenterId = datacenterId;
@@ -72,13 +73,13 @@ public final class SnowflakeIdFactory
         if (timestamp < this.lastTimestamp) 
         {
         	//服务器时钟被调整了,ID生成器停止服务.
-            throw new RuntimeException(String.format("Clock moved backwards.  Refusing to generate id for %d milliseconds", this.lastTimestamp - timestamp));
+            throw new SnowflakeIdFactoryRuntimeException(String.format("Clock moved backwards.  Refusing to generate id for %d milliseconds", this.lastTimestamp - timestamp));
         }
         
         ////如果是同一时间生成的，则进行毫秒内序列
         if (this.lastTimestamp == timestamp) 
         {
-            this.sequence = (this.sequence + 1) & this.sequenceMask;
+            this.sequence = (this.sequence + 1) & SEQUENCE_MASK;
             
             //毫秒内序列溢出
             if (this.sequence == 0) 
@@ -90,8 +91,7 @@ public final class SnowflakeIdFactory
  
         //上次生成ID的时间截
         this.lastTimestamp = timestamp;
-        long result = ((timestamp - this.twepoch) << this.timestampLeftShift) | (this.datacenterId << this.datacenterIdShift) | (this.workerId << this.workerIdShift) | this.sequence;
-        return result;
+        return ((timestamp - TWEPOCH) << TIMESTAMP_LEFT_SHIFT) | (this.datacenterId << DATA_CENTER_ID_SHIFT) | (this.workerId << WORKER_ID_SHIFT) | this.sequence;
     }
     
     /**
@@ -102,10 +102,18 @@ public final class SnowflakeIdFactory
      */
     protected long tilNextMillis(final long lastTimestamp) 
     {
-        long timestamp = System.currentTimeMillis();;
+        long timestamp = System.currentTimeMillis();
         while (timestamp <= lastTimestamp) 
-        { timestamp = System.currentTimeMillis();; }
+        { timestamp = System.currentTimeMillis(); }
         
         return timestamp;
+    }
+    
+    private static class SnowflakeIdFactoryRuntimeException extends RuntimeException
+    {
+		private static final long serialVersionUID = 2966428640071337151L;
+
+		private SnowflakeIdFactoryRuntimeException(final String message)
+    	{ super(message); }
     }
 }

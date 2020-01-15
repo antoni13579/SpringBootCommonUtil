@@ -26,5 +26,5 @@ public class Column implements Serializable
 	
 	private String columnTypeNameForJava;
 	
-	private Object columnValue;
+	private Serializable columnValue;
 }

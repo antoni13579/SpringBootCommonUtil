@@ -32,20 +32,19 @@ public final class ShiroFilterFactoryBeanConfig
 	 *            
 	 */
 	public static ShiroFilterFactoryBean getInstance(final SecurityManager securityManager, 
-													 final LinkedHashMap<String, InterceptorChain> paramFilterChainDefinitionMap,
+													 final Map<String, InterceptorChain> paramFilterChainDefinitionMap,
 													 final Optional<Map<String, Filter>> customFilter,
 													 final String unauthorizedUrl,
 													 final String loginUrl,
 													 final Optional<String> successUrl)
 	{
 		// 拦截器
-		Map<String, String> filterChainDefinitionMap = new LinkedHashMap<String, String>();
+		Map<String, String> filterChainDefinitionMap = new LinkedHashMap<>();
 		// 配置链接需注意这个是顺序判断
 		CollUtil.forEach//JavaCollectionsUtil.mapProcessor
 		(
 				paramFilterChainDefinitionMap, 
-				(final String key, final InterceptorChain value, final int indx) -> 
-				{ filterChainDefinitionMap.put(key, value.getInterceptorType()); }
+				(final String key, final InterceptorChain value, final int indx) -> filterChainDefinitionMap.put(key, value.getInterceptorType())
 		);
 		
 		ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
@@ -55,9 +54,9 @@ public final class ShiroFilterFactoryBeanConfig
 		shiroFilterFactoryBean.setUnauthorizedUrl(unauthorizedUrl);
 		
 		//添加自己的过滤器
-		customFilter.ifPresent(consumer -> { shiroFilterFactoryBean.setFilters(consumer); });
+		customFilter.ifPresent(shiroFilterFactoryBean::setFilters);
 		
-		successUrl.ifPresent(consumer -> { shiroFilterFactoryBean.setSuccessUrl(consumer); });
+		successUrl.ifPresent(shiroFilterFactoryBean::setSuccessUrl);
 		
 		return shiroFilterFactoryBean;
 	}

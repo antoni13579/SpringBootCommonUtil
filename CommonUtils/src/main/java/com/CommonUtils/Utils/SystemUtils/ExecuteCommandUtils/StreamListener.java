@@ -8,7 +8,11 @@ import com.CommonUtils.Utils.IOUtils.IOUtil;
 
 import lombok.extern.slf4j.Slf4j;
 
-@Deprecated
+/**
+ * 已过期
+ * @deprecated
+ * */
+@Deprecated(since="已过期")
 @Slf4j
 public final class StreamListener extends Thread
 {
@@ -28,12 +32,12 @@ public final class StreamListener extends Thread
 	@Override
 	public void run()
 	{
-		InputStreamReader isr = null;
-		BufferedReader br = null;
 		try
+		(
+				InputStreamReader isr = new InputStreamReader(is, this.encode);
+				BufferedReader br = new BufferedReader(isr);
+		)
 		{
-			isr = new InputStreamReader(is, this.encode);
-			br = new BufferedReader(isr);
 			String line = null;
 			while (null != (line = br.readLine()))
 			{
@@ -51,6 +55,6 @@ public final class StreamListener extends Thread
 			{ log.error("监听标准输出流出现了异常，命令为{}，异常原因为：", this.command, ex); }
 		}
 		finally
-		{ IOUtil.closeQuietly(br, isr, this.is); }
+		{ IOUtil.closeQuietly(this.is); }
 	}
 }

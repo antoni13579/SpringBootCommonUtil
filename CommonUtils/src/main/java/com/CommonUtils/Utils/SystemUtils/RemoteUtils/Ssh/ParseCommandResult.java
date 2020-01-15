@@ -10,13 +10,15 @@ import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 
 public final class ParseCommandResult
-{	
+{
+	private ParseCommandResult() {}
+	
 	/**
 	 * 运行了df -h命令后，解析其结果，获取结果
 	 * */
 	public static List<Map<String, String>> getDFHCommandResult(final List<String> executeRecords)
 	{
-		List<Map<String, String>> records = new ArrayList<Map<String, String>>();
+		List<Map<String, String>> records = new ArrayList<>();
 		if (!CollUtil.isEmpty(executeRecords))
 		{
 			int skipRow = 1;
@@ -30,9 +32,9 @@ public final class ParseCommandResult
 				}
 				
 				String addSeparatorStr = executeRecord.replaceAll(" ", "，");
-				String addSeparatorStrArray[] = addSeparatorStr.split("，");
+				String[] addSeparatorStrArray = addSeparatorStr.split("，");
 				int indx = 0;
-				Map<String, String> record = new HashMap<String, String>();
+				Map<String, String> record = new HashMap<>();
 				for (String str : addSeparatorStrArray)
 				{
 					if (!StrUtil.isEmptyIfStr(str))
@@ -70,7 +72,7 @@ public final class ParseCommandResult
 	 * */
     public static List<Map<String, String>> getLSLHCommandResult(final List<String> executeRecords)
     {
-    	List<Map<String, String>> records = new ArrayList<Map<String, String>>();
+    	List<Map<String, String>> records = new ArrayList<>();
     	if (!CollUtil.isEmpty(executeRecords))
     	{
     		int firstRow = 1;
@@ -80,26 +82,21 @@ public final class ParseCommandResult
     			if (firstRow == 1)
 				{
     				String addSeparatorStr = executeRecord.replaceAll(" ", "，");
-        			String addSeparatorStrArray[] = addSeparatorStr.split("，");
+        			String[] addSeparatorStrArray = addSeparatorStr.split("，");
         			if (!ArrayUtil.isEmpty(addSeparatorStrArray))
         			{
-        				records.add
-            			(
-            					new HashMap<String, String>()
-            					{
-    								private static final long serialVersionUID = 4551007307891451307L;
-    								{ put("TOTAL_USED", addSeparatorStrArray[1]); }
-            					}
-            		    );
+        				Map<String, String> record = new HashMap<>();
+        				record.put("TOTAL_USED", addSeparatorStrArray[1]);
+        				records.add(record);
         			}
     				firstRow++;
 					continue;
 				}
     			
     			String addSeparatorStr = executeRecord.replaceAll(" ", "，");
-    			String addSeparatorStrArray[] = addSeparatorStr.split("，");
+    			String[] addSeparatorStrArray = addSeparatorStr.split("，");
     			int indx = 0;
-    			Map<String, String> record = new HashMap<String, String>();
+    			Map<String, String> record = new HashMap<>();
     			for (String str : addSeparatorStrArray)
     			{
     				if (!StrUtil.isEmptyIfStr(str))

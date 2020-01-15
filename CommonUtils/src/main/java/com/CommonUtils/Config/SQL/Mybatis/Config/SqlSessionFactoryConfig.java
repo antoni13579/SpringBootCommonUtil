@@ -2,7 +2,6 @@ package com.CommonUtils.Config.SQL.Mybatis.Config;
 
 import javax.sql.DataSource;
 
-import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 
@@ -29,7 +28,7 @@ public final class SqlSessionFactoryConfig
 	{		
 		MybatisSqlSessionFactoryBean mybatisPlus = new MybatisSqlSessionFactoryBean();
 		mybatisPlus.setDataSource(dataSource);
-		mybatisPlus.setPlugins(new Interceptor[] { PageConfig.getBaomidouPaginationInterceptor() });
+		mybatisPlus.setPlugins(PageConfig.getBaomidouPaginationInterceptor());
 		mybatisPlus.setConfiguration(mybatisConfiguration);
 		mybatisPlus.setMapperLocations(new PathMatchingResourcePatternResolver().getResources(getMapperPath(mapperXmlPath)));
 		return mybatisPlus.getObject();

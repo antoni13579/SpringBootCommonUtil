@@ -14,8 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class GracefulShutdownTomcat implements TomcatConnectorCustomizer, ApplicationListener<ContextClosedEvent>
 {
-	private volatile Connector connector;
-	private final int waitTime = 30;
+	private Connector connector;
+	private static final int waitTime = 30;
 	
 	@Override
 	public void onApplicationEvent(ContextClosedEvent event) 
@@ -32,7 +32,7 @@ public class GracefulShutdownTomcat implements TomcatConnectorCustomizer, Applic
 	                ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) executor;
 	                threadPoolExecutor.shutdown();
 	                if (!threadPoolExecutor.awaitTermination(waitTime, TimeUnit.SECONDS)) 
-	                { log.warn("已等待{}秒了，不能再像绅士一样等待了，开启暴力模式，直接关闭Tomcat", this.waitTime); }
+	                { log.warn("已等待{}秒了，不能再像绅士一样等待了，开启暴力模式，直接关闭Tomcat", waitTime); }
 	            } 
 	            catch (InterruptedException ex) 
 	            { Thread.currentThread().interrupt(); }

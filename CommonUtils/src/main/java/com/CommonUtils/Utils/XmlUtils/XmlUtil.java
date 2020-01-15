@@ -25,44 +25,14 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public final class XmlUtil 
-{
-	private static XStream XSTREAM = null;
-	
-	private static SAXReader SAXREADER = null;
-	
+{	
 	private XmlUtil() {}
 	
 	private static XStream getInstanceForXStream()
-	{
-		if (null == XSTREAM)
-		{
-			synchronized (XmlUtil.class)
-			{
-				if (null == XSTREAM)
-				{
-					XSTREAM = new XStream();
-					XSTREAM.autodetectAnnotations(true);
-					XStream.setupDefaultSecurity(XSTREAM);
-				}
-			}
-		}
-		
-		return XSTREAM;
-	}
+	{ return SingletonContainerForXStream.xstream; }
 	
 	private static SAXReader getInstanceForSAXReader()
-	{
-		if (null == SAXREADER)
-		{
-			synchronized (XmlUtil.class)
-			{
-				if (null == SAXREADER)
-				{ SAXREADER = new SAXReader(); }
-			}
-		}
-		
-		return SAXREADER;
-	}
+	{ return SingletonContainerForSAXReader.saxReader; }
 	
 	public static String beanToXml(final Object obj)
 	{ return getInstanceForXStream().toXML(obj); }
@@ -147,6 +117,20 @@ public final class XmlUtil
 		{
 			log.error("根据XML文件，获取XML元素出现异常，文件名为{}，异常原因为", xmlFile.getAbsolutePath(), ex);
 			return Collections.emptyList();
+		}
+	}
+	
+	private static class SingletonContainerForSAXReader
+	{ private static SAXReader saxReader = new SAXReader(); }
+	
+	private static class SingletonContainerForXStream
+	{
+		private static XStream xstream = new XStream();
+		
+		static
+		{
+			xstream.autodetectAnnotations(true);
+			XStream.setupDefaultSecurity(xstream);
 		}
 	}
 }

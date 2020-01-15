@@ -26,6 +26,7 @@ import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.tokenizer.TokenizerUtil;
 import cn.hutool.extra.tokenizer.Word;
 import lombok.extern.slf4j.Slf4j;
@@ -50,9 +51,9 @@ public final class StringUtil
 			return CollUtil.newArrayList(strings)
 						 .stream()
 						 .map(String::trim)
-						 .filter(value -> !StringUtil.isStrEmpty(value))
+						 .filter(value -> !StrUtil.isEmpty(value))
 						 .map(value -> value.split(StringContants.PATTERN_5))
-						 .flatMap(x -> Stream.of(x))
+						 .flatMap(Stream::of)
 						 .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
 		}
 		else
@@ -61,7 +62,7 @@ public final class StringUtil
 	
 	public static int getNumberStartPos(final String str)
 	{
-		if (isStrEmpty(str))
+		if (StrUtil.isEmpty(str))
 		{ return -1; }
 		
 		int result = -1;
@@ -78,32 +79,31 @@ public final class StringUtil
 		return result;
 	}
 	
-	/**建议使用cn.hutool.core.convert.Convert.toStr*/ 
-	@Deprecated
-	public static <T> String getString(final T obj) throws Exception
+	/**建议使用cn.hutool.core.convert.Convert.toStr
+	 * @deprecated
+	 * */ 
+	@Deprecated(since="建议使用cn.hutool.core.convert.Convert.toStr")
+	public static <T> String getString(final T obj) throws StringUtilException
 	{
 		if (obj instanceof String)
 		{ return String.valueOf(obj); }
 		else
-		{ throw new Exception("无法转换为String类型"); }
+		{ throw new StringUtilException("无法转换为String类型"); }
 	}
 	
 	/**
 	 * 检测字符串是否为空，true为空，false为非空，建议使用cn.hutool.core.util.StrUtil.isEmpty相关方法代替
+	 * @deprecated
 	 * */
-	@Deprecated
+	@Deprecated(since="检测字符串是否为空，true为空，false为非空，建议使用cn.hutool.core.util.StrUtil.isEmpty相关方法代替")
 	public static boolean isStrEmpty(final String str)
-	{
-		if(null == str || "".equals(str.trim()) || str.length() == 0)
-		{ return true; }
-		
-		return false;
-	}
+	{ return null == str || "".equals(str.trim()) || str.length() == 0; }
 	
 	/**
 	 * 检测两个字符串是否相等，相等则返回true，不相等则返回false，建议使用cn.hutool.core.util.StrUtil.equals
+	 * @deprecated
 	 * */
-	@Deprecated
+	@Deprecated(since="检测两个字符串是否相等，相等则返回true，不相等则返回false，建议使用cn.hutool.core.util.StrUtil.equals")
 	public static boolean strEquals(final String str1, final String str2, final boolean ignoreCase)
 	{
 		//两个都是空串，则为相等
@@ -125,11 +125,13 @@ public final class StringUtil
 		}
 	}
 	
-	/**建议使用cn.hutool.core.net.URLEncoder.encode*/
-	@Deprecated
+	/**建议使用cn.hutool.core.net.URLEncoder.encode
+	 * @deprecated
+	 * */
+	@Deprecated(since="建议使用cn.hutool.core.net.URLEncoder.encode")
 	public static String toUtf8String(final String str) throws UnsupportedEncodingException
 	{
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
         for (int i = 0; i < str.length(); i++) 
         {
         	char c = str.charAt(i);
@@ -149,9 +151,11 @@ public final class StringUtil
         return sb.toString();
 	}
 	
-	/**建议使用cn.hutool.core.util.ObjectUtil.toString*/
-	@Deprecated
-	public static <T> String toString(final T value) throws Exception
+	/**建议使用cn.hutool.core.util.ObjectUtil.toString
+	 * @deprecated
+	 * */
+	@Deprecated(since="建议使用cn.hutool.core.util.ObjectUtil.toString")
+	public static <T> String toString(final T value) throws StringUtilException
 	{
 		if (null == value)
 		{ return ""; }
@@ -159,84 +163,74 @@ public final class StringUtil
 				 value instanceof java.sql.Date ||
 				 value instanceof java.sql.Timestamp ||
 				 value instanceof oracle.sql.TIMESTAMP)
-		{ throw new Exception("toString(final T value)不能处理时间类型，请使用toString(final oracle.sql.TIMESTAMP date, final DateFomat dateFomat)或toString(final java.util.Date date, final DateFomat dateFomat)"); }
+		{ throw new StringUtilException("toString(final T value)不能处理时间类型，请使用toString(final oracle.sql.TIMESTAMP date, final DateFomat dateFomat)或toString(final java.util.Date date, final DateFomat dateFomat)"); }
 		else if (value instanceof Boolean)
 		{
 			boolean val = Convert.toBool(value);
-			String result = Boolean.toString(val);
-			return result;
+			return Boolean.toString(val);
 		}
 		else if (value instanceof Integer)
 		{
 			int val = Convert.toInt(value);
-			String result = Integer.toString(val);
-			return result;
+			return Integer.toString(val);
 		}
 		else if (value instanceof Short)
 		{
 			short val = Convert.toShort(value);
-			String result = Short.toString(val);
-			return result;
+			return Short.toString(val);
 		}
 		else if (value instanceof Float)
 		{
 			float val = Convert.toFloat(value);
-			String result = Float.toString(val);
-			return result;
+			return Float.toString(val);
 		}
 		else if (value instanceof Double)
 		{
 			double val = Convert.toDouble(value);
-			String result = Double.toString(val);
-			return result;
+			return Double.toString(val);
 		}
 		else if (value instanceof Character)
 		{
 			char val = Convert.toChar(value);
-			String result = Character.toString(val);
-			return result;
+			return Character.toString(val);
 		}
 		else if (value instanceof Long)
 		{
 			long val = Convert.toLong(value);
-			String result = Long.toString(val);
-			return result;
+			return Long.toString(val);
 		}
 		else if (value instanceof Byte)
 		{
 			byte val = Convert.toByte(value);
-			String result = Byte.toString(val);
-			return result;
+			return Byte.toString(val);
 		}
 		else if (value instanceof String)
-		{
-			String val = StringUtil.getString(value);
-			return val;
-		}
+		{ return StringUtil.getString(value); }
 		else if (value instanceof BigDecimal)
 		{
 			BigDecimal val = Convert.toBigDecimal(value);
-			String result = val.toString();
-			return result;
+			return val.toString();
 		}
 		else
 		{
 			log.warn("需进行ToString的数据类型为：{}", value.getClass());
-			throw new Exception("出现了新的数据类型，请及时处理");
+			throw new StringUtilException("出现了新的数据类型，请及时处理");
 		}
 	}
 	
 	/**
 	 * 建议使用cn.hutool.core.date.DateTime进行格式转换
+	 * @deprecated
 	 * */
-	@Deprecated
+	@Deprecated(since="建议使用cn.hutool.core.date.DateTime进行格式转换")
 	public static String toString(final oracle.sql.TIMESTAMP date, final com.CommonUtils.Utils.DataTypeUtils.DateUtils.DateFormat dateFomat) throws SQLException
 	{ return toString(date.timestampValue(), dateFomat); }
 	
 	/**
 	 * 建议使用cn.hutool.core.date.DateTime进行格式转换
+	 * @deprecated
 	 * */
-	@Deprecated
+	@Deprecated(since="建议使用cn.hutool.core.date.DateTime进行格式转换")
 	public static String toString(final java.util.Date date, final com.CommonUtils.Utils.DataTypeUtils.DateUtils.DateFormat dateFomat)
 	{
 		if (null == date)
@@ -255,8 +249,9 @@ public final class StringUtil
 	
 	/**
 	 * 建议使用cn.hutool.core.util.StrUtil.padPre
+	 * @deprecated
 	 * */
-	@Deprecated
+	@Deprecated(since="建议使用cn.hutool.core.util.StrUtil.padPre")
 	public static String lpad(final String str, final int length, final char replaceStr)
 	{
 		int actuallyLength = length - str.length();
@@ -272,8 +267,9 @@ public final class StringUtil
 	
 	/**
 	 * 建议使用cn.hutool.core.util.StrUtil.padAfter
+	 * @deprecated
 	 * */
-	@Deprecated
+	@Deprecated(since="建议使用cn.hutool.core.util.StrUtil.padAfter")
 	public static String rpad(final String str, final int length, final char replaceStr)
 	{
 		StringBuilder sb = new StringBuilder(str);
@@ -284,21 +280,14 @@ public final class StringUtil
 		return sb.toString();
 	}
 	
-	/**建议使用cn.hutool.core.util.ReUtil.get的相关方法*/ 
-	@Deprecated
+	/**建议使用cn.hutool.core.util.ReUtil.get的相关方法
+	 * @deprecated
+	 * */ 
+	@Deprecated(since="建议使用cn.hutool.core.util.ReUtil.get的相关方法")
 	public static String searchStr(final String regex, final String string)
 	{
-		//StringBuilder sb = new StringBuilder();
 		Pattern p = Pattern.compile(regex);
         Matcher m = p.matcher(string);
-        /*
-        while (m.find()) 
-        {
-            String g = m.group();
-            sb.append(g);
-        }
-        return sb.toString();
-        */
         
         String result = m.replaceAll("");
         if (isStrEmpty(result)) { return ""; }
@@ -307,24 +296,19 @@ public final class StringUtil
 	
 	/**
 	 * 验证输入的字符串，是否符合正则表达式
+	 * @deprecated
 	 * @param string 需要判断的字符串；
 	 * 		  regex 正则表达式
 	 * @return 返回布尔值，true为验证通过，false为验证不通过
 	 * */
 	/**建议使用cn.hutool.core.util.ReUtil.isMatch的相关方法*/ 
-	@Deprecated
+	@Deprecated(since="建议使用cn.hutool.core.util.ReUtil.isMatch的相关方法")
 	public static boolean validateRegular(final String string, final String regex)
-	{
-		//Pattern p = Pattern.compile(regex);
-        //Matcher m = p.matcher(string);
-        //return m.find();
-        
-        return Pattern.matches(regex, string);
-        //return m.matches();
-	}
+	{ return Pattern.matches(regex, string); }
 	
 	/**
 	 * 分词工具
+	 * @deprecated
 	 * */
 	/**建议使用cn.hutool.extra.tokenizer.TokenizerUtil相关工具类
 	 * 
@@ -351,7 +335,7 @@ public final class StringUtil
 	//输出：这 两个 方法 的 区别 在于 返回 值
 	String resultStr = CollUtil.join((Iterator<Word>)result, " ");
 	 * */ 
-	@Deprecated
+	@Deprecated(since="建议使用cn.hutool.extra.tokenizer.TokenizerUtil相关工具类")
 	public static List<String> divideText(final String text)
 	{
 		if (isStrEmpty(text))
@@ -375,8 +359,9 @@ public final class StringUtil
 	
 	/**
 	 * 建议使用cn.hutool.core.util.StrUtil.subWithLength
+	 * @deprecated
 	 * */
-	@Deprecated
+	@Deprecated(since=" 建议使用cn.hutool.core.util.StrUtil.subWithLength")
 	public static String substr(final String str, final int startPosition, final int length)
 	{
 		if (!isStrEmpty(str))
@@ -387,18 +372,21 @@ public final class StringUtil
 	
 	/**
 	 * 数字验证
+	 * @deprecated
 	 * 
 	 * @param val
 	 * @return 提取的数字
 	 * 
 	 * 建议使用cn.hutool.core.util.ReUtil.isMatch
 	 */
-	@Deprecated
+	@Deprecated(since="建议使用cn.hutool.core.util.ReUtil.isMatch")
 	public static boolean isNum(final String val) 
-	{ return isStrEmpty(val) ? false : val.matches(StringContants.PATTERN_7); }
+	{ return val.matches(StringContants.PATTERN_7); }
 	
-	/**建议使用cn.hutool.core.util.StrUtil.similar*/
-	@Deprecated
+	/**建议使用cn.hutool.core.util.StrUtil.similar
+	 * @deprecated
+	 * */
+	@Deprecated(since="建议使用cn.hutool.core.util.StrUtil.similar")
 	public static Optional<com.CommonUtils.Utils.DataTypeUtils.StringUtils.Bean.Calculation> statistics(final String text1, final String text2)
 	{
 		//计算类
@@ -409,12 +397,8 @@ public final class StringUtil
 		
 		Map<String,int[]> resultMap = new HashMap<>();
 		
-		//统计				
-        //statistics(resultMap, StringUtil.divideText(text1), 1);
-        //statistics(resultMap, StringUtil.divideText(text2), 0);
-        
-        statistics(resultMap, CollUtil.list(false, (Iterable<Word>)TokenizerUtil.createEngine().parse(text1)).stream().map((word) -> { return word.getText(); }).collect(Collectors.toList()), 1);
-        statistics(resultMap, CollUtil.list(false, (Iterable<Word>)TokenizerUtil.createEngine().parse(text2)).stream().map((word) -> { return word.getText(); }).collect(Collectors.toList()), 0);
+        statistics(resultMap, CollUtil.list(false, (Iterable<Word>)TokenizerUtil.createEngine().parse(text1)).stream().map(Word::getText).collect(Collectors.toList()), true);
+        statistics(resultMap, CollUtil.list(false, (Iterable<Word>)TokenizerUtil.createEngine().parse(text2)).stream().map(Word::getText).collect(Collectors.toList()), false);
         
         calculation = new com.CommonUtils.Utils.DataTypeUtils.StringUtils.Bean.Calculation();
         Iterator<Map.Entry<String, int[]>> entries = resultMap.entrySet().iterator();
@@ -437,36 +421,43 @@ public final class StringUtil
 	
 	 /**
      * 组合词频向量
-     
+     @deprecated
      * @param words
      * @param direction
      * @return
      */
 	/**建议使用cn.hutool.core.util.StrUtil.similar*/
-	@Deprecated
-    private static void statistics(Map<String,int[]> map,List<String> words ,int direction)
+	@Deprecated(since="建议使用cn.hutool.core.util.StrUtil.similar")
+    private static void statistics(Map<String,int[]> map,List<String> words ,boolean direction)
     {
         if(CollUtil.isEmpty(words))
         { return; }
         
         int[] in = null;
-        boolean flag = direction == 1 ? true : false;     //判断不同句子
         for (String word : words)
         {
             int[] wordD = map.get(word);
             
             if(ArrayUtil.isEmpty(wordD))
             {
-                if(flag) { in = new int[]{1, 0}; }
+                if(direction) { in = new int[]{1, 0}; }
                 else { in = new int[]{0, 1}; }
                 map.put(word,in);
             }
             
             else
             {
-                if(flag) { wordD[0]++; }
+                if(direction) { wordD[0]++; }
                 else { wordD[1]++; }
             }
         }
     }
+	
+	private static class StringUtilException extends Exception
+	{
+		private static final long serialVersionUID = 672110601709299801L;
+
+		private StringUtilException(final String message)
+		{ super(message); }
+	}
 }

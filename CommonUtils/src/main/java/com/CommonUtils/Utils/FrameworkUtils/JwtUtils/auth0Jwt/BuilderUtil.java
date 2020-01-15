@@ -20,13 +20,13 @@ public final class BuilderUtil
 	public BuilderUtil(final Optional<Algorithm> algorithm)
 	{
 		this.builder = JWT.create();
-		this.algorithm = algorithm.get();
+		this.algorithm = algorithm.orElseThrow();
 	}
 	
 	public String getToken()
 	{ return this.builder.sign(this.algorithm); }
 	
-	public BuilderUtil setTokenPayload(final Map<String, Object> customPayloadClaims) throws Exception
+	public BuilderUtil setTokenPayload(final Map<String, Object> customPayloadClaims) throws BuilderUtilException
 	{
 		Iterator<Entry<String, Object>> iter = customPayloadClaims.entrySet().iterator();
 		while (iter.hasNext())
@@ -63,7 +63,7 @@ public final class BuilderUtil
 			{ this.builder.withArrayClaim(name, Convert.toLongArray(value)); }
 			
 			else 
-			{ throw new Exception("设置jwt token自定义payload的数据类型不符合要求！！！异常的数据类型为：" + value.getClass()); }
+			{ throw new BuilderUtilException("设置jwt token自定义payload的数据类型不符合要求！！！异常的数据类型为：" + value.getClass()); }
 		}
 		
 		return this;
@@ -128,5 +128,13 @@ public final class BuilderUtil
     {
     	this.builder.withJWTId(jwtId);
     	return this;
+    }
+    
+    private static class BuilderUtilException extends Exception
+    {
+		private static final long serialVersionUID = 1679883940952280151L;
+
+		private BuilderUtilException(final String message)
+    	{ super(message); }
     }
 }

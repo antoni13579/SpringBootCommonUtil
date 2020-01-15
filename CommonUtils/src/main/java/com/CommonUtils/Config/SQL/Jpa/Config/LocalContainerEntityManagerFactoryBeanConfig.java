@@ -1,8 +1,11 @@
 package com.CommonUtils.Config.SQL.Jpa.Config;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
 import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
@@ -13,21 +16,18 @@ import org.springframework.orm.jpa.persistenceunit.PersistenceUnitManager;
 import org.springframework.orm.jpa.vendor.Database;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 
-import com.CommonUtils.Utils.DataTypeUtils.CollectionUtils.CustomCollections.HashMap;
-
 /**
- * JpaProperties请用@Resource引用
- * PersistenceUnitManager请用@Autowired(required = false)引用
- * 
- * */
-/**建议使用mybatis plus*/ 
-@Deprecated
+ *PersistenceUnitManager请用@Autowired(required = false)引用
+ *JpaProperties请用@Resource引用 
+ * 建议使用mybatis plus
+ * @deprecated
+ * */ 
+@Deprecated(since="建议使用mybatis plus")
 public final class LocalContainerEntityManagerFactoryBeanConfig 
 {
 	private LocalContainerEntityManagerFactoryBeanConfig() {}
 	
-	public static LocalContainerEntityManagerFactoryBean getInstance(final JpaProperties jpaProperties,
-																	 final String packagesToScan,
+	public static LocalContainerEntityManagerFactoryBean getInstance(final String packagesToScan,
 																	 final String persistenceUnit,
 																	 final EntityManagerFactoryBuilder builder,
 																	 final DataSource dataSource)
@@ -41,10 +41,16 @@ public final class LocalContainerEntityManagerFactoryBeanConfig
 	}
 	
 	public static JpaTransactionManager getJpaTransactionManager(final LocalContainerEntityManagerFactoryBean localContainerEntityManagerFactoryBean)
-	{ return new JpaTransactionManager(localContainerEntityManagerFactoryBean.getObject()); }
+	{
+		EntityManagerFactory entityManagerFactory = localContainerEntityManagerFactoryBean.getObject();
+		return new JpaTransactionManager(Optional.ofNullable(entityManagerFactory).orElseThrow());
+	}
 	
 	public static EntityManager getEntityManager(final LocalContainerEntityManagerFactoryBean localContainerEntityManagerFactoryBean) 
-	{ return localContainerEntityManagerFactoryBean.getObject().createEntityManager(); }
+	{
+		EntityManagerFactory entityManagerFactory = localContainerEntityManagerFactoryBean.getObject();
+		return Optional.ofNullable(entityManagerFactory).orElseThrow().createEntityManager();
+	}
 	
 	public static EntityManagerFactoryBuilder getEntityManagerFactoryBuilder(final PersistenceUnitManager persistenceUnitManager, 
 																			 final JpaProperties jpaProperties,
@@ -63,15 +69,12 @@ public final class LocalContainerEntityManagerFactoryBeanConfig
 												           final JpaProperties jpaProperties,
 												           final Database database)
 	{
-		Map<String, String> properties = new HashMap<String, String>()
-				.put("hibernate.hbm2ddl.auto", "update")
-				.getMap();
+		Map<String, String> properties = new HashMap<>();
+		properties.put("hibernate.hbm2ddl.auto", "update");
 
 		jpaProperties.setShowSql(true);
 		jpaProperties.setProperties(properties);
-		//jpaProperties.setOpenInView(openInView);
 		jpaProperties.setGenerateDdl(true);
-		//jpaProperties.setDatabasePlatform(databasePlatform);
 		jpaProperties.setDatabase(database);
 		jpaProperties.determineDatabase(dataSource);
 		return jpaProperties.getProperties();

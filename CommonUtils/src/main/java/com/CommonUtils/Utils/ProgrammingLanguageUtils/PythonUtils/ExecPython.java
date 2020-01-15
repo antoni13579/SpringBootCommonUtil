@@ -19,7 +19,7 @@ public enum ExecPython
 			//获取python解释器  
 	        PythonInterpreter inter = JythonEnvironment.getInstance().getPythonInterpreter();  
 	         
-	        if (null != properties && properties.isEmpty() == false)
+	        if (null != properties && !properties.isEmpty())
 	        {
 	        	//设置python属性,python脚本中可以使用  
 	            for (Map.Entry<String,Object> entry : properties.entrySet())  
@@ -39,7 +39,7 @@ public enum ExecPython
 			//获取python解释器  
 	        PythonInterpreter inter = JythonEnvironment.getInstance().getPythonInterpreter(); 
 	        
-	        if (null != properties && properties.isEmpty() == false)
+	        if (null != properties && !properties.isEmpty())
 	        {
 	        	//设置python属性,python脚本中可以使用  
 	            for (Map.Entry<String,Object> entry : properties.entrySet())  
@@ -53,23 +53,14 @@ public enum ExecPython
 	}
 	
 	private static final class JythonEnvironment 
-	{
-		private static JythonEnvironment INSTANCE = null;
-		
+	{		
 		private JythonEnvironment() {}
 		
 		public static JythonEnvironment getInstance()
-		{
-			if (null == INSTANCE)
-			{
-				synchronized(JythonEnvironment.class)
-				{
-					if (null == INSTANCE)
-					{ INSTANCE = new JythonEnvironment(); }
-				}
-			}
-			return INSTANCE;
-		}
+		{ return JythonEnvironmentSingletonContainer.instance; }
+		
+		private static class JythonEnvironmentSingletonContainer
+		{ private static JythonEnvironment instance = new JythonEnvironment(); }
 		
 		/** 
 		 * * 获取python系统状态,可根据需要指定classloader/sys.stdin/sys.stdout等 
