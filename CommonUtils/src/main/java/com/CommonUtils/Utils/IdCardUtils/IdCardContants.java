@@ -20,7 +20,7 @@ public final class IdCardContants
 	/** 每位加权因子 */
 	protected static final int[] POWER = { 7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2 };
 	
-	protected static final Map<Integer, String> CITY_CODES = new HashMap<>();
+	public static final Map<Integer, String> CITY_CODES = new HashMap<>();
 	
 	static
 	{

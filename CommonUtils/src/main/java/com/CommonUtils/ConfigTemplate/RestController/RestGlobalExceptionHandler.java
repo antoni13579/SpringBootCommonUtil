@@ -23,13 +23,13 @@ public class RestGlobalExceptionHandler
     	if (cause instanceof SizeLimitExceededException)
     	{
     		SizeLimitExceededException flEx = (SizeLimitExceededException) cause; 
-    		float permittedSize = (flEx.getPermittedSize() / 1024 / 1024) * 1.0; 
+    		float permittedSize = (flEx.getPermittedSize() / 1024 / 1024) * 1.0F; 
     		message = "single request max size exceeds "+permittedSize+"MB"; 
     	} 
     	else if (cause instanceof FileSizeLimitExceededException)
     	{ 
     		FileSizeLimitExceededException flEx = (FileSizeLimitExceededException)mEx.getCause().getCause(); 
-    		float permittedSize = (flEx.getPermittedSize() / 1024 / 1024) * 1.0; 
+    		float permittedSize = (flEx.getPermittedSize() / 1024 / 1024) * 1.0F; 
     		message = "single file max size exceeds "+permittedSize+"MB"; 
     	}
     	else { message = "Please contact your administrator: " + ex.getMessage(); } 
