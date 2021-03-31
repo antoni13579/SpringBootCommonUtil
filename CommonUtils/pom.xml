@@ -47,7 +47,7 @@
 		<hutool.version>5.0.6</hutool.version>
 		<ikanalyzer.version>2012_u6</ikanalyzer.version>
 		<swagger.version>2.9.2</swagger.version>
-		<guava.version>28.0-jre</guava.version>
+		<guava.version>29.0-jre</guava.version>
 		<shiro.version>1.4.0</shiro.version>
 		<mybatisplus.version>3.2.0</mybatisplus.version>
 		<mybatisplus.dynamic-datasource.version>2.5.6</mybatisplus.dynamic-datasource.version>
