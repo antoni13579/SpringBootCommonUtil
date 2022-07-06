@@ -29,7 +29,7 @@
 		<opencsv.version>4.2</opencsv.version>
 		<poi.ooxml.version>3.17</poi.ooxml.version>
 		<kettle.version>7.1.0.0-12</kettle.version>
-		<jython.version>2.7.0</jython.version>
+		<jython.version>2.7.2</jython.version>
 		<curator-framework.version>4.2.0</curator-framework.version>
 		<commons-collections4.version>4.1</commons-collections4.version>
 		<luaj-jse.version>3.0.1</luaj-jse.version>
